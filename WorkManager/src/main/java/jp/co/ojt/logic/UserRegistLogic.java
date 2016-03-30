@@ -3,6 +3,7 @@ package jp.co.ojt.logic;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.ojt.common.util.PropertyUtils;
 import jp.co.ojt.model.User;
 
 public class UserRegistLogic {
@@ -12,13 +13,12 @@ public class UserRegistLogic {
 	public void register(User user) {
 
 		logger.info("DB登録処理");
-	}
 
-	public int createUserId() {
-		
-		logger.info("ユーザIDを生成");
+		String url = PropertyUtils.getValue("url");
+		logger.info("プロパティからの取得:" + url);
 
-		return 0;
+		// try(DriverManager.getConnection(url, user, password))
+
 	}
 
 }

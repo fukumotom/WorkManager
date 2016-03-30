@@ -8,5 +8,6 @@
 	</head>
 	<body>
 		<h1>ユーザ登録が完了しました！</h1>
+		<a href="/WorkManager/Menu">戻る</a>
 	</body>
 </html>

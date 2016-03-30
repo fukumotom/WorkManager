@@ -30,12 +30,12 @@ public class UserRegister extends HttpServlet {
 
 		String param = request.getParameter("action");
 		logger.info("取得したacion:{}", param);
-		
+
 		if (param == null) {
 			// ユーザ新規登録ボタン押下時
 			forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
 
-		} else if (param.equals("confirm")) {
+		} else if ("confirm".equals(param)) {
 			// 登録確認画面から登録ボタン押下時
 			HttpSession session = request.getSession();
 
@@ -64,14 +64,11 @@ public class UserRegister extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
-		// 登録情報取得
-		String name = (String) request.getParameter("userName");
-
+		// 登録情報設定
 		User user = new User();
-		// ユーザID作成
-		UserRegistLogic logic = new UserRegistLogic();
-		user.setUserId(logic.createUserId());
-		user.setUserName(name);
+		user.setUserName(request.getParameter("userName"));
+		// TODO 暗号化
+		user.setPassword(request.getParameter("password"));
 
 		// セッションに入力した名前を保存
 		HttpSession session = request.getSession();

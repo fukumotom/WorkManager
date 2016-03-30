@@ -1,0 +1,46 @@
+package jp.co.ojt.common.util;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.gaffer.PropertyUtil;
+
+public class PropertyUtils {
+
+	private static Properties prop = new Properties();
+
+	private static Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
+
+	private PropertyUtils() {
+
+		// singleton
+	}
+
+	/**
+	 * プロパティファイルの読み込み
+	 */
+	public static void load() {
+
+		try (InputStream iStream = PropertyUtil.class.getClassLoader().getResourceAsStream("postgres.properties");) {
+			prop.load(iStream);
+		} catch (IOException e) {
+			logger.error("プロパティファイル読み込み失敗", e);
+		}
+	}
+
+	/**
+	 * 独自プロパティからの値取得
+	 * 
+	 * @param key
+	 *            取得する値のkey
+	 * @return 取得する値
+	 */
+	public static String getValue(String key) {
+		return prop.getProperty(key);
+	}
+
+}
