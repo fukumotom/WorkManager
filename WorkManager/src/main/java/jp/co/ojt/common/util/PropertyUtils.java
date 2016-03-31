@@ -7,9 +7,9 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.classic.gaffer.PropertyUtil;
-
 public class PropertyUtils {
+
+	private static PropertyUtils propertyUtils = null;
 
 	private static Properties prop = new Properties();
 
@@ -20,16 +20,29 @@ public class PropertyUtils {
 		// singleton
 	}
 
+	public void loadProperty() {
+
+		try (InputStream iStream = PropertyUtils.class.getClassLoader().getResourceAsStream("postgres.properties");) {
+			prop.load(iStream);
+		} catch (IOException e) {
+			logger.error("プロパティファイル読み込み失敗", e);
+		}
+	}
+
 	/**
 	 * プロパティファイルの読み込み
 	 */
 	public static void load() {
 
-		try (InputStream iStream = PropertyUtil.class.getClassLoader().getResourceAsStream("postgres.properties");) {
-			prop.load(iStream);
-		} catch (IOException e) {
-			logger.error("プロパティファイル読み込み失敗", e);
+		if (propertyUtils == null) {
+			propertyUtils = new PropertyUtils();
+			propertyUtils.loadProperty();
 		}
+
+	}
+
+	public String getProperty(String key) {
+		return prop.getProperty(key);
 	}
 
 	/**
@@ -40,7 +53,11 @@ public class PropertyUtils {
 	 * @return 取得する値
 	 */
 	public static String getValue(String key) {
-		return prop.getProperty(key);
+
+		if (propertyUtils == null) {
+			return null;
+		}
+		return propertyUtils.getProperty(key);
 	}
 
 }

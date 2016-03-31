@@ -8,7 +8,7 @@ import jp.co.ojt.model.User;
 
 public class UserRegistLogic {
 
-	protected static Logger logger = LoggerFactory.getLogger(UserRegistLogic.class);
+	private static Logger logger = LoggerFactory.getLogger(UserRegistLogic.class);
 
 	public void register(User user) {
 

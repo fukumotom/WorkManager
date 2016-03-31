@@ -5,6 +5,7 @@
 		<encoder>
 			<pattern>%d{yyyy/MM/dd HH:mm:ss} %-5level %m%n</pattern>
 		</encoder>
+		<charset>Shift-JIS</charset>
 	</appender>
 
 	<root>

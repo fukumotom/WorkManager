@@ -2,20 +2,17 @@ package jp.co.ojt.logic;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import javax.servlet.annotation.WebListener;
 
 import jp.co.ojt.common.util.PropertyUtils;
 
+@WebListener
 public class InitialListener implements ServletContextListener {
-	private static Logger logger = LoggerFactory.getLogger(InitialListener.class);
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		// プロパティファイルのロード
 		PropertyUtils.load();
-		logger.info("★★★初期処理終了");
 	}
 
 	@Override

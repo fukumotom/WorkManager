@@ -13,13 +13,14 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.ojt.common.util.EncryptionUtils;
 import jp.co.ojt.logic.UserRegistLogic;
 import jp.co.ojt.model.User;
 
 @WebServlet("/RegisterForm")
 public class UserRegister extends HttpServlet {
 
-	protected Logger logger = LoggerFactory.getLogger(UserRegister.class);
+	private static Logger logger = LoggerFactory.getLogger(UserRegister.class);
 
 	private static final long serialVersionUID = 1L;
 
@@ -29,7 +30,6 @@ public class UserRegister extends HttpServlet {
 		String forwardPath = null;
 
 		String param = request.getParameter("action");
-		logger.info("取得したacion:{}", param);
 
 		if (param == null) {
 			// ユーザ新規登録ボタン押下時
@@ -67,8 +67,10 @@ public class UserRegister extends HttpServlet {
 		// 登録情報設定
 		User user = new User();
 		user.setUserName(request.getParameter("userName"));
-		// TODO 暗号化
-		user.setPassword(request.getParameter("password"));
+		// 暗号化
+		String plainPassword = request.getParameter("password");
+		String encPassword = EncryptionUtils.getEncPassword(plainPassword);
+		user.setPassword(encPassword);
 
 		// セッションに入力した名前を保存
 		HttpSession session = request.getSession();

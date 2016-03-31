@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 public class MenuServlet extends HttpServlet {
 
-	protected static Logger logger = LoggerFactory.getLogger(MenuServlet.class);
+	private static Logger logger = LoggerFactory.getLogger(MenuServlet.class);
 
 	private static final long serialVersionUID = -1971958283532858214L;
 
