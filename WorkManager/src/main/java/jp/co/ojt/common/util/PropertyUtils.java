@@ -7,11 +7,16 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * プロパティファイル読み込み用クラス.
+ * アプリ起動時にリスナーより呼び出される.
+ *
+ */
 public class PropertyUtils {
 
 	private static PropertyUtils propertyUtils = null;
 
-	private static Properties prop = new Properties();
+	private Properties prop = new Properties();
 
 	private static Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
 
