@@ -10,9 +10,6 @@
 	<body>
 		<table>
 			<tr>
-				<td>ユーザID(自動採番)：</td><td><%=user.getUserId() %></td>
-			</tr>
-			<tr>
 				<td>ユーザ名：</td><td><%=user.getUserName() %></td>
 			</tr>
 			<tr>

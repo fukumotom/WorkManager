@@ -9,17 +9,16 @@
 		<title>メニュー画面</title>
 	</head>
 	<body>
+		<a style="text-align : right" href="/WorkManager/Logout">ログアウト</a>
+	
 		<h1>メニュー</h1>
 		<p>ようこそ！ <%=name %> さん</p>
 		
-		<form method="get" action="/WorkManager/Logout">
-			<input type="submit" value="ログアウト">
-		</form>
 		
-		<form method="get" action="/WorkManager/Logout">
+		<form method="get" action="/WorkManager/WorkRegister">
 			<input type="submit" value="作業登録/終了">
 		</form>
-		
+		<br/>
 		<form method="get" action="/WorkManager/Logout">
 			<input type="submit" value="作業リスト">
 		</form>

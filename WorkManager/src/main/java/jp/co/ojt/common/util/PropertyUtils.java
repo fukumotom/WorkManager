@@ -27,7 +27,7 @@ public class PropertyUtils {
 
 	public void loadProperty() {
 
-		try (InputStream iStream = PropertyUtils.class.getClassLoader().getResourceAsStream("postgres.properties");) {
+		try (InputStream iStream = PropertyUtils.class.getClassLoader().getResourceAsStream("messages.properties");) {
 			prop.load(iStream);
 		} catch (IOException e) {
 			logger.error("プロパティファイル読み込み失敗", e);
