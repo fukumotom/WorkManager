@@ -3,7 +3,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8" >
-		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/css/style.css" >
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/app/css/styles.css" >
 		<title>ユーザ登録フォーム</title>
 	</head>
 	<body>
