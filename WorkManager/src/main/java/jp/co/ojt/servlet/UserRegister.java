@@ -14,7 +14,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.co.ojt.common.exception.BusinessException;
 import jp.co.ojt.common.util.EncryptionUtils;
 import jp.co.ojt.common.util.InputValidation;
 import jp.co.ojt.common.util.ValidationResult;
@@ -40,16 +39,14 @@ public class UserRegister extends HttpServlet {
 			forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
 
 		} else if ("confirm".equals(param)) {
-			
+
 			// 更新前入力チェック
 			ArrayList<ValidationResult> checkList = validation(request);
 			for (ValidationResult check : checkList) {
 				if (!check.isCheckResult()) {
-					// エラーがある場合、エラーページへ
-					throw new BusinessException();
 				}
 			}
-			
+
 			// 登録確認画面から登録ボタン押下時
 			HttpSession session = request.getSession();
 

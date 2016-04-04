@@ -7,15 +7,6 @@
 
 	<!-- =============================== sample ▼▼▼ =============================== -->
 	<servlet>
-		<servlet-name>dispatcherServlet</servlet-name>
-		<servlet-class>jp.co.ojt.servlet.TaskFowardServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>dispatcherServlet</servlet-name>
-		<url-pattern>/TaskFowardServlet</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
 		<servlet-name>dispatcherServlet_re</servlet-name>
 		<servlet-class>jp.co.ojt.servlet.TaskRedirectServlet</servlet-class>
 	</servlet>
@@ -24,45 +15,7 @@
 		<url-pattern>/TaskRedirectServlet</url-pattern>
 	</servlet-mapping>
 
-
-	<servlet>
-		<servlet-name>dispatcherServlet_re2</servlet-name>
-		<servlet-class>jp.co.ojt.servlet.SampleServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>dispatcherServlet_re2</servlet-name>
-		<url-pattern>/SampleServlet</url-pattern>
-	</servlet-mapping>
-
 	<!-- =============================== sample ▲▲▲ =============================== -->
-
-	<servlet>
-		<servlet-name>menuServlet</servlet-name>
-		<servlet-class>jp.co.ojt.servlet.MenuServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>menuServlet</servlet-name>
-		<url-pattern>/Menu</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>logoutServlet</servlet-name>
-		<servlet-class>jp.co.ojt.servlet.LogoutServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>logoutServlet</servlet-name>
-		<url-pattern>/Logout</url-pattern>
-	</servlet-mapping>
-
-	<!-- ユーザ新規登録機能 -->
-<!-- 	<servlet> -->
-<!-- 		<servlet-name>registerFormServlet</servlet-name> -->
-<!-- 		<servlet-class>jp.co.ojt.servlet.RegisterFormServlet</servlet-class> -->
-<!-- 	</servlet> -->
-<!-- 	<servlet-mapping> -->
-<!-- 		<servlet-name>registerFormServlet</servlet-name> -->
-<!-- 		<url-pattern>/RegisterForm</url-pattern> -->
-<!-- 	</servlet-mapping> -->
 
 	<!-- 認証範囲 -->
 	<security-constraint>
@@ -84,7 +37,8 @@
 	</security-constraint>
 	<security-constraint>
 		<web-resource-collection>
-			<web-resource-name>Authentication of FormAuth</web-resource-name>
+			<web-resource-name>All user permission</web-resource-name>
+			<url-pattern>/RegisterForm/*</url-pattern>
 			<url-pattern>/RegisterForm/*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
