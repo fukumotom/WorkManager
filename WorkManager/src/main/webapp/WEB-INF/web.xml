@@ -40,12 +40,19 @@
 			<web-resource-name>All user permission</web-resource-name>
 			<url-pattern>/RegisterForm/*</url-pattern>
 			<url-pattern>/resources/*</url-pattern>
+			<url-pattern>/Error/*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 
 	<security-role>
 		<role-name>admin</role-name>
 	</security-role>
+	
+	<!-- エラー定義 -->
+	<error-page>
+		<exception-type>javax.servlet.ServletException</exception-type>
+		<location>/WEB-INF/jsp/error/error.jsp</location>
+	</error-page>
 
 	<!-- form認証設定 -->
 	<login-config>

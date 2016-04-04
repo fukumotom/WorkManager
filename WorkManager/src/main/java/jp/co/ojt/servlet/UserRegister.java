@@ -28,7 +28,7 @@ public class UserRegister extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
 
 		String forwardPath = null;
 
@@ -40,12 +40,13 @@ public class UserRegister extends HttpServlet {
 
 		} else if ("confirm".equals(param)) {
 
-			// 更新前入力チェック
-			ArrayList<ValidationResult> checkList = validation(request);
-			for (ValidationResult check : checkList) {
-				if (!check.isCheckResult()) {
-				}
-			}
+			// 更新前入力チェック TODO
+//			ArrayList<ValidationResult> checkList = validation(request);
+//			for (ValidationResult check : checkList) {
+//				if (!check.isCheckResult()) {
+//					throw new BusinessException("");
+//				}
+//			}
 
 			// 登録確認画面から登録ボタン押下時
 			HttpSession session = request.getSession();
@@ -63,6 +64,9 @@ public class UserRegister extends HttpServlet {
 			forwardPath = "/WEB-INF/jsp/user/userRegistComplete.jsp";
 
 		}
+
+//		logger.info("サーブレット例外発生");
+//		throw new ServletException();
 
 		RequestDispatcher dispacher = request.getRequestDispatcher(forwardPath);
 		try {
