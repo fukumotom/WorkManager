@@ -39,7 +39,7 @@
 		<web-resource-collection>
 			<web-resource-name>All user permission</web-resource-name>
 			<url-pattern>/RegisterForm/*</url-pattern>
-			<url-pattern>/RegisterForm/*</url-pattern>
+			<url-pattern>/resources/*</url-pattern>
 		</web-resource-collection>
 	</security-constraint>
 
