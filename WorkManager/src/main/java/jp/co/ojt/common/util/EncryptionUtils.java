@@ -10,6 +10,10 @@ public class EncryptionUtils {
 
 	private static Logger logger = LoggerFactory.getLogger(EncryptionUtils.class);
 
+	private EncryptionUtils() {
+
+	}
+
 	public static String getEncPassword(String plainPassword) {
 
 		return getSHA256(plainPassword);
@@ -19,7 +23,7 @@ public class EncryptionUtils {
 	private static String getSHA256(String target) {
 
 		MessageDigest md;
-		StringBuffer buf = new StringBuffer();
+		StringBuilder buf = new StringBuilder();
 
 		try {
 			md = MessageDigest.getInstance("SHA-256");
