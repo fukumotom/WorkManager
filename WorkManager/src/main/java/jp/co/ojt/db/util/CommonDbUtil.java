@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -38,10 +38,15 @@ public class CommonDbUtil {
 		StringBuilder builder = new StringBuilder();
 		try (InputStreamReader reader = new InputStreamReader(iStream);
 				BufferedReader bufReader = new BufferedReader(reader);) {
-			String line = null;
-			while ((line = bufReader.readLine()) != null) {
+
+			while (true) {
+				String line = bufReader.readLine();
+				if (line == null) {
+					break;
+				}
 				builder.append(line);
 			}
+
 		} catch (IOException e) {
 			logger.error("SQLファイル読み込み失敗", e);
 		}
@@ -52,14 +57,16 @@ public class CommonDbUtil {
 	 * @param sql
 	 * @param paramList
 	 */
-	public static void insertDB(String sql, ArrayList<String> paramList) {
+	public static void insertDB(String sql, List<String> paramList) {
 
+		Connection con = null;
+		PreparedStatement pstm = null;
 		try {
 			Context context = new InitialContext();
 			DataSource ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
-			Connection con = ds.getConnection();
+			con = ds.getConnection();
 
-			PreparedStatement pstm = con.prepareStatement(sql);
+			pstm = con.prepareStatement(sql);
 
 			// parameter join
 			for (int index = 1; index < paramList.size() + 1; index++) {
@@ -71,6 +78,21 @@ public class CommonDbUtil {
 
 		} catch (NamingException | SQLException e) {
 			logger.error("DB接続失敗", e);
+		} finally {
+			if (con != null) {
+				try {
+					con.close();
+				} catch (SQLException e) {
+					logger.warn("コネクション削除失敗", e);
+				}
+			}
+			if (pstm != null) {
+				try {
+					pstm.close();
+				} catch (SQLException e) {
+					logger.warn("PreparedStatement削除失敗", e);
+				}
+			}
 		}
 	}
 }

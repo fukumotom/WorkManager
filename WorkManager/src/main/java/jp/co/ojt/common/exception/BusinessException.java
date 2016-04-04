@@ -14,11 +14,11 @@ public class BusinessException extends RuntimeException {
 
 	private static Logger logger = LoggerFactory.getLogger(BusinessException.class);
 
-	public void Businessexce(String msg) {
+	public BusinessException(String msg) {
 		logger.error(msg);
 	}
 
-	public void Businessexce(Exception e) {
+	public BusinessException(Exception e) {
 		logger.error("業務エラー", e);
 	}
 
