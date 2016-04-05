@@ -18,7 +18,7 @@ public class PropertyUtils {
 
 	private Properties prop = new Properties();
 
-	private static Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
 
 	private PropertyUtils() {
 

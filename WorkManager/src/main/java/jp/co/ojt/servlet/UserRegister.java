@@ -23,7 +23,7 @@ import jp.co.ojt.model.User;
 @WebServlet("/RegisterForm")
 public class UserRegister extends HttpServlet {
 
-	private static Logger logger = LoggerFactory.getLogger(UserRegister.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserRegister.class);
 
 	private static final long serialVersionUID = 1L;
 

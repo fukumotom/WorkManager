@@ -21,7 +21,10 @@ public class CommonDbUtil {
 
 	private static ClassLoader classLoader = CommonDbUtil.class.getClassLoader();
 
-	private static Logger logger = LoggerFactory.getLogger(CommonDbUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(CommonDbUtil.class);
+
+	private CommonDbUtil() {
+	}
 
 	/**
 	 * SQLファイル読み込み

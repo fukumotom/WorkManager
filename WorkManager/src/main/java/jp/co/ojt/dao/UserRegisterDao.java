@@ -10,7 +10,7 @@ import jp.co.ojt.db.util.CommonDbUtil;
 
 public class UserRegisterDao {
 	
-	private static Logger logger = LoggerFactory.getLogger(UserRegisterDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserRegisterDao.class);
 
 	public void insert(UsersDto dto) {
 

@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 @WebServlet("/Logout")
 public class LogoutServlet extends HttpServlet {
 
-	private static Logger logger = LoggerFactory.getLogger(LogoutServlet.class);
+	private static final Logger logger = LoggerFactory.getLogger(LogoutServlet.class);
 
 	private static final long serialVersionUID = -1971958283532858214L;
 

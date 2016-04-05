@@ -12,7 +12,7 @@ public class BusinessException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	private static Logger logger = LoggerFactory.getLogger(BusinessException.class);
+	private static final Logger logger = LoggerFactory.getLogger(BusinessException.class);
 
 	public BusinessException(String msg) {
 		logger.error(msg);

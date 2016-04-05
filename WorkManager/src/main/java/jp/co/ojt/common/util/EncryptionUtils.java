@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 public class EncryptionUtils {
 
-	private static Logger logger = LoggerFactory.getLogger(EncryptionUtils.class);
+	private static final Logger logger = LoggerFactory.getLogger(EncryptionUtils.class);
 
 	private EncryptionUtils() {
 
