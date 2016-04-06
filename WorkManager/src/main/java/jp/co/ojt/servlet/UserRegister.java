@@ -41,12 +41,12 @@ public class UserRegister extends HttpServlet {
 		} else if ("confirm".equals(param)) {
 
 			// 更新前入力チェック TODO
-//			ArrayList<ValidationResult> checkList = validation(request);
-//			for (ValidationResult check : checkList) {
-//				if (!check.isCheckResult()) {
-//					throw new BusinessException("");
-//				}
-//			}
+			// ArrayList<ValidationResult> checkList = validation(request);
+			// for (ValidationResult check : checkList) {
+			// if (!check.isCheckResult()) {
+			// throw new BusinessException("");
+			// }
+			// }
 
 			// 登録確認画面から登録ボタン押下時
 			HttpSession session = request.getSession();
@@ -64,9 +64,6 @@ public class UserRegister extends HttpServlet {
 			forwardPath = "/WEB-INF/jsp/user/userRegistComplete.jsp";
 
 		}
-
-//		logger.info("サーブレット例外発生");
-//		throw new ServletException();
 
 		RequestDispatcher dispacher = request.getRequestDispatcher(forwardPath);
 		try {

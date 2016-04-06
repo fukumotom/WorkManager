@@ -2,7 +2,7 @@ package jp.co.ojt.common.util;
 
 public class MsgCodeDef {
 
-	public MsgCodeDef() {
+	private MsgCodeDef() {
 	}
 
 	public static final String CONFIRM_ERROR = "e.validation.001";

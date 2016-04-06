@@ -4,9 +4,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InputValidation {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(InputValidation.class);
 
+	private InputValidation() {
+
+	}
 
 	/**
 	 * data size check
@@ -20,9 +23,9 @@ public class InputValidation {
 	 * @return
 	 */
 	public static ValidationResult inputSize(String target, int min, int max) {
-		
+
 		ValidationResult result = new ValidationResult();
-		
+
 		logger.info("チェックする文字列：{}", target);
 
 		if ((target.length() <= max) && (target.length() >= min)) {
