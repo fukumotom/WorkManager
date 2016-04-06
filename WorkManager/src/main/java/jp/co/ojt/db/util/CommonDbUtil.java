@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.Context;
@@ -16,6 +17,8 @@ import javax.sql.DataSource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jp.co.ojt.dao.dto.WorkDto;
 
 public class CommonDbUtil {
 
@@ -48,11 +51,13 @@ public class CommonDbUtil {
 					break;
 				}
 				builder.append(line);
+				builder.append("\n");
 			}
 
 		} catch (IOException e) {
 			logger.error("SQLファイル読み込み失敗", e);
 		}
+		logger.info("発行SQL：{}", builder.toString());
 		return builder.toString();
 	}
 
@@ -60,42 +65,64 @@ public class CommonDbUtil {
 	 * @param sql
 	 * @param paramList
 	 */
-	public static void insertDB(String sql, List<String> paramList) {
+	public static void insertDB(String sql, List<?> paramList) {
 
-		Connection con = null;
-		PreparedStatement pstm = null;
-		try {
-			Context context = new InitialContext();
-			DataSource ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
-			con = ds.getConnection();
-
-			pstm = con.prepareStatement(sql);
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			// parameter join
-			for (int index = 1; index < paramList.size() + 1; index++) {
-				pstm.setString(index, paramList.get(index - 1));
-			}
+			// bindParam(pstm, paramList);
 
 			int resultCnt = pstm.executeUpdate();
 			logger.info("{}件登録", resultCnt);
 
-		} catch (NamingException | SQLException e) {
+		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
-		} finally {
-			if (con != null) {
-				try {
-					con.close();
-				} catch (SQLException e) {
-					logger.warn("コネクション削除失敗", e);
-				}
-			}
-			if (pstm != null) {
-				try {
-					pstm.close();
-				} catch (SQLException e) {
-					logger.warn("PreparedStatement削除失敗", e);
-				}
-			}
 		}
 	}
+
+	public static ArrayList<WorkDto> findAllWork(String sql, WorkDto dto) {
+
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+
+			// createParam
+			ArrayList<Object> paramList = new ArrayList<>();
+			paramList.add(0, dto.getUserName());
+
+		} catch (SQLException e) {
+			logger.error("DB接続失敗", e);
+		}
+
+		return null;
+	}
+
+	// TODO
+	// private static ArrayList<Object> bindParam(PreparedStatement pstm,
+	// WorkDto dto) throws SQLException {
+	//
+	// int index = 1;
+	// if (dto.getUserName() != null) {
+	// pstm.setString(index, dto.getUserName());
+	// index++;
+	// } else if (dto.getId() != 0) {
+	// pstm.setInt(index, dto.getId() );
+	// index++;
+	// } else if (dto.) {
+	// pstm.setTime(index, (Date)obj);(index, (int) obj);
+	// }
+	// }
+
+	private static DataSource lookup() {
+
+		DataSource ds = null;
+		try {
+			Context context = new InitialContext();
+			ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
+		} catch (NamingException e) {
+			logger.error("JNDI接続エラー:{}", e);
+		}
+		return ds;
+	}
+
 }

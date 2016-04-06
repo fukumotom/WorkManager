@@ -19,7 +19,7 @@
 			<input type="submit" value="作業登録/終了">
 		</form>
 		<br/>
-		<form method="get" action="/WorkManager/Logout">
+		<form method="get" action="/WorkManager/WorkList">
 			<input type="submit" value="作業リスト">
 		</form>
 	</body>

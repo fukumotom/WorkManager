@@ -16,14 +16,12 @@ public class UserRegisterDao {
 
 		// load SQLsentence
 		String[] sqls = new String[2];
-		sqls[0] = CommonDbUtil.readSql("i_users.sql");
+		sqls[0] = CommonDbUtil.readSql("registUser.sql");
 		sqls[1] = CommonDbUtil.readSql("i_role.sql");
 		
-		logger.info("読みこんだSQL:{}", sqls[0]);
-		logger.info("読みこんだSQL:{}", sqls[1]);
-
-		
 		// create sql parameter
+//		createParam(dto);
+		
 		ArrayList<String> usersParamList = new ArrayList<>();
 		usersParamList.add(dto.getUserName());
 		usersParamList.add(dto.getPassword());
