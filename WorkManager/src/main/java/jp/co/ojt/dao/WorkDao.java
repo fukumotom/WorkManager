@@ -22,13 +22,13 @@ public class WorkDao {
 	public ArrayList<Work> findAllWork(Work work) {
 
 		// load sqlFile
-		String sql = CommonDbUtil.readSql("getWorkList.sql");
+		StringBuilder sql = CommonDbUtil.readSql("getWorkList.sql");
 
 		WorkDto dto = mappingModelToDto(work);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		ArrayList<WorkDto> dtoList = CommonDbUtil.findAllWork(sql, dto);
+		ArrayList<WorkDto> dtoList = CommonDbUtil.findAllWork(sql.toString(), paramMap);
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
@@ -39,46 +39,25 @@ public class WorkDao {
 		return workList;
 	}
 
-	private HashMap<Integer, Object> createParamMap(String sql, WorkDto dto) {
+	private HashMap<Integer, Object> createParamMap(StringBuilder sql, WorkDto dto) {
 
 		HashMap<String, Object> dtoMap = createDtoMap(dto);
 
-		HashMap<Integer, String> sqlParamMap = createSqlMap(sql);
+		HashMap<String, Integer> sqlParamMap = CommonDbUtil.createSqlMap(sql);
 
 		HashMap<Integer, Object> paramMap = new HashMap<>();
+
 		for (String fieldName : dtoMap.keySet()) {
 
-			for (Integer index : sqlParamMap.keySet()) {
-
+			for (String paramName : sqlParamMap.keySet()) {
+				if (fieldName.equals(paramName)) {
+					paramMap.put(sqlParamMap.get(paramName), dtoMap.get(fieldName));
+				}
 			}
-
 		}
 
 		return paramMap;
 
-	}
-
-	private HashMap<Integer, String> createSqlMap(String sql) {
-		// sql文の動的パラメータとパラメータの順番のMapを作成
-		String regex = "${([a-zA-Z\\d]*)}))";
-		Pattern ptm = Pattern.compile(regex);
-
-		// SQL文からパラメータ代入箇所を取得
-		HashMap<Integer, String> sqlParamMap = new HashMap<>();
-		Matcher mat = ptm.matcher(sql);
-		if (mat.find()) {
-			int groupId = 1;
-
-			String sqlParam = mat.group(groupId);
-
-			sqlParamMap.put(groupId, sqlParam);
-
-		}
-
-		for (Integer key : sqlParamMap.keySet()) {
-			logger.info("Map内容[{}]:{}", key, sqlParamMap.get(key));
-		}
-		return sqlParamMap;
 	}
 
 	private HashMap<String, Object> createDtoMap(WorkDto dto) {

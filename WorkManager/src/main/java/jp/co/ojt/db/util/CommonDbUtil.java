@@ -6,9 +6,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -36,7 +41,7 @@ public class CommonDbUtil {
 	 *            SQLファイル名
 	 * @return 読みこんだSQL文
 	 */
-	public static String readSql(String sqlName) {
+	public static StringBuilder readSql(String sqlName) {
 
 		// sqlファイル読みこみ
 		InputStream iStream = classLoader.getResourceAsStream("/sql/" + sqlName);
@@ -57,21 +62,54 @@ public class CommonDbUtil {
 		} catch (IOException e) {
 			logger.error("SQLファイル読み込み失敗", e);
 		}
-		logger.info("発行SQL：{}", builder.toString());
-		return builder.toString();
+		logger.info("読み込みSQL：{}", builder.toString());
+		return builder;
+	}
+
+	/**
+	 * sql文からパラメータ用Map作成
+	 * 
+	 * @param sql
+	 * @return
+	 */
+	public static HashMap<String, Integer> createSqlMap(StringBuilder sql) {
+		// sql文の動的パラメータとパラメータの順番のMapを作成
+		String regex = "\\$\\{([a-zA-Z\\d]*)\\}";
+		Pattern ptm = Pattern.compile(regex);
+
+		// SQL文からパラメータ代入箇所を取得
+		HashMap<String, Integer> sqlParamMap = new HashMap<>();
+		Matcher mat = ptm.matcher(sql);
+		int index = 0;
+		while (mat.find()) {
+			index++;
+			String sqlParam = mat.group(1);
+
+			sqlParamMap.put(sqlParam, index);
+		}
+		String convertQuery = mat.replaceAll("?");
+		// クエリに置換
+		sql.replace(0, sql.length(), convertQuery);
+
+		for (String key : sqlParamMap.keySet()) {
+			logger.info("Map内容[{}]:{}", key, sqlParamMap.get(key));
+		}
+		return sqlParamMap;
 	}
 
 	/**
 	 * @param sql
-	 * @param paramList
+	 * @param paramMap
 	 */
-	public static void insertDB(String sql, List<?> paramList) {
+	public static void insertUsers(String sql, HashMap<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
 
+			logger.info("発行SQL:{}", sql);
+
 			// parameter join
-			// bindParam(pstm, paramList);
+			bindParam(pstm, paramMap);
 
 			int resultCnt = pstm.executeUpdate();
 			logger.info("{}件登録", resultCnt);
@@ -81,37 +119,48 @@ public class CommonDbUtil {
 		}
 	}
 
-	public static ArrayList<WorkDto> findAllWork(String sql, WorkDto dto) {
+	public static ArrayList<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) {
+
+		ArrayList<WorkDto> dtoList = new ArrayList<>();
 
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
 
-			// createParam
-			ArrayList<Object> paramList = new ArrayList<>();
-			paramList.add(0, dto.getUserName());
+			logger.info("発行SQL:{}", sql);
+
+			// bindParam
+			bindParam(pstm, paramMap);
+
+			ResultSet result = pstm.executeQuery();
+
+			while (result.next()) {
+				dtoList.add(getWorkresult(result));
+			}
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
 		}
 
-		return null;
+		return dtoList;
 	}
 
-	// TODO
-	// private static ArrayList<Object> bindParam(PreparedStatement pstm,
-	// WorkDto dto) throws SQLException {
-	//
-	// int index = 1;
-	// if (dto.getUserName() != null) {
-	// pstm.setString(index, dto.getUserName());
-	// index++;
-	// } else if (dto.getId() != 0) {
-	// pstm.setInt(index, dto.getId() );
-	// index++;
-	// } else if (dto.) {
-	// pstm.setTime(index, (Date)obj);(index, (int) obj);
-	// }
-	// }
+	private static void bindParam(PreparedStatement pstm, HashMap<Integer, Object> paramMap) throws SQLException {
+
+		for (Integer parameterIndex : paramMap.keySet()) {
+
+			Object value = paramMap.get(parameterIndex);
+
+			if (value instanceof String) {
+				pstm.setString(parameterIndex, (String) value);
+			} else if (value instanceof Integer) {
+				pstm.setInt(parameterIndex, ((Integer) value).intValue());
+			} else if (value instanceof Date) {
+				pstm.setTime(parameterIndex, (Time) value);
+			} else {
+				pstm.setObject(parameterIndex, value.toString());
+			}
+		}
+	}
 
 	private static DataSource lookup() {
 
@@ -125,4 +174,15 @@ public class CommonDbUtil {
 		return ds;
 	}
 
+	private static WorkDto getWorkresult(ResultSet result) throws SQLException {
+
+		WorkDto dto = new WorkDto();
+		dto.setId((Integer) (result.getObject("id")));
+		dto.setStartTime(result.getTime("startTime"));
+		dto.setEndTime(result.getTime("endTime"));
+		dto.setWorkingTime(result.getTime("workingTime"));
+		dto.setContents(result.getString("contents"));
+		dto.setNote(result.getString("note"));
+		return dto;
+	}
 }

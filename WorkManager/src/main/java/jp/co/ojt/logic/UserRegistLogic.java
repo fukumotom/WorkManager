@@ -15,14 +15,9 @@ public class UserRegistLogic {
 
 		logger.info("DB登録処理");
 
-		// 登録情報を設定
-		UsersDto dto = new UsersDto();
-		dto.setUserName(user.getUserName());
-		dto.setPassword(user.getPassword());
-
 		// DB更新
 		UserRegisterDao dao = new UserRegisterDao();
-		dao.insert(dto);
+		dao.insertUsers(user);
 	}
 
 }

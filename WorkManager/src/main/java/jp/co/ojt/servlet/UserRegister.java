@@ -78,15 +78,15 @@ public class UserRegister extends HttpServlet {
 
 		String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
 
-		// 入力チェック
-		ArrayList<ValidationResult> checkList = validation(request);
-		for (ValidationResult check : checkList) {
-			if (!check.isCheckResult()) {
-				// 入力チェックがある場合、入力フォームを再表示
-				forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
-				break;
-			}
-		}
+		// 入力チェック  TODO 開発中はコメントアウト
+//		ArrayList<ValidationResult> checkList = validation(request);
+//		for (ValidationResult check : checkList) {
+//			if (!check.isCheckResult()) {
+//				// 入力チェックがある場合、入力フォームを再表示
+//				forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
+//				break;
+//			}
+//		}
 
 		// 登録情報設定
 		User user = new User();

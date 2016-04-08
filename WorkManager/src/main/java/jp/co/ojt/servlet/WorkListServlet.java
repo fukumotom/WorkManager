@@ -29,7 +29,7 @@ public class WorkListServlet extends HttpServlet {
 		ArrayList<Work> workList = logic.findAllWork(work);
 		request.setAttribute("workList", workList);
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/workList.jsp");
+		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
 		dispatcher.forward(request, response);
 
 	}

@@ -9,8 +9,9 @@
 		<title>メニュー画面</title>
 	</head>
 	<body>
-		<a style="text-align : right" href="/WorkManager/Logout">ログアウト</a>
-	
+		<form method="get" action="/WorkManager/Logout">
+			<input type="submit" value="ログアウト">
+		</form>	
 		<h1>メニュー</h1>
 		<p>ようこそ！ <%=name %> さん</p>
 		

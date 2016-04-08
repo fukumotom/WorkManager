@@ -1,7 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" %>
 <html>
-	<body>
+	<head>
+		<meta charset="UTF-8" >
 		<title>ログイン画面</title>
+	</head>
+	<body>
+		
 		<% if("true".equals(request.getParameter("error"))) {%><p>ID または PW が違います。</pli><%} %>
 		<h2>ユーザ情報を入力してください。</h2>
 		<form method="post" action="j_security_check">
