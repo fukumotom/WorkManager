@@ -12,6 +12,9 @@ import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -72,27 +75,27 @@ public class CommonDbUtil {
 	 * @param sql
 	 * @return
 	 */
-	public static HashMap<String, Integer> createSqlMap(StringBuilder sql) {
+	public static Map<Integer, String> createSqlMap(StringBuilder sql) {
 		// sql文の動的パラメータとパラメータの順番のMapを作成
 		String regex = "\\$\\{([a-zA-Z\\d]*)\\}";
 		Pattern ptm = Pattern.compile(regex);
 
 		// SQL文からパラメータ代入箇所を取得
-		HashMap<String, Integer> sqlParamMap = new HashMap<>();
+		HashMap<Integer, String> sqlParamMap = new HashMap<>();
 		Matcher mat = ptm.matcher(sql);
 		int index = 0;
 		while (mat.find()) {
 			index++;
 			String sqlParam = mat.group(1);
 
-			sqlParamMap.put(sqlParam, index);
+			sqlParamMap.put(index, sqlParam);
 		}
 		String convertQuery = mat.replaceAll("?");
 		// クエリに置換
 		sql.replace(0, sql.length(), convertQuery);
 
-		for (String key : sqlParamMap.keySet()) {
-			logger.info("Map内容[{}]:{}", key, sqlParamMap.get(key));
+		for (Entry<Integer, String> entry : sqlParamMap.entrySet()) {
+			logger.info("Map内容[{}]:{}", entry.getKey(), entry.getValue());
 		}
 		return sqlParamMap;
 	}
@@ -119,7 +122,7 @@ public class CommonDbUtil {
 		}
 	}
 
-	public static ArrayList<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) {
+	public static List<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) {
 
 		ArrayList<WorkDto> dtoList = new ArrayList<>();
 

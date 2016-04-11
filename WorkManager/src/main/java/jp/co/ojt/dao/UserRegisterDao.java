@@ -3,6 +3,8 @@ package jp.co.ojt.dao;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,15 +41,15 @@ public class UserRegisterDao {
 
 		HashMap<String, Object> dtoMap = createUserDtoMap(dto);
 
-		HashMap<String, Integer> sqlParamMap = CommonDbUtil.createSqlMap(sql);
+		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
 
 		HashMap<Integer, Object> paramMap = new HashMap<>();
 
-		for (String fieldName : dtoMap.keySet()) {
+		for (Entry<String, Object> dtoEntry : dtoMap.entrySet()) {
 
-			for (String paramName : sqlParamMap.keySet()) {
-				if (fieldName.equals(paramName)) {
-					paramMap.put(sqlParamMap.get(paramName), dtoMap.get(fieldName));
+			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
+				if ((dtoEntry.getKey()).equals(sqlEntry.getValue())) {
+					paramMap.put(sqlEntry.getKey(), dtoEntry.getValue());
 				}
 			}
 		}

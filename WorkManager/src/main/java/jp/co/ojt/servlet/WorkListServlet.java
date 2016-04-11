@@ -1,7 +1,7 @@
 package jp.co.ojt.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -31,7 +31,7 @@ public class WorkListServlet extends HttpServlet {
 		Work work = new Work();
 		work.setUserName(userName);
 		WorkListLogic logic = new WorkListLogic();
-		ArrayList<Work> workList = logic.findAllWork(work);
+		List<Work> workList = logic.findAllWork(work);
 		request.setAttribute("workList", workList);
 
 		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
@@ -46,7 +46,6 @@ public class WorkListServlet extends HttpServlet {
 		Integer selectId = Integer.valueOf(request.getParameter("radio"));
 
 		logger.info("選択したタスクのID:{}", selectId);
-		// 
 
 		response.sendRedirect("/WorkManager/WotkList?action=reload");
 

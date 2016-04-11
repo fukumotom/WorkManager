@@ -5,6 +5,9 @@ import java.lang.reflect.Method;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,9 +20,9 @@ import jp.co.ojt.model.Work;
 
 public class WorkDao {
 
-	Logger logger = LoggerFactory.getLogger(Work.class);
+	private static final Logger logger = LoggerFactory.getLogger(Work.class);
 
-	public ArrayList<Work> findAllWork(Work work) {
+	public List<Work> findAllWork(Work work) {
 
 		// load sqlFile
 		StringBuilder sql = CommonDbUtil.readSql("getWorkList.sql");
@@ -28,7 +31,7 @@ public class WorkDao {
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		ArrayList<WorkDto> dtoList = CommonDbUtil.findAllWork(sql.toString(), paramMap);
+		List<WorkDto> dtoList = CommonDbUtil.findAllWork(sql.toString(), paramMap);
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
@@ -41,21 +44,21 @@ public class WorkDao {
 
 	private HashMap<Integer, Object> createParamMap(StringBuilder sql, WorkDto dto) {
 
-		HashMap<String, Object> dtoMap = createDtoMap(dto);
+		Map<String, Object> dtoMap = createDtoMap(dto);
 
-		HashMap<String, Integer> sqlParamMap = CommonDbUtil.createSqlMap(sql);
+		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
 
 		HashMap<Integer, Object> paramMap = new HashMap<>();
 
-		for (String fieldName : dtoMap.keySet()) {
+		for (Entry<String, Object> fieldEntry : dtoMap.entrySet()) {
 
-			for (String paramName : sqlParamMap.keySet()) {
-				if (fieldName.equals(paramName)) {
-					paramMap.put(sqlParamMap.get(paramName), dtoMap.get(fieldName));
+			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
+				if ((fieldEntry.getKey()).equals(sqlEntry.getValue())) {
+
+					paramMap.put(sqlEntry.getKey(), fieldEntry.getValue());
 				}
 			}
 		}
-
 		return paramMap;
 
 	}
