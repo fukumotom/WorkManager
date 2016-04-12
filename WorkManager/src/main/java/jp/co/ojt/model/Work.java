@@ -33,8 +33,8 @@ public class Work implements Serializable {
 		return userName;
 	}
 
-	public void setUserName(String user_name) {
-		this.userName = user_name;
+	public void setUserName(String userName) {
+		this.userName = userName;
 	}
 
 	public Date getStartTime() {

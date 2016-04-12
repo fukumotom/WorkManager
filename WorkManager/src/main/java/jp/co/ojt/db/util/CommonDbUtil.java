@@ -149,18 +149,18 @@ public class CommonDbUtil {
 
 	private static void bindParam(PreparedStatement pstm, HashMap<Integer, Object> paramMap) throws SQLException {
 
-		for (Integer parameterIndex : paramMap.keySet()) {
+		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
 
-			Object value = paramMap.get(parameterIndex);
+			Object value = entry.getValue();
 
 			if (value instanceof String) {
-				pstm.setString(parameterIndex, (String) value);
+				pstm.setString(entry.getKey(), (String) entry.getValue());
 			} else if (value instanceof Integer) {
-				pstm.setInt(parameterIndex, ((Integer) value).intValue());
+				pstm.setInt(entry.getKey(), ((Integer) entry.getValue()).intValue());
 			} else if (value instanceof Date) {
-				pstm.setTime(parameterIndex, (Time) value);
+				pstm.setTime(entry.getKey(), (Time) entry.getValue());
 			} else {
-				pstm.setObject(parameterIndex, value.toString());
+				pstm.setObject(entry.getKey(), entry.getValue().toString());
 			}
 		}
 	}
@@ -187,5 +187,10 @@ public class CommonDbUtil {
 		dto.setContents(result.getString("contents"));
 		dto.setNote(result.getString("note"));
 		return dto;
+	}
+
+	public static ResultSet getStartTime(String string, HashMap<Integer, Object> paramMap) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

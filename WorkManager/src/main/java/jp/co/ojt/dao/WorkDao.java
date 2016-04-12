@@ -2,6 +2,7 @@ package jp.co.ojt.dao;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.ResultSet;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,6 +41,25 @@ public class WorkDao {
 		}
 
 		return workList;
+	}
+
+	public Work getStartTime(Work inputWork) {
+
+		// load SQLfile
+		StringBuilder sql = CommonDbUtil.readSql("getStartTime.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		// パラメータ設定
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		// 実行
+		ResultSet result = CommonDbUtil.getStartTime(sql.toString(), paramMap);
+
+		Work resultWork = mappingDtoToModel(dto);
+
+		return resultWork;
 	}
 
 	private HashMap<Integer, Object> createParamMap(StringBuilder sql, WorkDto dto) {
@@ -93,8 +113,8 @@ public class WorkDao {
 			}
 		}
 
-		for (String key : dtoMap.keySet()) {
-			logger.info("Map内容[{}]:{}", key, dtoMap.get(key));
+		for (Entry<String, Object> entry : dtoMap.entrySet()) {
+			logger.info("Map内容[{}]:{}", entry.getKey(), entry.getValue());
 		}
 		return dtoMap;
 	}

@@ -18,7 +18,7 @@
 				</tr>
 	
 				<tr>
-					<td></td><td><input type="submit" name="ログイン"></td>
+					<td></td><td><input type="submit" value="ログイン"></td>
 				</tr>
 			</table>
 		</form>

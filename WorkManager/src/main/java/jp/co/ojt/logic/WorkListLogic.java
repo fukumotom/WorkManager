@@ -1,5 +1,6 @@
 package jp.co.ojt.logic;
 
+import java.util.Date;
 import java.util.List;
 
 import jp.co.ojt.dao.WorkDao;
@@ -15,5 +16,18 @@ public class WorkListLogic {
 
 		return workList;
 
+	}
+
+	public Date getStartTime(Work inputWork) {
+		WorkDao dao = new WorkDao();
+		
+		Work work = dao.getStartTime(inputWork);
+		
+		return work.getStartTime();
+	}
+
+	public void insertWork(Work inputWork) {
+		// TODO Auto-generated method stub
+		
 	}
 }
