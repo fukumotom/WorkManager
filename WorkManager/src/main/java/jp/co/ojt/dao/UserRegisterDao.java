@@ -23,7 +23,7 @@ public class UserRegisterDao {
 
 		// load SQLsentence
 		StringBuilder sql1 = CommonDbUtil.readSql("registUser.sql");
-		StringBuilder sql2 = CommonDbUtil.readSql("i_role.sql");
+		StringBuilder sql2 = CommonDbUtil.readSql("registRole.sql");
 
 		UsersDto dto = mappingModelToDto(user);
 

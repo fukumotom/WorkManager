@@ -5,12 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,8 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.ojt.common.exception.BusinessException;
+import jp.co.ojt.common.exception.SystemException;
 import jp.co.ojt.dao.dto.WorkDto;
 
 public class CommonDbUtil {
@@ -95,7 +98,7 @@ public class CommonDbUtil {
 		sql.replace(0, sql.length(), convertQuery);
 
 		for (Entry<Integer, String> entry : sqlParamMap.entrySet()) {
-			logger.info("Map内容[{}]:{}", entry.getKey(), entry.getValue());
+			logger.info("sqlMap内容[{}]:{}", entry.getKey(), entry.getValue());
 		}
 		return sqlParamMap;
 	}
@@ -119,14 +122,14 @@ public class CommonDbUtil {
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
+			throw new SystemException(e);
 		}
 	}
 
-	public static List<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) {
-
-		ArrayList<WorkDto> dtoList = new ArrayList<>();
+	public static List<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) throws SystemException {
 
 		DataSource ds = lookup();
+		ArrayList<WorkDto> dtoList;
 		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
@@ -136,17 +139,99 @@ public class CommonDbUtil {
 
 			ResultSet result = pstm.executeQuery();
 
-			while (result.next()) {
-				dtoList.add(getWorkresult(result));
-			}
+			dtoList = resultSetToWorkDtoList(result);
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
+			throw new SystemException(e);
 		}
 
 		return dtoList;
 	}
 
+	public static void insertWork(String sql, HashMap<Integer, Object> paramMap) {
+
+		DataSource ds = lookup();
+
+		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+
+			bindParam(pstm, paramMap);
+
+			int resultCnt = pstm.executeUpdate();
+			logger.info("{}件挿入", resultCnt);
+
+		} catch (SQLException e) {
+			logger.error("DB接続失敗", e);
+			throw new SystemException(e);
+		}
+
+	}
+
+	public static LocalTime findTime(String sql, HashMap<Integer, Object> paramMap, String column)
+			throws BusinessException, SystemException {
+
+		LocalTime time = null;
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+
+			logger.info("発行SQL:{}", sql);
+
+			// bindParam;
+			bindParam(pstm, paramMap);
+
+			// DB検索
+			ResultSet result = pstm.executeQuery();
+
+			int resultcnt = 0;
+			while (result.next()) {
+				resultcnt++;
+				time = result.getTime(column).toLocalTime();
+			}
+			if (resultcnt != 1) {
+				throw new BusinessException("時間取得エラーです。");
+			}
+
+		} catch (SQLException e) {
+			logger.error("DB更新失敗", e);
+			throw new SystemException(e);
+		}
+
+		return time;
+	}
+
+	public static void deleteWork(String sql, HashMap<Integer, Object> paramMap) {
+
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+
+			logger.info("発行SQL:{}", sql);
+
+			// bindParam;
+			bindParam(pstm, paramMap);
+
+			int resultCnt = pstm.executeUpdate();
+			logger.info("{}件削除フラグ更新", resultCnt);
+
+			if (resultCnt != 1) {
+				throw new BusinessException("削除が正常に行われませんでした。");
+			}
+
+		} catch (SQLException e) {
+			logger.error("DB更新失敗", e);
+			throw new SystemException(e);
+		}
+
+	}
+
+	/**
+	 * dtoに変換したパラメータをSQL文に補完する。
+	 * 
+	 * @param pstm
+	 *            クエリーSQL文
+	 * @param paramMap
+	 *            補完用パラメータ
+	 * @throws SQLException
+	 */
 	private static void bindParam(PreparedStatement pstm, HashMap<Integer, Object> paramMap) throws SQLException {
 
 		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
@@ -157,14 +242,22 @@ public class CommonDbUtil {
 				pstm.setString(entry.getKey(), (String) entry.getValue());
 			} else if (value instanceof Integer) {
 				pstm.setInt(entry.getKey(), ((Integer) entry.getValue()).intValue());
-			} else if (value instanceof Date) {
+			} else if (value instanceof Time) {
 				pstm.setTime(entry.getKey(), (Time) entry.getValue());
+			} else if (value instanceof Date) {
+				pstm.setDate(entry.getKey(), (Date) entry.getValue());
 			} else {
-				pstm.setObject(entry.getKey(), entry.getValue().toString());
+				// 想定外の型は一律String型に置換
+				pstm.setString(entry.getKey(), entry.getValue().toString());
 			}
 		}
 	}
 
+	/**
+	 * JNDIによりデータソースを取得
+	 * 
+	 * @return
+	 */
 	private static DataSource lookup() {
 
 		DataSource ds = null;
@@ -173,24 +266,32 @@ public class CommonDbUtil {
 			ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
 		} catch (NamingException e) {
 			logger.error("JNDI接続エラー:{}", e);
+			throw new SystemException(e);
 		}
 		return ds;
 	}
 
-	private static WorkDto getWorkresult(ResultSet result) throws SQLException {
+	/**
+	 * SQL実行結果をDtoに詰め替える
+	 * 
+	 * @param result
+	 * @return
+	 * @throws SQLException
+	 */
+	private static ArrayList<WorkDto> resultSetToWorkDtoList(ResultSet result) throws SQLException {
 
-		WorkDto dto = new WorkDto();
-		dto.setId((Integer) (result.getObject("id")));
-		dto.setStartTime(result.getTime("startTime"));
-		dto.setEndTime(result.getTime("endTime"));
-		dto.setWorkingTime(result.getTime("workingTime"));
-		dto.setContents(result.getString("contents"));
-		dto.setNote(result.getString("note"));
-		return dto;
+		ArrayList<WorkDto> dtoList = new ArrayList<>();
+		while (result.next()) {
+			WorkDto dto = new WorkDto();
+			dto.setId((Integer) (result.getObject("id")));
+			dto.setStartTime(result.getTime("start_time"));
+			dto.setEndTime(result.getTime("end_time"));
+			dto.setWorkingTime(result.getTime("working_time"));
+			dto.setContents(result.getString("contents"));
+			dto.setNote(result.getString("note"));
+			dtoList.add(dto);
+		}
+		return dtoList;
 	}
 
-	public static ResultSet getStartTime(String string, HashMap<Integer, Object> paramMap) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

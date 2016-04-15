@@ -2,8 +2,9 @@ package jp.co.ojt.dao;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.ResultSet;
+import java.sql.Date;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.ojt.common.exception.SystemException;
 import jp.co.ojt.dao.dto.WorkDto;
 import jp.co.ojt.db.util.CommonDbUtil;
 import jp.co.ojt.model.Work;
@@ -23,7 +25,7 @@ public class WorkDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(Work.class);
 
-	public List<Work> findAllWork(Work work) {
+	public List<Work> findAllWork(Work work) throws SystemException {
 
 		// load sqlFile
 		StringBuilder sql = CommonDbUtil.readSql("getWorkList.sql");
@@ -55,11 +57,60 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		ResultSet result = CommonDbUtil.getStartTime(sql.toString(), paramMap);
+		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap, "start_time");
 
-		Work resultWork = mappingDtoToModel(dto);
+		Work resultWork = new Work();
+		resultWork.setStartTime(startTime);
 
 		return resultWork;
+	}
+
+	public Work getEndTime(Work inputWork) {
+
+		// load SQLfile
+		StringBuilder sql = CommonDbUtil.readSql("getEndTime.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		// パラメータ設定
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		// 実行
+		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap, "end_time");
+
+		Work resultWork = new Work();
+		resultWork.setStartTime(startTime);
+
+		return resultWork;
+	}
+
+	public void insert(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("insertWork.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		// パラメータ設定
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		CommonDbUtil.insertWork(sql.toString(), paramMap);
+
+	}
+
+	public void delete(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("deleteWork.sql");
+
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		CommonDbUtil.deleteWork(sql.toString(), paramMap);
+
 	}
 
 	private HashMap<Integer, Object> createParamMap(StringBuilder sql, WorkDto dto) {
@@ -76,6 +127,7 @@ public class WorkDao {
 				if ((fieldEntry.getKey()).equals(sqlEntry.getValue())) {
 
 					paramMap.put(sqlEntry.getKey(), fieldEntry.getValue());
+					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(), fieldEntry.getValue());
 				}
 			}
 		}
@@ -114,7 +166,7 @@ public class WorkDao {
 		}
 
 		for (Entry<String, Object> entry : dtoMap.entrySet()) {
-			logger.info("Map内容[{}]:{}", entry.getKey(), entry.getValue());
+			logger.info("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
 		}
 		return dtoMap;
 	}
@@ -125,9 +177,9 @@ public class WorkDao {
 
 		work.setId(dto.getId());
 		work.setUserName(dto.getUserName());
-		work.setStartTime(dto.getStartTime());
-		work.setEndTime(dto.getEndTime());
-		work.setWorkingTime(dto.getWorkingTime());
+		work.setStartTime(dto.getStartTime().toLocalTime());
+		work.setEndTime(dto.getEndTime().toLocalTime());
+		work.setWorkingTime(dto.getWorkingTime().toLocalTime());
 		work.setContents(dto.getContents());
 		work.setNote(dto.getNote());
 		return work;
@@ -138,11 +190,21 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		dto.setId(work.getId());
 		dto.setUserName(work.getUserName());
-		dto.setStartTime((Time) work.getStartTime());
-		dto.setEndTime((Time) work.getEndTime());
-		dto.setWorkingTime((Time) work.getWorkingTime());
+		if (work.getStartTime() != null) {
+			dto.setStartTime(Time.valueOf(work.getStartTime()));
+		}
+		if (work.getEndTime() != null) {
+			dto.setEndTime(Time.valueOf(work.getEndTime()));
+		}
+		if (work.getWorkingTime() != null) {
+			dto.setWorkingTime(Time.valueOf(work.getWorkingTime()));
+		}
 		dto.setContents(work.getContents());
 		dto.setNote(work.getNote());
+		dto.setDeleteFlg(work.getDeleteFlg());
+		if (work.getWorkDate() != null) {
+			dto.setWorkDate(Date.valueOf(work.getWorkDate()));
+		}
 		return dto;
 	}
 
