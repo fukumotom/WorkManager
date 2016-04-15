@@ -1,7 +1,8 @@
 package jp.co.ojt.model;
 
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Work implements Serializable {
 
@@ -11,15 +12,19 @@ public class Work implements Serializable {
 
 	private String userName;
 
-	private Date startTime;
+	private LocalTime startTime;
 
-	private Date endTime;
+	private LocalTime endTime;
 
-	private Date workingTime;
+	private LocalTime workingTime;
 
 	private String contents;
 
 	private String note;
+	
+	private Integer deleteFlg;
+	
+	private LocalDate workDate;
 
 	public Integer getId() {
 		return id;
@@ -37,27 +42,27 @@ public class Work implements Serializable {
 		this.userName = userName;
 	}
 
-	public Date getStartTime() {
+	public LocalTime getStartTime() {
 		return startTime;
 	}
 
-	public void setStartTime(Date startTime) {
+	public void setStartTime(LocalTime startTime) {
 		this.startTime = startTime;
 	}
 
-	public Date getEndTime() {
+	public LocalTime getEndTime() {
 		return endTime;
 	}
 
-	public void setEndTime(Date endTime) {
+	public void setEndTime(LocalTime endTime) {
 		this.endTime = endTime;
 	}
 
-	public Date getWorkingTime() {
+	public LocalTime getWorkingTime() {
 		return workingTime;
 	}
 
-	public void setWorkingTime(Date workingTime) {
+	public void setWorkingTime(LocalTime workingTime) {
 		this.workingTime = workingTime;
 	}
 
@@ -75,6 +80,22 @@ public class Work implements Serializable {
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public Integer getDeleteFlg() {
+		return deleteFlg;
+	}
+
+	public void setDeleteFlg(Integer deleteFlg) {
+		this.deleteFlg = deleteFlg;
+	}
+
+	public LocalDate getWorkDate() {
+		return workDate;
+	}
+
+	public void setWorkDate(LocalDate workDate) {
+		this.workDate = workDate;
 	}
 
 }

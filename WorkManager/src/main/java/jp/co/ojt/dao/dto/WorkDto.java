@@ -1,6 +1,7 @@
 package jp.co.ojt.dao.dto;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.sql.Time;
 
 public class WorkDto implements Serializable {
@@ -20,6 +21,10 @@ public class WorkDto implements Serializable {
 	private String contents;
 
 	private String note;
+	
+	private Integer deleteFlg;
+	
+	private Date workDate;
 
 	public Integer getId() {
 		return id;
@@ -75,6 +80,22 @@ public class WorkDto implements Serializable {
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	public Integer getDeleteFlg() {
+		return deleteFlg;
+	}
+
+	public void setDeleteFlg(Integer deleteFlg) {
+		this.deleteFlg = deleteFlg;
+	}
+
+	public Date getWorkDate() {
+		return workDate;
+	}
+
+	public void setWorkDate(Date workDate) {
+		this.workDate = workDate;
 	}
 
 }
