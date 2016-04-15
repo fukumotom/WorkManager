@@ -1,14 +1,15 @@
 SELECT
 	id
 	,user_name
-	,startTime
-	,endTime
-	,workingTime
+	,start_time
+	,end_time
+	,working_time
 	,contents
 	,note
 FROM
 	WorkManage w
 WHERE
 	w.user_name = ${userName}
+	AND w.delete_flg = 0
 ORDER BY
-	w.startTime, w.endTime
+	w.start_time, w.end_time
