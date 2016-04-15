@@ -7,7 +7,6 @@
 		<title>ユーザ登録フォーム</title>
 	</head>
 	<body>
-	<h1>スタイルお試し</h1>
 	<%
 		String errMsg = (String)request.getAttribute("syze_user");
 		String errMsg2 = (String)request.getAttribute("syze_pass");

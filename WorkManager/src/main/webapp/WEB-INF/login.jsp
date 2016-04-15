@@ -2,6 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8" >
+		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/resources/app/css/styles.css" >
 		<title>ログイン画面</title>
 	</head>
 	<body>
