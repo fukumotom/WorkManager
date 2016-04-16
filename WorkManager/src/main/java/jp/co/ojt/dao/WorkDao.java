@@ -1,5 +1,6 @@
 package jp.co.ojt.dao;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Date;
@@ -10,12 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.ojt.common.exception.BusinessException;
 import jp.co.ojt.common.exception.SystemException;
 import jp.co.ojt.dao.dto.WorkDto;
 import jp.co.ojt.db.util.CommonDbUtil;
@@ -136,33 +136,29 @@ public class WorkDao {
 	}
 
 	private HashMap<String, Object> createDtoMap(WorkDto dto) {
-		// Dtoのフィールド名と値のMapを作成
-		String regex = "get(([A-Z][a-zA-Z\\d]*))";
-		Pattern ptm = Pattern.compile(regex);
 
-		// Dtoのgetterからフィールド名を取得
-		Method[] methods = dto.getClass().getMethods();
+		Field[] fields = dto.getClass().getFields();
 		HashMap<String, Object> dtoMap = new HashMap<>();
 
-		for (Method method : methods) {
-			// getterを抽出
-			Matcher mat = ptm.matcher(method.getName());
-			if (mat.find()) {
-				String getter = method.getName();
-				if (!getter.contains("Class")) {
-					String fieldName = mat.group(1);
-					fieldName = fieldName.substring(0, 1).toLowerCase() + fieldName.substring(1);
+		try {
+			for (Field field : fields) {
 
-					Object value = null;
-					try {
-						value = method.invoke(dto, null);
-					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-						logger.info("リフレクション失敗", e);
-					}
-
-					dtoMap.put(fieldName, value);
+				// フィールド名からgetterを取得
+				String fName = field.getName();
+				if (fName == "serialVersionUID") {
+					continue;
 				}
+				String getter = "get" + fName.substring(0, 1).toUpperCase() + fName.substring(1);
+
+				// getterから値を取得し、Mapにつめる
+				Method method = dto.getClass().getMethod(getter, null);
+				Object value = method.invoke(dto, null);
+				dtoMap.put(fName, value);
 			}
+
+		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			throw new BusinessException(e);
 		}
 
 		for (Entry<String, Object> entry : dtoMap.entrySet()) {
