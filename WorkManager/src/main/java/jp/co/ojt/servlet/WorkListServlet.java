@@ -3,6 +3,8 @@ package jp.co.ojt.servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -133,9 +135,28 @@ public class WorkListServlet extends HttpServlet {
 
 	}
 
-	private LocalDate dateCheck(String inputLogDate, HttpServletRequest request) {
-		// TODO Auto-generated method stub
-		return null;
+	private LocalDate dateCheck(String inputLogDate, HttpServletRequest request) throws BusinessException {
+
+		// format
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
+
+		LocalDate workDate = null;
+		try {
+			workDate = LocalDate.parse(inputLogDate, formatter);
+		} catch (DateTimeParseException e) {
+			logger.error("フォーマットエラー", e);
+			request.setAttribute("errMsg", "フォーマットエラーです。");
+
+			throw new BusinessException(e);
+		}
+		// 過去日チェック
+		logger.info("今日の日付:{}", LocalDate.now());
+		if (workDate.isAfter(LocalDate.now())) {
+			request.setAttribute("errMsg", "過去日を選択してください。");
+			throw new BusinessException("過去日でない。");
+		}
+
+		return workDate;
 	}
 
 	private void insertWork(Work inputWork, String actionName) {
