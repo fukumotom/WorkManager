@@ -8,7 +8,6 @@ public class InputValidation {
 	private static final Logger logger = LoggerFactory.getLogger(InputValidation.class);
 
 	private InputValidation() {
-
 	}
 
 	/**

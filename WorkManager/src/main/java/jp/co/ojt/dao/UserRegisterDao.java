@@ -17,7 +17,7 @@ import jp.co.ojt.model.User;
 
 public class UserRegisterDao {
 
-	Logger logger = LoggerFactory.getLogger(UserRegisterDao.class);
+	private static final Logger logger = LoggerFactory.getLogger(UserRegisterDao.class);
 
 	public void insertUsers(User user) {
 

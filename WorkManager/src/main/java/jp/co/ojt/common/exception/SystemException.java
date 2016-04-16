@@ -7,7 +7,7 @@ public class SystemException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
-	Logger logger = LoggerFactory.getLogger(SystemException.class);
+	private static final Logger logger = LoggerFactory.getLogger(SystemException.class);
 
 	public SystemException(Exception e) {
 		logger.error("システムエラー", e);

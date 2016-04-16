@@ -21,5 +21,4 @@ public class ValidationResult {
 	public void setCheckResult(boolean checkResult) {
 		this.checkResult = checkResult;
 	}
-
 }

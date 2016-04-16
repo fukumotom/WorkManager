@@ -11,17 +11,13 @@ public class EncryptionUtils {
 	private static final Logger logger = LoggerFactory.getLogger(EncryptionUtils.class);
 
 	private EncryptionUtils() {
-
 	}
 
 	public static String getEncPassword(String plainPassword) {
-
 		return getSHA256(plainPassword);
-
 	}
 
 	private static String getSHA256(String target) {
-
 		MessageDigest md;
 		StringBuilder buf = new StringBuilder();
 
@@ -39,5 +35,4 @@ public class EncryptionUtils {
 		}
 		return buf.toString();
 	}
-
 }

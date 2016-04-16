@@ -8,17 +8,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * プロパティファイル読み込み用クラス.
- * アプリ起動時にリスナーより呼び出される.
+ * プロパティファイル読み込み用クラス. アプリ起動時にリスナーより呼び出される.
  *
  */
 public class PropertyUtils {
 
-	private static PropertyUtils propertyUtils = null;
-
-	private Properties prop = new Properties();
-
 	private static final Logger logger = LoggerFactory.getLogger(PropertyUtils.class);
+
+	private static PropertyUtils propertyUtils = null;
+	private Properties prop = new Properties();
 
 	private PropertyUtils() {
 

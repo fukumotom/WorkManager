@@ -23,9 +23,9 @@ import jp.co.ojt.model.User;
 @WebServlet("/RegisterForm")
 public class UserRegister extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory.getLogger(UserRegister.class);
-
 	private static final long serialVersionUID = 1L;
+
+	private static final Logger logger = LoggerFactory.getLogger(UserRegister.class);
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {

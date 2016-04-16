@@ -33,9 +33,9 @@ import jp.co.ojt.dao.dto.WorkDto;
 
 public class CommonDbUtil {
 
-	private static ClassLoader classLoader = CommonDbUtil.class.getClassLoader();
-
 	private static final Logger logger = LoggerFactory.getLogger(CommonDbUtil.class);
+
+	private static ClassLoader classLoader = CommonDbUtil.class.getClassLoader();
 
 	private CommonDbUtil() {
 	}

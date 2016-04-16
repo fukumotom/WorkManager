@@ -16,9 +16,9 @@ import org.slf4j.LoggerFactory;
 @WebServlet("/Menu")
 public class MenuServlet extends HttpServlet {
 
-	private static final Logger logger = LoggerFactory.getLogger(MenuServlet.class);
+	private static final long serialVersionUID = 1L;
 
-	private static final long serialVersionUID = -1971958283532858214L;
+	private static final Logger logger = LoggerFactory.getLogger(MenuServlet.class);
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response) {
