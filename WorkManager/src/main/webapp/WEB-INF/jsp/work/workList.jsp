@@ -45,13 +45,14 @@
 	</table>
 	<%
 		String errMsg = (String) request.getAttribute("errMsg");
+		String listDate = (String) request.getAttribute("listDate");
 		if (errMsg != null) {
 	%>
-	<h1>${errMsg}</h1>
+	<h2 id=errMsg>${errMsg}</h2>
 	<%
 		}
 	%>
-
+	<H1>${listDate}の作業リスト</H1>
 	<form method="post" action="/WorkManager/WorkList">
 		<table>
 			<tr>
@@ -68,7 +69,7 @@
 					request.setAttribute("work", work);
 			%>
 			<tr>
-				<td><input type="radio" name="radio" value="${work.id}"></td>
+				<td><input type="radio" name="id" value="${work.id}" checked="checked"></td>
 				<td>${work.startTime}</td>
 				<td>${work.endTime}</td>
 				<td>${work.workingTime}</td>
@@ -85,9 +86,9 @@
 				<td><input type="submit" value="追加" name="addBtn"></td>
 				<td><input type="submit" value="削除" name="deleteBtn"></td>
 				<td><input type="submit" value="保存" name="saveBtn"></td>
-				<td><input type="checkbox" value="1" name="delFlg">
-						削除を含む <input type="text" name="logDate"> (yyyy/MM/dd) <input
-					type="submit" value="履歴" name="logBtn"></td>
+				<td><input type="checkbox" value="1" name="deleteFlg">
+						削除を含む <input type="text" name="workDate"> (yyyy/MM/dd) <input
+					type="submit" value="履歴" name="historyBtn"></td>
 			</tr>
 		</table>
 
