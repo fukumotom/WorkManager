@@ -3,6 +3,7 @@ package jp.co.ojt.logic;
 import java.time.LocalTime;
 import java.util.List;
 
+import jp.co.ojt.common.exception.BusinessException;
 import jp.co.ojt.common.exception.SystemException;
 import jp.co.ojt.dao.WorkDao;
 import jp.co.ojt.model.Work;
@@ -16,13 +17,13 @@ public class WorkListLogic {
 
 	}
 
-	public LocalTime getStartTime(Work inputWork) {
+	public LocalTime getStartTime(Work inputWork) throws BusinessException {
 		WorkDao dao = new WorkDao();
 		Work work = dao.getStartTime(inputWork);
 		return work.getStartTime();
 	}
 
-	public LocalTime getEndTime(Work inputWork) {
+	public LocalTime getEndTime(Work inputWork) throws BusinessException {
 		WorkDao dao = new WorkDao();
 		Work work = dao.getEndTime(inputWork);
 		return work.getStartTime();
@@ -34,7 +35,7 @@ public class WorkListLogic {
 
 	}
 
-	public void delete(Work inputWork) {
+	public void delete(Work inputWork) throws BusinessException {
 		WorkDao dao = new WorkDao();
 		dao.delete(inputWork);
 	}
