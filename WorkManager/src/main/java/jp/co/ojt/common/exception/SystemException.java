@@ -13,4 +13,8 @@ public class SystemException extends RuntimeException {
 		logger.error("システムエラー", e);
 	}
 
+	public SystemException(String string) {
+		logger.error("システムエラー");
+	}
+
 }

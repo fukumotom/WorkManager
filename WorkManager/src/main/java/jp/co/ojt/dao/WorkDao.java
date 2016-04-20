@@ -25,7 +25,7 @@ public class WorkDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(Work.class);
 
-	public List<Work> findAllWork(Work work) throws SystemException {
+	public List<Work> findAllWork(Work work) {
 
 		// load sqlFile
 		StringBuilder sql = CommonDbUtil.readSql("getWorkList.sql");
@@ -45,7 +45,7 @@ public class WorkDao {
 		return workList;
 	}
 
-	public Work getStartTime(Work inputWork) {
+	public Work getStartTime(Work inputWork) throws BusinessException {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getStartTime.sql");
@@ -65,7 +65,7 @@ public class WorkDao {
 		return resultWork;
 	}
 
-	public Work getEndTime(Work inputWork) {
+	public Work getEndTime(Work inputWork) throws BusinessException {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getEndTime.sql");
@@ -100,7 +100,7 @@ public class WorkDao {
 
 	}
 
-	public void delete(Work inputWork) {
+	public void delete(Work inputWork) throws BusinessException {
 
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("deleteWork.sql");
@@ -137,7 +137,9 @@ public class WorkDao {
 
 	private HashMap<String, Object> createDtoMap(WorkDto dto) {
 
-		Field[] fields = dto.getClass().getFields();
+		logger.info("dtoMap作成");
+
+		Field[] fields = dto.getClass().getDeclaredFields();
 		HashMap<String, Object> dtoMap = new HashMap<>();
 
 		try {
@@ -148,6 +150,8 @@ public class WorkDao {
 				if (fName == "serialVersionUID") {
 					continue;
 				}
+				logger.info("取得したフィールド:{}", fName);
+
 				String getter = "get" + fName.substring(0, 1).toUpperCase() + fName.substring(1);
 
 				// getterから値を取得し、Mapにつめる
@@ -158,7 +162,9 @@ public class WorkDao {
 
 		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			throw new BusinessException(e);
+			logger.debug("リフレクションエラー");
+			throw new SystemException(e);
+
 		}
 
 		for (Entry<String, Object> entry : dtoMap.entrySet()) {

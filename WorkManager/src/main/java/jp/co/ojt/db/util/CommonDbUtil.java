@@ -126,6 +126,46 @@ public class CommonDbUtil {
 		}
 	}
 
+	// TODO 作業登録処理用
+	public static WorkDto findOne(String sql, ArrayList<String> paramsList) {
+
+		WorkDto work = new WorkDto();
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+
+			// 引数バインド
+			pstm.setString(1, paramsList.get(0));
+			ResultSet result = pstm.executeQuery();
+
+			// マッピング
+			String contents = null;
+			String note = null;
+			int resultcnt = 0;
+			while (result.next()) {
+				resultcnt++;
+				contents = result.getString("contents");
+				note = result.getString("note");
+			}
+			if (resultcnt == 0) {
+				logger.info("仕掛処理なし");
+				work = null;
+			} else if (resultcnt > 1) {
+				throw new SystemException("仕掛作業が複数あります");
+			} else {
+				work.setContents(contents);
+				work.setNote(note);
+				logger.info("取得した内容:{} 備考:{}", contents, note);
+			}
+
+		} catch (SQLException e) {
+
+			logger.error("DB接続失敗", e);
+			throw new SystemException(e);
+		}
+
+		return work;
+	}
+
 	public static List<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) throws SystemException {
 
 		DataSource ds = lookup();
@@ -188,7 +228,7 @@ public class CommonDbUtil {
 				time = result.getTime(column).toLocalTime();
 			}
 			if (resultcnt != 1) {
-				throw new BusinessException("時間取得エラーです。");
+				throw new BusinessException("選択した作業の開始または終了時間を取得できませんでした。");
 			}
 
 		} catch (SQLException e) {
@@ -199,7 +239,7 @@ public class CommonDbUtil {
 		return time;
 	}
 
-	public static void deleteWork(String sql, HashMap<Integer, Object> paramMap) {
+	public static void deleteWork(String sql, HashMap<Integer, Object> paramMap) throws BusinessException {
 
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
@@ -210,10 +250,13 @@ public class CommonDbUtil {
 			bindParam(pstm, paramMap);
 
 			int resultCnt = pstm.executeUpdate();
+
 			logger.info("{}件削除フラグ更新", resultCnt);
 
-			if (resultCnt != 1) {
-				throw new BusinessException("削除が正常に行われませんでした。");
+			if (resultCnt == 0) {
+				throw new BusinessException("データは削除されています。");
+			} else if (resultCnt > 1) {
+				throw new SystemException("削除が正常に行われませんでした。");
 			}
 
 		} catch (SQLException e) {
