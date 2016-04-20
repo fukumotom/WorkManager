@@ -2,9 +2,6 @@ package jp.co.ojt.servlet;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -18,7 +15,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.ojt.common.exception.BindFormatException;
 import jp.co.ojt.common.exception.BusinessException;
+import jp.co.ojt.common.exception.SystemException;
+import jp.co.ojt.common.util.ConvertToModelUtils;
+import jp.co.ojt.common.util.DateUtils;
 import jp.co.ojt.logic.WorkListLogic;
 import jp.co.ojt.model.Work;
 
@@ -27,163 +28,118 @@ public class WorkListServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(WorkListServlet.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(WorkListServlet.class);
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
 		// 作業リスト取得
 		String userName = request.getUserPrincipal().getName();
 		Work work = new Work();
 		work.setUserName(userName);
+		work.setWorkDate(LocalDate.now());
+
 		WorkListLogic logic = new WorkListLogic();
 		List<Work> workList = null;
 		workList = logic.findAllWork(work);
 		request.setAttribute("workList", workList);
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
-		dispatcher.forward(request, response);
+		request.setAttribute("listDate", DateUtils.getTodayStr());
+		logger.info("作業リストの日付:{}", DateUtils.getTodayStr());
 
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
+		try {
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
+			throw new SystemException(e);
+		}
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 
+		// 作業リスト表示条件をセッションに保持
 		Work inputWork = (Work) request.getSession().getAttribute("criteria");
 		if (inputWork == null) {
 			inputWork = new Work();
 			request.getSession().setAttribute("criteria", inputWork);
 		}
 
-		inputWork.setUserName(request.getUserPrincipal().getName());
+		// パラメータをモデルに設定
+		try {
+			// ログインユーザ
+			inputWork.setUserName(request.getUserPrincipal().getName());
+			// 作業ID
+			String id = request.getParameter("id");
+			inputWork.setId(ConvertToModelUtils.convertInt(id));
+			// 履歴の日付と削除対象チェック
+			String workDate = request.getParameter("workDate");
+
+			inputWork.setWorkDate(
+					ConvertToModelUtils.convertLocalDate(workDate, "workDate"));
+
+			String deleteFlg = request.getParameter("deleteFlg");
+			inputWork.setDeleteFlg(
+					ConvertToModelUtils.convertBoolean(deleteFlg, "deleteFlg"));
+		} catch (BindFormatException e) {
+			request.setAttribute("errMsg", e.getErrMsg());
+		}
 
 		Map<String, String[]> requestParamMap = request.getParameterMap();
+		WorkListLogic logic = new WorkListLogic();
 
 		// submitボタン判定
-		String actionName = null;
-		if (requestParamMap.containsKey("insertBtn")) {
-			actionName = "insert";
-			logger.info("挿入処理開始:");
-		} else if (requestParamMap.containsKey("addBtn")) {
-			actionName = "add";
-			logger.info("追加処理開始:");
-		} else if (requestParamMap.containsKey("deleteBtn")) {
-			actionName = "delete";
-			logger.info("削除処理開始:");
-		}
+		String actionName = "";
+		WorkHelper helper = new WorkHelper();
+		String listDate = DateUtils.getTodayStr();
 
-		String id = request.getParameter("radio");
-		WorkListLogic logic = new WorkListLogic();
-
-		if ((id == null) && (!requestParamMap.containsKey("logBtn"))) {
-			request.setAttribute("errMsg", "行を選択して下さい。");
-		} else {
-			inputWork.setId(Integer.valueOf(id));
-			logger.info("選択した行ID：{}", id);
-
-			switch (actionName) {
-
-			case "insert":
-			case "add":
-				try {
-					insertWork(inputWork, actionName);
-				} catch (BusinessException e) {
-					logger.error("挿入失敗", e);
-				}
-				break;
-
-			case "delete":
-				try {
-					logic.delete(inputWork);
-				} catch (BusinessException e) {
-					logger.error("削除失敗", e);
-				}
-				break;
-			}
-		}
-
-		List<Work> workList = getWorkList(inputWork);
-		request.setAttribute("workList", workList);
-
-		if (requestParamMap.containsKey("logBtn")) {
-			logger.info("履歴表示処理開始:");
-
-			// 選択日付取得
-			String inputLogDate = request.getParameter("workDate");
-
-			try {
-				LocalDate workDate = dateCheck(inputLogDate, request);
-
-				if (request.getParameter("delFlg") != null) {
-					logger.info("削除含むラジオボタン押下：{}", request.getParameter("delFlg"));
-					inputWork.setDeleteFlg(1);
-				} else {
-					inputWork.setDeleteFlg(null);
-				}
-
-				inputWork.setWorkDate(workDate);
-				workList = logic.findAllWork(inputWork);
-			} catch (BusinessException e) {
-				logger.error("履歴取得に失敗", e);
-				workList = getWorkList(inputWork);
-			}
-			request.setAttribute("workList", workList);
-
-		}
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
-		dispatcher.forward(request, response);
-
-	}
-
-	private LocalDate dateCheck(String inputLogDate, HttpServletRequest request) throws BusinessException {
-
-		// format
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd");
-
-		LocalDate workDate = null;
 		try {
-			workDate = LocalDate.parse(inputLogDate, formatter);
-		} catch (DateTimeParseException e) {
-			logger.error("フォーマットエラー", e);
-			request.setAttribute("errMsg", "フォーマットエラーです。");
 
-			throw new BusinessException(e);
+			if (requestParamMap.containsKey("insertBtn")) {
+				actionName = "insert";
+				logger.info("挿入処理開始:");
+				helper.idCheck(inputWork.getId());
+				helper.action(inputWork, actionName);
+			} else if (requestParamMap.containsKey("addBtn")) {
+				actionName = "add";
+				logger.info("追加処理開始:");
+				helper.idCheck(inputWork.getId());
+				helper.action(inputWork, actionName);
+			} else if (requestParamMap.containsKey("deleteBtn")) {
+				actionName = "delete";
+				logger.info("削除処理開始:");
+				helper.idCheck(inputWork.getId());
+				helper.action(inputWork, actionName);
+			} else if (requestParamMap.containsKey("historyBtn")) {
+				actionName = "history";
+				logger.info("履歴表示処理開始:");
+				// 履歴日付入力チェック
+				helper.dateCheck(inputWork);
+			}
+		} catch (BusinessException e) {
+			if (request.getAttribute("errMsg") == null) {
+				request.setAttribute("errMsg", e.getMessage());
+			}
 		}
-		// 過去日チェック
-		logger.info("今日の日付:{}", LocalDate.now());
-		if (workDate.isAfter(LocalDate.now())) {
-			request.setAttribute("errMsg", "過去日を選択してください。");
-			throw new BusinessException("過去日でない。");
-		}
 
-		return workDate;
-	}
-
-	private void insertWork(Work inputWork, String actionName) {
-
-		WorkListLogic logic = new WorkListLogic();
-
-		LocalTime time = null;
-		// 挿入の場合
-		if ("insert".equals(actionName)) {
-			time = logic.getStartTime(inputWork);
-
-		} else if ("add".equals(actionName)) {
-			time = logic.getEndTime(inputWork);
-		}
-		inputWork.setStartTime(time);
-		inputWork.setEndTime(time);
-
-		logic.insertWork(inputWork);
-
-	}
-
-	private List<Work> getWorkList(Work inputWork) {
-
-		WorkListLogic logic = new WorkListLogic();
+		// 作業リストの再表示
 		List<Work> workList = logic.findAllWork(inputWork);
+		request.setAttribute("workList", workList);
+		request.setAttribute("listDate", listDate);
 
-		return workList;
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
+
+		try {
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
+			throw new SystemException(e);
+		}
+
 	}
 
 }

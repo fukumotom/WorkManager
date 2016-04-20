@@ -1,6 +1,5 @@
 package jp.co.ojt.dao;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Date;
@@ -11,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class WorkDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(Work.class);
 
-	public List<Work> findAllWork(Work work) {
+	public List<Work> findAllWork(Work work) throws SystemException {
 
 		// load sqlFile
 		StringBuilder sql = CommonDbUtil.readSql("getWorkList.sql");
@@ -34,7 +35,8 @@ public class WorkDao {
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		List<WorkDto> dtoList = CommonDbUtil.findAllWork(sql.toString(), paramMap);
+		List<WorkDto> dtoList = CommonDbUtil.findAllWork(sql.toString(),
+				paramMap);
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
@@ -57,7 +59,8 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap, "start_time");
+		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap,
+				"start_time");
 
 		Work resultWork = new Work();
 		resultWork.setStartTime(startTime);
@@ -77,7 +80,8 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap, "end_time");
+		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap,
+				"end_time");
 
 		Work resultWork = new Work();
 		resultWork.setStartTime(startTime);
@@ -113,7 +117,8 @@ public class WorkDao {
 
 	}
 
-	private HashMap<Integer, Object> createParamMap(StringBuilder sql, WorkDto dto) {
+	private HashMap<Integer, Object> createParamMap(StringBuilder sql,
+			WorkDto dto) {
 
 		Map<String, Object> dtoMap = createDtoMap(dto);
 
@@ -127,7 +132,8 @@ public class WorkDao {
 				if ((fieldEntry.getKey()).equals(sqlEntry.getValue())) {
 
 					paramMap.put(sqlEntry.getKey(), fieldEntry.getValue());
-					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(), fieldEntry.getValue());
+					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(),
+							fieldEntry.getValue());
 				}
 			}
 		}
@@ -136,35 +142,35 @@ public class WorkDao {
 	}
 
 	private HashMap<String, Object> createDtoMap(WorkDto dto) {
+		// Dtoのフィールド名と値のMapを作成
+		String regex = "get(([A-Z][a-zA-Z\\d]*))";
+		Pattern ptm = Pattern.compile(regex);
 
-		logger.info("dtoMap作成");
-
-		Field[] fields = dto.getClass().getDeclaredFields();
+		// Dtoのgetterからフィールド名を取得
+		Method[] methods = dto.getClass().getMethods();
 		HashMap<String, Object> dtoMap = new HashMap<>();
 
-		try {
-			for (Field field : fields) {
+		for (Method method : methods) {
+			// getterを抽出
+			Matcher mat = ptm.matcher(method.getName());
+			if (mat.find()) {
+				String getter = method.getName();
+				if (!getter.contains("Class")) {
+					String fieldName = mat.group(1);
+					fieldName = fieldName.substring(0, 1).toLowerCase()
+							+ fieldName.substring(1);
 
-				// フィールド名からgetterを取得
-				String fName = field.getName();
-				if (fName == "serialVersionUID") {
-					continue;
+					Object value = null;
+					try {
+						value = method.invoke(dto, null);
+					} catch (IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException e) {
+						logger.info("リフレクション失敗", e);
+					}
+
+					dtoMap.put(fieldName, value);
 				}
-				logger.info("取得したフィールド:{}", fName);
-
-				String getter = "get" + fName.substring(0, 1).toUpperCase() + fName.substring(1);
-
-				// getterから値を取得し、Mapにつめる
-				Method method = dto.getClass().getMethod(getter, null);
-				Object value = method.invoke(dto, null);
-				dtoMap.put(fName, value);
 			}
-
-		} catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
-				| InvocationTargetException e) {
-			logger.debug("リフレクションエラー");
-			throw new SystemException(e);
-
 		}
 
 		for (Entry<String, Object> entry : dtoMap.entrySet()) {
@@ -203,7 +209,11 @@ public class WorkDao {
 		}
 		dto.setContents(work.getContents());
 		dto.setNote(work.getNote());
-		dto.setDeleteFlg(work.getDeleteFlg());
+		if (work.getDeleteFlg()) {
+			dto.setDeleteFlg(1);
+		} else {
+			dto.setDeleteFlg(0);
+		}
 		if (work.getWorkDate() != null) {
 			dto.setWorkDate(Date.valueOf(work.getWorkDate()));
 		}

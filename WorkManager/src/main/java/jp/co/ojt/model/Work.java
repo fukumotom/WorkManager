@@ -21,9 +21,9 @@ public class Work implements Serializable {
 	private String contents;
 
 	private String note;
-	
-	private Integer deleteFlg;
-	
+
+	private boolean deleteFlg;
+
 	private LocalDate workDate;
 
 	public Integer getId() {
@@ -82,12 +82,12 @@ public class Work implements Serializable {
 		this.note = note;
 	}
 
-	public Integer getDeleteFlg() {
+	public boolean getDeleteFlg() {
 		return deleteFlg;
 	}
 
-	public void setDeleteFlg(Integer deleteFlg) {
-		this.deleteFlg = deleteFlg;
+	public void setDeleteFlg(boolean b) {
+		this.deleteFlg = b;
 	}
 
 	public LocalDate getWorkDate() {
