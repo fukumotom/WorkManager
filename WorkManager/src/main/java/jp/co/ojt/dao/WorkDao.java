@@ -29,7 +29,15 @@ public class WorkDao {
 	public List<Work> findAllWork(Work work) throws SystemException {
 
 		// load sqlFile
-		StringBuilder sql = CommonDbUtil.readSql("getWorkList.sql");
+		String sqlName;
+		if (work.getDeleteFlg()) {
+			sqlName = "getWorkDelList.sql";
+		} else if (work.getWorkDate() != null) {
+			sqlName = "getWorkPastList.sql";
+		} else {
+			sqlName = "getWorkList.sql";
+		}
+		StringBuilder sql = CommonDbUtil.readSql(sqlName);
 
 		WorkDto dto = mappingModelToDto(work);
 
