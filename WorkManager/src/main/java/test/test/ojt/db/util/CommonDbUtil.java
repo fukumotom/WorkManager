@@ -237,6 +237,10 @@ public class CommonDbUtil {
 			int resultcnt = 0;
 			while (result.next()) {
 				resultcnt++;
+				if ("end_time".equals(column)
+						&& result.getTime(column) == null) {
+					throw new BusinessException("作業中の下に追加はできません。");
+				}
 				time = result.getTime(column).toLocalTime();
 			}
 			if (resultcnt != 1) {

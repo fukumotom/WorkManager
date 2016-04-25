@@ -115,7 +115,7 @@ public class WorkDao {
 	public void delete(Work inputWork) throws BusinessException {
 
 		// SQL読み込み
-		StringBuilder sql = CommonDbUtil.readSql("deleteWork.sql");
+		StringBuilder sql = CommonDbUtil.readSql("updateDeleteFlg.sql");
 
 		WorkDto dto = mappingModelToDto(inputWork);
 
@@ -194,8 +194,12 @@ public class WorkDao {
 		work.setId(dto.getId());
 		work.setUserName(dto.getUserName());
 		work.setStartTime(dto.getStartTime().toLocalTime());
-		work.setEndTime(dto.getEndTime().toLocalTime());
-		work.setWorkingTime(dto.getWorkingTime().toLocalTime());
+		if (dto.getEndTime() != null) {
+			work.setEndTime(dto.getEndTime().toLocalTime());
+		}
+		if (dto.getWorkingTime() != null) {
+			work.setWorkingTime(dto.getWorkingTime().toLocalTime());
+		}
 		work.setContents(dto.getContents());
 		work.setNote(dto.getNote());
 		return work;
