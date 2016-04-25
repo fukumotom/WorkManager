@@ -1,4 +1,4 @@
-package jp.co.ojt.db.util;
+package test.test.ojt.db.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -27,15 +27,17 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.co.ojt.common.exception.BusinessException;
-import jp.co.ojt.common.exception.SystemException;
-import jp.co.ojt.dao.dto.WorkDto;
+import test.test.ojt.common.exception.BusinessException;
+import test.test.ojt.common.exception.SystemException;
+import test.test.ojt.dao.dto.WorkDto;
 
 public class CommonDbUtil {
 
-	private static final Logger logger = LoggerFactory.getLogger(CommonDbUtil.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(CommonDbUtil.class);
 
-	private static ClassLoader classLoader = CommonDbUtil.class.getClassLoader();
+	private static ClassLoader classLoader = CommonDbUtil.class
+			.getClassLoader();
 
 	private CommonDbUtil() {
 	}
@@ -50,7 +52,8 @@ public class CommonDbUtil {
 	public static StringBuilder readSql(String sqlName) {
 
 		// sqlファイル読みこみ
-		InputStream iStream = classLoader.getResourceAsStream("/sql/" + sqlName);
+		InputStream iStream = classLoader
+				.getResourceAsStream("/sql/" + sqlName);
 
 		StringBuilder builder = new StringBuilder();
 		try (InputStreamReader reader = new InputStreamReader(iStream);
@@ -107,10 +110,12 @@ public class CommonDbUtil {
 	 * @param sql
 	 * @param paramMap
 	 */
-	public static void insertUsers(String sql, HashMap<Integer, Object> paramMap) {
+	public static void insertUsers(String sql,
+			HashMap<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
-		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
@@ -131,7 +136,8 @@ public class CommonDbUtil {
 
 		WorkDto work = new WorkDto();
 		DataSource ds = lookup();
-		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			// 引数バインド
 			pstm.setString(1, paramsList.get(0));
@@ -166,11 +172,13 @@ public class CommonDbUtil {
 		return work;
 	}
 
-	public static List<WorkDto> findAllWork(String sql, HashMap<Integer, Object> paramMap) throws SystemException {
+	public static List<WorkDto> findAllWork(String sql,
+			HashMap<Integer, Object> paramMap) throws SystemException {
 
 		DataSource ds = lookup();
 		ArrayList<WorkDto> dtoList;
-		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
@@ -189,11 +197,13 @@ public class CommonDbUtil {
 		return dtoList;
 	}
 
-	public static void insertWork(String sql, HashMap<Integer, Object> paramMap) {
+	public static void insertWork(String sql,
+			HashMap<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
 
-		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			bindParam(pstm, paramMap);
 
@@ -207,12 +217,14 @@ public class CommonDbUtil {
 
 	}
 
-	public static LocalTime findTime(String sql, HashMap<Integer, Object> paramMap, String column)
+	public static LocalTime findTime(String sql,
+			HashMap<Integer, Object> paramMap, String column)
 			throws BusinessException, SystemException {
 
 		LocalTime time = null;
 		DataSource ds = lookup();
-		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
@@ -239,10 +251,12 @@ public class CommonDbUtil {
 		return time;
 	}
 
-	public static void deleteWork(String sql, HashMap<Integer, Object> paramMap) throws BusinessException {
+	public static void deleteWork(String sql, HashMap<Integer, Object> paramMap)
+			throws BusinessException {
 
 		DataSource ds = lookup();
-		try (Connection con = ds.getConnection(); PreparedStatement pstm = con.prepareStatement(sql);) {
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
@@ -275,7 +289,8 @@ public class CommonDbUtil {
 	 *            補完用パラメータ
 	 * @throws SQLException
 	 */
-	private static void bindParam(PreparedStatement pstm, HashMap<Integer, Object> paramMap) throws SQLException {
+	private static void bindParam(PreparedStatement pstm,
+			HashMap<Integer, Object> paramMap) throws SQLException {
 
 		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
 
@@ -284,7 +299,8 @@ public class CommonDbUtil {
 			if (value instanceof String) {
 				pstm.setString(entry.getKey(), (String) entry.getValue());
 			} else if (value instanceof Integer) {
-				pstm.setInt(entry.getKey(), ((Integer) entry.getValue()).intValue());
+				pstm.setInt(entry.getKey(),
+						((Integer) entry.getValue()).intValue());
 			} else if (value instanceof Time) {
 				pstm.setTime(entry.getKey(), (Time) entry.getValue());
 			} else if (value instanceof Date) {
@@ -321,7 +337,8 @@ public class CommonDbUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static ArrayList<WorkDto> resultSetToWorkDtoList(ResultSet result) throws SQLException {
+	private static ArrayList<WorkDto> resultSetToWorkDtoList(ResultSet result)
+			throws SQLException {
 
 		ArrayList<WorkDto> dtoList = new ArrayList<>();
 		while (result.next()) {

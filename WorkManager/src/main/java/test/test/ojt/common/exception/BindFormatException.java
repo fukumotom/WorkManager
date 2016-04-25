@@ -1,4 +1,4 @@
-package jp.co.ojt.common.exception;
+package test.test.ojt.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,7 +7,8 @@ public class BindFormatException extends Exception {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(BindFormatException.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(BindFormatException.class);
 
 	private String paramName;
 
@@ -21,7 +22,8 @@ public class BindFormatException extends Exception {
 		logger.warn("{}の値[{}]が不正です。", this.paramName, this.paramValue);
 	}
 
-	public BindFormatException(Exception e, String paramName, String paramValue) {
+	public BindFormatException(Exception e, String paramName,
+			String paramValue) {
 		this.paramName = paramName;
 		this.paramValue = paramValue;
 		logger.warn("バインドエラー", e);

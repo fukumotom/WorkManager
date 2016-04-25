@@ -1,12 +1,12 @@
-package jp.co.ojt.logic;
+package test.test.ojt.logic;
 
 import java.time.LocalTime;
 import java.util.List;
 
-import jp.co.ojt.common.exception.BusinessException;
-import jp.co.ojt.common.exception.SystemException;
-import jp.co.ojt.dao.WorkDao;
-import jp.co.ojt.model.Work;
+import test.test.ojt.common.exception.BusinessException;
+import test.test.ojt.common.exception.SystemException;
+import test.test.ojt.dao.WorkDao;
+import test.test.ojt.model.Work;
 
 public class WorkListLogic {
 

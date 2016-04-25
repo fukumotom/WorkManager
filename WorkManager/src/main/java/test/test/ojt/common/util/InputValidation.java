@@ -1,4 +1,4 @@
-package jp.co.ojt.common.util;
+package test.test.ojt.common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

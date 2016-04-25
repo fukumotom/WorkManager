@@ -1,4 +1,4 @@
-package jp.co.ojt.dao;
+package test.test.ojt.dao;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -11,9 +11,9 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.co.ojt.dao.dto.UsersDto;
-import jp.co.ojt.db.util.CommonDbUtil;
-import jp.co.ojt.model.User;
+import test.test.ojt.dao.dto.UsersDto;
+import test.test.ojt.db.util.CommonDbUtil;
+import test.test.ojt.model.User;
 
 public class UserRegisterDao {
 

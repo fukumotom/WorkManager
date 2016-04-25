@@ -1,4 +1,4 @@
-package jp.co.ojt.servlet;
+package test.test.ojt.servlet;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -6,12 +6,13 @@ import java.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.co.ojt.common.exception.BusinessException;
-import jp.co.ojt.logic.WorkListLogic;
-import jp.co.ojt.model.Work;
+import test.test.ojt.common.exception.BusinessException;
+import test.test.ojt.logic.WorkListLogic;
+import test.test.ojt.model.Work;
 
 public class WorkHelper {
-	private static final Logger logger = LoggerFactory.getLogger(WorkHelper.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(WorkHelper.class);
 
 	void idCheck(Integer id) throws BusinessException {
 		if (id == null) {

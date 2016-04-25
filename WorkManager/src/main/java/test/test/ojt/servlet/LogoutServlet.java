@@ -1,4 +1,4 @@
-package jp.co.ojt.servlet;
+package test.test.ojt.servlet;
 
 import java.io.IOException;
 

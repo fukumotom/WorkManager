@@ -1,7 +1,7 @@
+<%@page import="test.test.ojt.model.User"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%@ page import="jp.co.ojt.model.User"%>
 <%
 	User user = (User) session.getAttribute("registUser");
 %>

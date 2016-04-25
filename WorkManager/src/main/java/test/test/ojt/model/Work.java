@@ -1,4 +1,4 @@
-package jp.co.ojt.model;
+package test.test.ojt.model;
 
 import java.io.Serializable;
 import java.time.LocalDate;

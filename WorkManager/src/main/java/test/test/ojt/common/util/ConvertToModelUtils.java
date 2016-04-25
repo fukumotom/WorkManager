@@ -1,11 +1,11 @@
-package jp.co.ojt.common.util;
+package test.test.ojt.common.util;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-import jp.co.ojt.common.exception.BindFormatException;
+import test.test.ojt.common.exception.BindFormatException;
 
 public class ConvertToModelUtils {
 

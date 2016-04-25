@@ -1,4 +1,4 @@
-package jp.co.ojt.common.util;
+package test.test.ojt.common.util;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

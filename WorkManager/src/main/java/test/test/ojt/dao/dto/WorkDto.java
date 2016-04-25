@@ -1,4 +1,4 @@
-package jp.co.ojt.dao.dto;
+package test.test.ojt.dao.dto;
 
 import java.io.Serializable;
 import java.sql.Date;

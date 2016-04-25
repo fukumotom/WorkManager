@@ -1,4 +1,4 @@
-package jp.co.ojt.common.util;
+package test.test.ojt.common.util;
 
 public class ValidationResult {
 

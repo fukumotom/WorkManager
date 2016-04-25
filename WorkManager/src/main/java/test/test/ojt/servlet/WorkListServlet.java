@@ -1,4 +1,4 @@
-package jp.co.ojt.servlet;
+package test.test.ojt.servlet;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -15,13 +15,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.co.ojt.common.exception.BindFormatException;
-import jp.co.ojt.common.exception.BusinessException;
-import jp.co.ojt.common.exception.SystemException;
-import jp.co.ojt.common.util.ConvertToModelUtils;
-import jp.co.ojt.common.util.DateUtils;
-import jp.co.ojt.logic.WorkListLogic;
-import jp.co.ojt.model.Work;
+import test.test.ojt.common.exception.BindFormatException;
+import test.test.ojt.common.exception.BusinessException;
+import test.test.ojt.common.exception.SystemException;
+import test.test.ojt.common.util.ConvertToModelUtils;
+import test.test.ojt.common.util.DateUtils;
+import test.test.ojt.logic.WorkListLogic;
+import test.test.ojt.model.Work;
 
 @WebServlet("/WorkList")
 public class WorkListServlet extends HttpServlet {

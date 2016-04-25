@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<%@page import="test.test.ojt.model.Work"%>
+<%@page import="java.util.ArrayList"%>
 <taglib xmlns="http://java.sun.com/xml/ns/j2ee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
@@ -6,7 +8,6 @@
 
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
-<%@ page import="jp.co.ojt.model.Work, java.util.*"%>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -69,7 +70,8 @@
 					request.setAttribute("work", work);
 			%>
 			<tr>
-				<td><input type="radio" name="id" value="${work.id}" checked="checked"></td>
+				<td><input type="radio" name="id" value="${work.id}"
+					checked="checked"></td>
 				<td>${work.startTime}</td>
 				<td>${work.endTime}</td>
 				<td>${work.workingTime}</td>

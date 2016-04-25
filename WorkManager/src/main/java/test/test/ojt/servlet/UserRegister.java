@@ -1,4 +1,4 @@
-package jp.co.ojt.servlet;
+package test.test.ojt.servlet;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,21 +14,23 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.co.ojt.common.util.EncryptionUtils;
-import jp.co.ojt.common.util.InputValidation;
-import jp.co.ojt.common.util.ValidationResult;
-import jp.co.ojt.logic.UserRegistLogic;
-import jp.co.ojt.model.User;
+import test.test.ojt.common.util.EncryptionUtils;
+import test.test.ojt.common.util.InputValidation;
+import test.test.ojt.common.util.ValidationResult;
+import test.test.ojt.logic.UserRegistLogic;
+import test.test.ojt.model.User;
 
 @WebServlet("/RegisterForm")
 public class UserRegister extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(UserRegister.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(UserRegister.class);
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException {
 
 		String forwardPath = null;
 
@@ -74,19 +76,20 @@ public class UserRegister extends HttpServlet {
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	public void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
 
-		// 入力チェック  TODO 開発中はコメントアウト
-//		ArrayList<ValidationResult> checkList = validation(request);
-//		for (ValidationResult check : checkList) {
-//			if (!check.isCheckResult()) {
-//				// 入力チェックがある場合、入力フォームを再表示
-//				forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
-//				break;
-//			}
-//		}
+		// 入力チェック TODO 開発中はコメントアウト
+		// ArrayList<ValidationResult> checkList = validation(request);
+		// for (ValidationResult check : checkList) {
+		// if (!check.isCheckResult()) {
+		// // 入力チェックがある場合、入力フォームを再表示
+		// forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
+		// break;
+		// }
+		// }
 
 		// 登録情報設定
 		User user = new User();
@@ -102,7 +105,8 @@ public class UserRegister extends HttpServlet {
 		session.setAttribute("registUser", user);
 
 		// 確認画面へフォワード
-		RequestDispatcher dispatcher = request.getRequestDispatcher(forwardPath);
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher(forwardPath);
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
@@ -119,7 +123,8 @@ public class UserRegister extends HttpServlet {
 
 		ValidationResult result = InputValidation.inputSize(userName, 5, 20);
 		ValidationResult result2 = InputValidation.inputSize(password, 5, 64);
-		ValidationResult result3 = InputValidation.confilm(password, passConfilm);
+		ValidationResult result3 = InputValidation.confilm(password,
+				passConfilm);
 		resultList.add(result);
 		resultList.add(result2);
 		resultList.add(result3);
