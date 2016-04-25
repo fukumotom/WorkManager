@@ -132,15 +132,16 @@ public class CommonDbUtil {
 	}
 
 	// TODO 作業登録処理用
-	public static WorkDto findOne(String sql, ArrayList<String> paramsList) {
+	public static List<WorkDto> findWorking(String sql,
+			HashMap<Integer, Object> paramMap) {
 
 		WorkDto work = new WorkDto();
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection();
 				PreparedStatement pstm = con.prepareStatement(sql);) {
 
-			// 引数バインド
-			pstm.setString(1, paramsList.get(0));
+			// parameter join TODO
+			bindParam(pstm, paramMap);
 			ResultSet result = pstm.executeQuery();
 
 			// マッピング
@@ -152,24 +153,13 @@ public class CommonDbUtil {
 				contents = result.getString("contents");
 				note = result.getString("note");
 			}
-			if (resultcnt == 0) {
-				logger.info("仕掛処理なし");
-				work = null;
-			} else if (resultcnt > 1) {
-				throw new SystemException("仕掛作業が複数あります");
-			} else {
-				work.setContents(contents);
-				work.setNote(note);
-				logger.info("取得した内容:{} 備考:{}", contents, note);
-			}
 
 		} catch (SQLException e) {
-
 			logger.error("DB接続失敗", e);
 			throw new SystemException(e);
 		}
 
-		return work;
+		return null;
 	}
 
 	public static List<WorkDto> findAllWork(String sql,

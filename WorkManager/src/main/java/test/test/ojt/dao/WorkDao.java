@@ -26,6 +26,27 @@ public class WorkDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(Work.class);
 
+	public List<Work> findWorking(Work work) {
+
+		// load SQLfile
+		StringBuilder sql = CommonDbUtil.readSql("getWorking.sql");
+
+		WorkDto dto = mappingModelToDto(work);
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		List<WorkDto> dtoList = CommonDbUtil.findWorking(sql.toString(),
+				paramMap);
+
+		// TODO
+		ArrayList<Work> workList = new ArrayList<>();
+		for (WorkDto dtoElm : dtoList) {
+			Work elm = mappingDtoToModel(dtoElm);
+			workList.add(elm);
+		}
+
+		return workList;
+	}
+
 	public List<Work> findAllWork(Work work) throws SystemException {
 
 		// load sqlFile
