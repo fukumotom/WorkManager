@@ -131,27 +131,29 @@ public class CommonDbUtil {
 		}
 	}
 
-	// TODO 作業登録処理用
+	// 作業登録処理用
 	public static List<WorkDto> findWorking(String sql,
 			HashMap<Integer, Object> paramMap) {
 
-		WorkDto work = new WorkDto();
+		ArrayList<WorkDto> workDtoList = new ArrayList<>();
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection();
 				PreparedStatement pstm = con.prepareStatement(sql);) {
 
-			// parameter join TODO
+			logger.info("発行SQL:{}", sql);
+
+			// parameter join
 			bindParam(pstm, paramMap);
 			ResultSet result = pstm.executeQuery();
 
 			// マッピング
-			String contents = null;
-			String note = null;
-			int resultcnt = 0;
 			while (result.next()) {
-				resultcnt++;
-				contents = result.getString("contents");
-				note = result.getString("note");
+				WorkDto workDto = new WorkDto();
+				workDto.setId(result.getInt("id"));
+				workDto.setStartTime(result.getTime("start_time"));
+				workDto.setContents(result.getString("contents"));
+				workDto.setNote(result.getString("note"));
+				workDtoList.add(workDto);
 			}
 
 		} catch (SQLException e) {
@@ -159,7 +161,35 @@ public class CommonDbUtil {
 			throw new SystemException(e);
 		}
 
-		return null;
+		return workDtoList;
+	}
+
+	/**
+	 * 作業終了処理
+	 * 
+	 * @param string
+	 * @param paramMap
+	 * @return
+	 * @throws BusinessException
+	 */
+	public static int finishWork(String sql,
+			HashMap<Integer, Object> paramMap) {
+
+		int resultCnt = 0;
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql)) {
+
+			logger.info("発行SQL:{}", sql);
+
+			resultCnt = pstm.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error("DB接続失敗");
+			throw new SystemException(e);
+		}
+
+		return resultCnt;
 	}
 
 	public static List<WorkDto> findAllWork(String sql,

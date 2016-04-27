@@ -10,6 +10,7 @@
 <title>作業登録フォーム</title>
 </head>
 <body>
+	<jsp:include page="/WEB-INF/jsp/header.jsp" />
 	<%
 		String state = (String) request.getAttribute("state");
 		String stateStr = "";
@@ -41,7 +42,7 @@
 	<table>
 		<tr>
 			<th>作業内容</th>
-			<th>備考</th>
+			<th>備考 ${work.id}</th>
 		</tr>
 		<tr>
 			<td>${work.contents}</td>
@@ -50,7 +51,7 @@
 	</table>
 	<form method="post" action="/WorkManager/WorkRegister">
 		<input type="hidden" name="id" value="${work.id}"> <input
-			type="submit" value="作業終了">
+			type="submit" name="action" value="作業終了">
 	</form>
 </body>
 </html>

@@ -6,8 +6,10 @@ import java.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.core.db.dialect.DBUtil;
 import test.test.ojt.common.exception.BusinessException;
-import test.test.ojt.logic.WorkListLogic;
+import test.test.ojt.common.util.DateUtils;
+import test.test.ojt.logic.WorkLogic;
 import test.test.ojt.model.Work;
 
 public class WorkHelper {
@@ -22,14 +24,14 @@ public class WorkHelper {
 
 	void action(Work work, String actionName) throws BusinessException {
 
-		WorkListLogic logic = new WorkListLogic();
+		WorkLogic logic = new WorkLogic();
 		LocalTime time;
 		switch (actionName) {
 
 		case "insert":
 			time = logic.getStartTime(work);
-			work.setStartTime(time);
-			work.setEndTime(time);
+			work.setStartTime(DateUtils.getParseTime(time));
+			work.setEndTime(DateUtils.getParseTime(time));
 
 			logic.insertWork(work);
 
@@ -37,8 +39,8 @@ public class WorkHelper {
 
 		case "add":
 			time = logic.getEndTime(work);
-			work.setStartTime(time);
-			work.setEndTime(time);
+			work.setStartTime(DateUtils.getParseTime(time));
+			work.setEndTime(DateUtils.getParseTime(time));
 
 			logic.insertWork(work);
 

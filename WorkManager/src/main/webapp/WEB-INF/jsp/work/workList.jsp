@@ -1,12 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <%@page import="test.test.ojt.model.Work"%>
 <%@page import="java.util.ArrayList"%>
-<taglib xmlns="http://java.sun.com/xml/ns/j2ee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee web-jsptaglibrary_2_0.xsd"
-	version="2.0" />
-
-
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <html>
 <head>
@@ -27,26 +21,13 @@
 			}
 		}
 	}
+	String errMsg = (String) request.getAttribute("errMsg");
+	String listDate = (String) request.getAttribute("listDate");
 %>
 
 <body>
-	<table>
-		<tr>
-			<td>
-				<form method="get" action="/WorkManager/Menu">
-					<input type="submit" value="メニュー">
-				</form>
-			</td>
-			<td>
-				<form method="get" action="/WorkManager/Logout">
-					<input type="submit" value="ログアウト">
-				</form>
-			</td>
-		</tr>
-	</table>
+	<jsp:include page="/WEB-INF/jsp/header.jsp" />
 	<%
-		String errMsg = (String) request.getAttribute("errMsg");
-		String listDate = (String) request.getAttribute("listDate");
 		if (errMsg != null) {
 	%>
 	<h2 id=errMsg>${errMsg}</h2>
@@ -70,8 +51,18 @@
 					request.setAttribute("work", work);
 			%>
 			<tr>
-				<td><input type="radio" name="id" value="${work.id}"
-					checked="checked"></td>
+				<td>
+					<%
+						if (index == 0) {
+					%> <input type="radio" name="id" value="${work.id}"
+					checked="checked">
+					<%
+						} else {
+					%> <input type="radio" name="id" value="${work.id}">
+					<%
+						}
+					%>
+				</td>
 				<td>${work.startTime}</td>
 				<td>${work.endTime}</td>
 				<td>${work.workingTime}</td>

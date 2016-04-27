@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import test.test.ojt.common.exception.BusinessException;
 import test.test.ojt.common.exception.SystemException;
+import test.test.ojt.common.util.DateUtils;
 import test.test.ojt.dao.dto.WorkDto;
 import test.test.ojt.db.util.CommonDbUtil;
 import test.test.ojt.model.Work;
@@ -37,7 +38,6 @@ public class WorkDao {
 		List<WorkDto> dtoList = CommonDbUtil.findWorking(sql.toString(),
 				paramMap);
 
-		// TODO
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
 			Work elm = mappingDtoToModel(dtoElm);
@@ -45,6 +45,24 @@ public class WorkDao {
 		}
 
 		return workList;
+	}
+
+	public void finishWork(Work work) throws BusinessException {
+
+		StringBuilder sql = CommonDbUtil.readSql("finishWork.sql");
+
+		WorkDto dto = mappingModelToDto(work);
+
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		int resultCnt = CommonDbUtil.finishWork(sql.toString(), paramMap);
+		if (resultCnt == 0) {
+			throw new BusinessException("すでに完了した作業です。");
+		} else if (resultCnt == 1) {
+			logger.info("正常に作業が終了");
+		} else {
+			throw new SystemException("作業の終了が正常に行われませんでした。");
+		}
 	}
 
 	public List<Work> findAllWork(Work work) throws SystemException {
@@ -196,7 +214,6 @@ public class WorkDao {
 							| InvocationTargetException e) {
 						logger.info("リフレクション失敗", e);
 					}
-
 					dtoMap.put(fieldName, value);
 				}
 			}

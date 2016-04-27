@@ -20,7 +20,7 @@ import test.test.ojt.common.exception.BusinessException;
 import test.test.ojt.common.exception.SystemException;
 import test.test.ojt.common.util.ConvertToModelUtils;
 import test.test.ojt.common.util.DateUtils;
-import test.test.ojt.logic.WorkListLogic;
+import test.test.ojt.logic.WorkLogic;
 import test.test.ojt.model.Work;
 
 @WebServlet("/WorkList")
@@ -41,7 +41,7 @@ public class WorkListServlet extends HttpServlet {
 		work.setUserName(userName);
 		work.setWorkDate(LocalDate.now());
 
-		WorkListLogic logic = new WorkListLogic();
+		WorkLogic logic = new WorkLogic();
 		List<Work> workList = null;
 		workList = logic.findAllWork(work);
 		request.setAttribute("workList", workList);
@@ -90,7 +90,7 @@ public class WorkListServlet extends HttpServlet {
 		}
 
 		Map<String, String[]> requestParamMap = request.getParameterMap();
-		WorkListLogic logic = new WorkListLogic();
+		WorkLogic logic = new WorkLogic();
 
 		// submitボタン判定
 		String actionName = "";
