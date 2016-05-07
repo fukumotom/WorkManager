@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import test.test.ojt.common.exception.BusinessException;
 import test.test.ojt.common.exception.SystemException;
-import test.test.ojt.common.util.DateUtils;
 import test.test.ojt.dao.dto.WorkDto;
 import test.test.ojt.db.util.CommonDbUtil;
 import test.test.ojt.model.Work;
@@ -61,7 +60,23 @@ public class WorkDao {
 		} else if (resultCnt == 1) {
 			logger.info("正常に作業が終了");
 		} else {
-			throw new SystemException("作業の終了が正常に行われませんでした。");
+			throw new SystemException("作業終了が正常に行われませんでした。");
+		}
+	}
+
+	public void startWork(Work work) throws BusinessException {
+
+		StringBuilder sql = CommonDbUtil.readSql("startWork.sql");
+
+		WorkDto dto = mappingModelToDto(work);
+
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		int resultCnt = CommonDbUtil.startWork(sql.toString(), paramMap);
+		if (resultCnt > 0) {
+			logger.info("正常に作業を開始");
+			logger.info("作業開始件数:{}件", resultCnt);
+		} else {
+			throw new SystemException("作業開始が正常に行われませんでした。");
 		}
 	}
 

@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
 import java.time.LocalTime;
@@ -182,10 +183,30 @@ public class CommonDbUtil {
 
 			logger.info("発行SQL:{}", sql);
 
+			// parameter join
+			bindParam(pstm, paramMap);
 			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗");
+			throw new SystemException(e);
+		}
+
+		return resultCnt;
+	}
+
+	public static int startWork(String sql, HashMap<Integer, Object> paramMap) {
+
+		DataSource ds = lookup();
+		int resultCnt = 0;
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql)) {
+
+			bindParam(pstm, paramMap);
+			resultCnt = pstm.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error("DB接続失敗", e);
 			throw new SystemException(e);
 		}
 
@@ -239,7 +260,7 @@ public class CommonDbUtil {
 
 	public static LocalTime findTime(String sql,
 			HashMap<Integer, Object> paramMap, String column)
-			throws BusinessException, SystemException {
+					throws BusinessException, SystemException {
 
 		LocalTime time = null;
 		DataSource ds = lookup();
@@ -364,10 +385,57 @@ public class CommonDbUtil {
 	private static ArrayList<WorkDto> resultSetToWorkDtoList(ResultSet result)
 			throws SQLException {
 
+		String regex = "_[a-z]";
+		Pattern ptm = Pattern.compile(regex);
+
+		HashMap<String, String> clmNameMap = new HashMap<String, String>();
+		ResultSetMetaData meta = result.getMetaData();
+		for (int i = 1; i < meta.getColumnCount() + 1; i++) {
+
+			meta.getColumnType(i);
+			clmNameMap.put(meta.getColumnClassName(i), meta.getColumnLabel(i));
+		}
+
 		ArrayList<WorkDto> dtoList = new ArrayList<>();
+		// Method[] dtoMethods = new WorkDto().getClass().getMethods();
+		HashMap<String, String> setterTypeMap = new HashMap<String, String>();
+		for (Entry<String, String> entry : clmNameMap.entrySet()) {
+			String clmNm = entry.getValue();
+			logger.info("clmNameMap内容[型]:ラベル     [{}]:{}", entry.getKey(),
+					clmNm);
+
+			// ラベル名からフィールド名へ変換
+			Matcher mat = ptm.matcher(clmNm);
+			if (mat.find()) {
+				clmNm = clmNm.replace(mat.group(),
+						mat.group().substring(1).toUpperCase());
+			}
+			String setter = "set" + clmNm.substring(0, 1).toUpperCase()
+					+ clmNm.substring(1);
+			logger.info("setter:{}", setter);
+			clmNameMap.replace(entry.getKey(), setter);
+
+		}
+		for (Entry<String, String> entry : clmNameMap.entrySet()) {
+			logger.info("clmNameMap内容[型]:setter     [{}]:{}", entry.getKey(),
+					entry.getValue());
+		}
+
+		// Object obj;
+		// try {
+		// obj = Class.forName(entry.getValue()).getClass();
+		// } catch (ClassNotFoundException e) {
+		// logger.error("DBから取得した値の変換に失敗しました。");
+		// throw new SystemException(e);
+		// }
 		while (result.next()) {
 			WorkDto dto = new WorkDto();
-			dto.setId((Integer) (result.getObject("id")));
+
+			// if (obj instanceof String) {
+			//
+			// }
+
+			dto.setId((result.getInt("id")));
 			dto.setStartTime(result.getTime("start_time"));
 			dto.setEndTime(result.getTime("end_time"));
 			dto.setWorkingTime(result.getTime("working_time"));
@@ -375,6 +443,7 @@ public class CommonDbUtil {
 			dto.setNote(result.getString("note"));
 			dtoList.add(dto);
 		}
+
 		return dtoList;
 	}
 

@@ -11,4 +11,4 @@ WHERE
     AND w.work_date = Date 'now'
     AND w.delete_flg = 0
 order by 
-    w.start_Time, w.end_time
+    w.start_time, w.end_time

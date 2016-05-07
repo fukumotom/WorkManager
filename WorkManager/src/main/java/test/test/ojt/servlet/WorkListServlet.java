@@ -3,7 +3,6 @@ package test.test.ojt.servlet;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -62,6 +61,8 @@ public class WorkListServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		request.setCharacterEncoding("UTF-8");
+
 		// 作業リスト表示条件をセッションに保持
 		Work inputWork = (Work) request.getSession().getAttribute("criteria");
 		if (inputWork == null) {
@@ -89,7 +90,7 @@ public class WorkListServlet extends HttpServlet {
 			request.setAttribute("errMsg", e.getErrMsg());
 		}
 
-		Map<String, String[]> requestParamMap = request.getParameterMap();
+		String btnAction = request.getParameter("action");
 		WorkLogic logic = new WorkLogic();
 
 		// submitボタン判定
@@ -99,22 +100,22 @@ public class WorkListServlet extends HttpServlet {
 
 		try {
 
-			if (requestParamMap.containsKey("insertBtn")) {
+			if ("挿入".equals(btnAction)) {
 				actionName = "insert";
 				logger.info("挿入処理開始:");
 				helper.idCheck(inputWork.getId());
 				helper.action(inputWork, actionName);
-			} else if (requestParamMap.containsKey("addBtn")) {
+			} else if ("追加".equals(btnAction)) {
 				actionName = "add";
 				logger.info("追加処理開始:");
 				helper.idCheck(inputWork.getId());
 				helper.action(inputWork, actionName);
-			} else if (requestParamMap.containsKey("deleteBtn")) {
+			} else if ("削除".equals(btnAction)) {
 				actionName = "delete";
 				logger.info("削除処理開始:");
 				helper.idCheck(inputWork.getId());
 				helper.action(inputWork, actionName);
-			} else if (requestParamMap.containsKey("historyBtn")) {
+			} else if ("履歴".equals(btnAction)) {
 				actionName = "history";
 				logger.info("履歴表示処理開始:");
 				// 履歴日付入力チェック

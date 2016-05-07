@@ -3,6 +3,7 @@ package test.test.ojt.common.util;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 public class DateUtils {
 
@@ -19,15 +20,20 @@ public class DateUtils {
 		return LocalDate.now().format(dateFormatter);
 	}
 
-	public static LocalTime getfomatNowTime() {
-		String now = LocalDate.now().format(timeFormatter);
-		return LocalTime.parse(now);
+	public static LocalTime getNowTime() {
+		String now = LocalTime.now().format(timeFormatter);
+		return LocalTime.parse(now).truncatedTo(ChronoUnit.SECONDS);
 	}
 
 	public static LocalTime getParseTime(LocalTime time) {
 
 		String timeStr = time.format(timeFormatter);
-		return LocalTime.parse(timeStr);
+		return LocalTime.parse(timeStr).truncatedTo(ChronoUnit.SECONDS);
+	}
+
+	public static LocalTime getFomatTime(String startTime) {
+
+		return LocalTime.parse(startTime, timeFormatter);
 	}
 
 }

@@ -60,14 +60,19 @@ public class WorkLogic {
 		LocalTime startTime = DateUtils.getParseTime(inputWork.getStartTime());
 		logger.info("開始時間:{}", startTime);
 		LocalTime endTime = DateUtils.getParseTime(inputWork.getEndTime());
-		LocalTime hour = endTime.minusHours(startTime.getHour());
-		LocalTime minute = endTime.minusMinutes(startTime.getMinute());
-		LocalTime workingTime = LocalTime.of(hour.getHour(),
-				minute.getMinute());
+		LocalTime calcTime1 = endTime.minusHours(startTime.getHour());
+		LocalTime workingTime = calcTime1.minusMinutes(startTime.getMinute());
+//		LocalTime workingTime = LocalTime.of(hour.getHour(),
+//				minute.getMinute());
 		inputWork.setWorkingTime(DateUtils.getParseTime(workingTime));
 		logger.info("作業時間:{}", inputWork.getWorkingTime());
 
 		WorkDao dao = new WorkDao();
 		dao.finishWork(inputWork);
+	}
+
+	public void startWork(Work inputWork) throws BusinessException {
+		WorkDao dao = new WorkDao();
+		dao.startWork(inputWork);
 	}
 }

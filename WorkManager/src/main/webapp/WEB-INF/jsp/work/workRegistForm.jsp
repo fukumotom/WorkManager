@@ -30,6 +30,9 @@
 		request.setAttribute("stateStr", stateStr);
 	%>
 	<h2>現在の状況:${stateStr}</h2>
+	<%
+		if ("作業中".equals(stateStr)) {
+	%>
 	<table>
 		<tr>
 			<th>開始時間</th>
@@ -42,7 +45,7 @@
 	<table>
 		<tr>
 			<th>作業内容</th>
-			<th>備考 ${work.id}</th>
+			<th>備考</th>
 		</tr>
 		<tr>
 			<td>${work.contents}</td>
@@ -52,6 +55,33 @@
 	<form method="post" action="/WorkManager/WorkRegister">
 		<input type="hidden" name="id" value="${work.id}"> <input
 			type="submit" name="action" value="作業終了">
+	</form>
+	<%
+		}
+	%>
+	<form method="post" action="/WorkManager/WorkRegister">
+		<table>
+			<tr>
+				<th>開始時間</th>
+			</tr>
+			<tr>
+				<td><input type="text" name="startTime" value="（未入力の場合は現在時間）"></td>
+			</tr>
+		</table>
+		<br />
+		<table>
+			<tr>
+				<th>作業内容</th>
+				<th>備考</th>
+			</tr>
+			<tr>
+				<td><input type="text" name="contents"></td>
+				<td><input type="text" name="note"></td>
+			</tr>
+		</table>
+		<input type="hidden" name="state" value="${stateStr}"> <input
+			type="hidden" name="id" value="${work.id}"><input
+			type="submit" name="action" value="作業開始">
 	</form>
 </body>
 </html>

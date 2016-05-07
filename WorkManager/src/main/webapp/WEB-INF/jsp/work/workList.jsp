@@ -75,13 +75,13 @@
 		</table>
 		<table>
 			<tr>
-				<td><input type="submit" value="挿入" name="insertBtn"></td>
-				<td><input type="submit" value="追加" name="addBtn"></td>
-				<td><input type="submit" value="削除" name="deleteBtn"></td>
-				<td><input type="submit" value="保存" name="saveBtn"></td>
+				<td><input type="submit" value="挿入" name="action"></td>
+				<td><input type="submit" value="追加" name="action"></td>
+				<td><input type="submit" value="削除" name="action"></td>
+				<td><input type="submit" value="保存" name="action"></td>
 				<td><input type="checkbox" value="1" name="deleteFlg">
 						削除を含む <input type="text" name="workDate"> (yyyy/MM/dd) <input
-					type="submit" value="履歴" name="historyBtn"></td>
+					type="submit" value="履歴" name="action"></td>
 			</tr>
 		</table>
 

@@ -69,8 +69,10 @@ public class WorkRegister extends HttpServlet {
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request,
-			HttpServletResponse response) {
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		request.setCharacterEncoding("UTF-8");
 
 		String userName = request.getUserPrincipal().getName();
 		String id = request.getParameter("id");
@@ -79,16 +81,60 @@ public class WorkRegister extends HttpServlet {
 		inputWork.setId(ConvertToModelUtils.convertInt(id));
 
 		String action = request.getParameter("action");
-		WorkLogic logic = new WorkLogic();
-		if (action != null) {
-			inputWork.setEndTime(LocalTime.now());
+		// 作業終了処理
+		if ("作業終了".equals(action)) {
+
 			try {
-				LocalTime startTime = logic.getStartTime(inputWork);
-				inputWork.setStartTime(startTime);
-				logic.finishWork(inputWork);
+
+				workFinish(inputWork);
+
+			} catch (BusinessException e) {
+				request.setAttribute("errMsg", e.getMessage());
+			}
+		} else if ("作業開始".equals(action)) {
+
+			String state = request.getParameter("state");
+			logger.info("作業状況を取得:{}", state);
+
+			String startTime = request.getParameter("startTime");
+			String contents = (String) request.getParameter("contents");
+			String note = (String) request.getParameter("note");
+			logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", startTime, contents,
+					note);
+
+			if ("作業中".equals(state)) {
+
+				try {
+					workFinish(inputWork);
+				} catch (BusinessException e) {
+					request.setAttribute("errMsg", e.getMessage());
+				}
+			}
+
+			if (startTime != "") {
+				inputWork.setStartTime(DateUtils.getFomatTime(startTime));
+			} else {
+				// 未入力の場合、現在時間で開始
+				inputWork.setStartTime(DateUtils.getNowTime());
+			}
+			inputWork.setContents(contents);
+			inputWork.setNote(note);
+			WorkLogic logic = new WorkLogic();
+
+			try {
+				logic.startWork(inputWork);
 			} catch (BusinessException e) {
 				request.setAttribute("errMsg", e.getMessage());
 			}
 		}
+		doGet(request, response);
+	}
+
+	private void workFinish(Work inputWork) throws BusinessException {
+		WorkLogic logic = new WorkLogic();
+		inputWork.setEndTime(DateUtils.getNowTime());
+		LocalTime startTime = logic.getStartTime(inputWork);
+		inputWork.setStartTime(DateUtils.getParseTime(startTime));
+		logic.finishWork(inputWork);
 	}
 }
