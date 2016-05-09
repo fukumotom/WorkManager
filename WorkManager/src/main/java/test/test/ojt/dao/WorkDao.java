@@ -80,7 +80,7 @@ public class WorkDao {
 		}
 	}
 
-	public List<Work> findAllWork(Work work) throws SystemException {
+	public List<Work> findAllWork(Work work) {
 
 		// load sqlFile
 		String sqlName;

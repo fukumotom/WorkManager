@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import test.test.ojt.common.exception.BusinessException;
-import test.test.ojt.common.exception.SystemException;
 import test.test.ojt.common.util.DateUtils;
 import test.test.ojt.dao.WorkDao;
 import test.test.ojt.model.Work;
@@ -17,7 +16,7 @@ public class WorkLogic {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkLogic.class);
 
-	public List<Work> findAllWork(Work work) throws SystemException {
+	public List<Work> findAllWork(Work work) {
 		WorkDao dao = new WorkDao();
 		List<Work> workList = dao.findAllWork(work);
 		return workList;
@@ -62,8 +61,8 @@ public class WorkLogic {
 		LocalTime endTime = DateUtils.getParseTime(inputWork.getEndTime());
 		LocalTime calcTime1 = endTime.minusHours(startTime.getHour());
 		LocalTime workingTime = calcTime1.minusMinutes(startTime.getMinute());
-//		LocalTime workingTime = LocalTime.of(hour.getHour(),
-//				minute.getMinute());
+		// LocalTime workingTime = LocalTime.of(hour.getHour(),
+		// minute.getMinute());
 		inputWork.setWorkingTime(DateUtils.getParseTime(workingTime));
 		logger.info("作業時間:{}", inputWork.getWorkingTime());
 

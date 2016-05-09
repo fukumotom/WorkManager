@@ -111,8 +111,7 @@ public class CommonDbUtil {
 	 * @param sql
 	 * @param paramMap
 	 */
-	public static void insertUsers(String sql,
-			HashMap<Integer, Object> paramMap) {
+	public static void insertUsers(String sql, Map<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection();
@@ -134,7 +133,7 @@ public class CommonDbUtil {
 
 	// 作業登録処理用
 	public static List<WorkDto> findWorking(String sql,
-			HashMap<Integer, Object> paramMap) {
+			Map<Integer, Object> paramMap) {
 
 		ArrayList<WorkDto> workDtoList = new ArrayList<>();
 		DataSource ds = lookup();
@@ -173,8 +172,7 @@ public class CommonDbUtil {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public static int finishWork(String sql,
-			HashMap<Integer, Object> paramMap) {
+	public static int finishWork(String sql, Map<Integer, Object> paramMap) {
 
 		int resultCnt = 0;
 		DataSource ds = lookup();
@@ -195,7 +193,7 @@ public class CommonDbUtil {
 		return resultCnt;
 	}
 
-	public static int startWork(String sql, HashMap<Integer, Object> paramMap) {
+	public static int startWork(String sql, Map<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
 		int resultCnt = 0;
@@ -214,7 +212,7 @@ public class CommonDbUtil {
 	}
 
 	public static List<WorkDto> findAllWork(String sql,
-			HashMap<Integer, Object> paramMap) throws SystemException {
+			Map<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
 		ArrayList<WorkDto> dtoList;
@@ -238,8 +236,7 @@ public class CommonDbUtil {
 		return dtoList;
 	}
 
-	public static void insertWork(String sql,
-			HashMap<Integer, Object> paramMap) {
+	public static void insertWork(String sql, Map<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
 
@@ -258,9 +255,8 @@ public class CommonDbUtil {
 
 	}
 
-	public static LocalTime findTime(String sql,
-			HashMap<Integer, Object> paramMap, String column)
-					throws BusinessException, SystemException {
+	public static LocalTime findTime(String sql, Map<Integer, Object> paramMap,
+			String column) throws BusinessException {
 
 		LocalTime time = null;
 		DataSource ds = lookup();
@@ -296,7 +292,7 @@ public class CommonDbUtil {
 		return time;
 	}
 
-	public static void deleteWork(String sql, HashMap<Integer, Object> paramMap)
+	public static void deleteWork(String sql, Map<Integer, Object> paramMap)
 			throws BusinessException {
 
 		DataSource ds = lookup();
@@ -335,7 +331,7 @@ public class CommonDbUtil {
 	 * @throws SQLException
 	 */
 	private static void bindParam(PreparedStatement pstm,
-			HashMap<Integer, Object> paramMap) throws SQLException {
+			Map<Integer, Object> paramMap) throws SQLException {
 
 		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
 
@@ -416,24 +412,20 @@ public class CommonDbUtil {
 			clmNameMap.replace(entry.getKey(), setter);
 
 		}
+		Object obj;
 		for (Entry<String, String> entry : clmNameMap.entrySet()) {
 			logger.info("clmNameMap内容[型]:setter     [{}]:{}", entry.getKey(),
 					entry.getValue());
+			try {
+				obj = Class.forName(entry.getValue()).getClass();
+			} catch (ClassNotFoundException e) {
+				logger.error("DBから取得した値の変換に失敗しました。");
+				throw new SystemException(e);
+			}
 		}
 
-		// Object obj;
-		// try {
-		// obj = Class.forName(entry.getValue()).getClass();
-		// } catch (ClassNotFoundException e) {
-		// logger.error("DBから取得した値の変換に失敗しました。");
-		// throw new SystemException(e);
-		// }
 		while (result.next()) {
 			WorkDto dto = new WorkDto();
-
-			// if (obj instanceof String) {
-			//
-			// }
 
 			dto.setId((result.getInt("id")));
 			dto.setStartTime(result.getTime("start_time"));

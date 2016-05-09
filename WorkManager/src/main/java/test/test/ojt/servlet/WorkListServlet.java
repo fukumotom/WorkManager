@@ -85,7 +85,7 @@ public class WorkListServlet extends HttpServlet {
 
 			String deleteFlg = request.getParameter("deleteFlg");
 			inputWork.setDeleteFlg(
-					ConvertToModelUtils.convertBoolean(deleteFlg, "deleteFlg"));
+					ConvertToModelUtils.convertBoolean(deleteFlg));
 		} catch (BindFormatException e) {
 			request.setAttribute("errMsg", e.getErrMsg());
 		}

@@ -13,8 +13,8 @@ public class DateUtils {
 	public static final DateTimeFormatter timeFormatter = DateTimeFormatter
 			.ofPattern("HH:mm");
 
-	// private static final Logger logger = LoggerFactory
-	// .getLogger(DateUtils.class);
+	private DateUtils() {
+	}
 
 	public static String getTodayStr() {
 		return LocalDate.now().format(dateFormatter);

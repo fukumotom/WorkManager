@@ -9,6 +9,9 @@ import test.test.ojt.common.exception.BindFormatException;
 
 public class ConvertToModelUtils {
 
+	private ConvertToModelUtils() {
+	}
+
 	public static String convertStr(Object target) {
 
 		if (target instanceof String) {
@@ -28,13 +31,10 @@ public class ConvertToModelUtils {
 
 	}
 
-	public static boolean convertBoolean(String target, String targetName)
+	public static boolean convertBoolean(String target)
 			throws BindFormatException {
-		if ("true".equals(target)) {
-			return true;
-		} else {
-			return false;
-		}
+		return "true".equals(target);
+
 	}
 
 	public static LocalDate convertLocalDate(String target, String targetName)
