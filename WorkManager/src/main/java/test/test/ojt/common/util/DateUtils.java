@@ -20,6 +20,11 @@ public class DateUtils {
 		return LocalDate.now().format(dateFormatter);
 	}
 
+	public static String getNowTimeStr() {
+		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS)
+				.format(timeFormatter);
+	}
+
 	public static LocalTime getNowTime() {
 		String now = LocalTime.now().format(timeFormatter);
 		return LocalTime.parse(now).truncatedTo(ChronoUnit.SECONDS);

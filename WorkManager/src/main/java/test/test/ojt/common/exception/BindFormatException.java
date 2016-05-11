@@ -10,11 +10,9 @@ public class BindFormatException extends Exception {
 	private static final Logger logger = LoggerFactory
 			.getLogger(BindFormatException.class);
 
-	private String paramName;
+	private final String paramName;
 
-	private String paramValue;
-
-	private String errMsg;
+	private final String paramValue;
 
 	public BindFormatException(String paramName, String paramValue) {
 		this.paramName = paramName;
@@ -31,9 +29,12 @@ public class BindFormatException extends Exception {
 	}
 
 	public String getErrMsg() {
+		String errMsg;
 		if (this.paramName != null && this.paramValue != null) {
-			this.errMsg = this.paramName + "の値[" + this.paramValue + "]が不正です。";
+			errMsg = this.paramName + "の値[" + this.paramValue + "]が不正です。";
+		} else {
+			errMsg = "入力値バインドエラーです。";
 		}
-		return this.errMsg;
+		return errMsg;
 	}
 }

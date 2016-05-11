@@ -1,3 +1,4 @@
+<%@page import="test.test.ojt.common.util.DateUtils"%>
 <%@page import="test.test.ojt.model.Work"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
@@ -58,6 +59,8 @@
 	</form>
 	<%
 		}
+		String now = DateUtils.getNowTimeStr();
+		request.setAttribute("now", now);
 	%>
 	<form method="post" action="/WorkManager/WorkRegister">
 		<table>
@@ -65,7 +68,7 @@
 				<th>開始時間</th>
 			</tr>
 			<tr>
-				<td><input type="text" name="startTime" value="（未入力の場合は現在時間）"></td>
+				<td><input type="text" name="startTime" value="${now}"></td>
 			</tr>
 		</table>
 		<br />

@@ -78,7 +78,10 @@ public class WorkRegister extends HttpServlet {
 		String id = request.getParameter("id");
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
-		inputWork.setId(ConvertToModelUtils.convertInt(id));
+		if (id != "") {
+			// ID取得時に型変換
+			inputWork.setId(ConvertToModelUtils.convertInt(id));
+		}
 
 		String action = request.getParameter("action");
 		// 作業終了処理
