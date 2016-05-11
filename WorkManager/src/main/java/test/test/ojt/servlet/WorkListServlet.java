@@ -87,6 +87,7 @@ public class WorkListServlet extends HttpServlet {
 			inputWork.setDeleteFlg(
 					ConvertToModelUtils.convertBoolean(deleteFlg));
 		} catch (BindFormatException e) {
+			logger.warn("入力値のバインドに失敗");
 			request.setAttribute("errMsg", e.getErrMsg());
 		}
 
@@ -122,6 +123,7 @@ public class WorkListServlet extends HttpServlet {
 				helper.dateCheck(inputWork);
 			}
 		} catch (BusinessException e) {
+			logger.warn("入力チェックエラー");
 			if (request.getAttribute("errMsg") == null) {
 				request.setAttribute("errMsg", e.getMessage());
 			}
