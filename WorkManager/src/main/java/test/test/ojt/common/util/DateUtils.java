@@ -41,4 +41,9 @@ public class DateUtils {
 		return LocalTime.parse(startTime, timeFormatter);
 	}
 
+	public static String formatDate(LocalDate localDate) {
+
+		return localDate.format(dateFormatter);
+	}
+
 }

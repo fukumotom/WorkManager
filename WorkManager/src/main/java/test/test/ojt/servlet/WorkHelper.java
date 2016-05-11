@@ -6,7 +6,6 @@ import java.time.LocalTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import ch.qos.logback.core.db.dialect.DBUtil;
 import test.test.ojt.common.exception.BusinessException;
 import test.test.ojt.common.util.DateUtils;
 import test.test.ojt.logic.WorkLogic;
@@ -16,40 +15,24 @@ public class WorkHelper {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkHelper.class);
 
-	void idCheck(Integer id) throws BusinessException {
-		if (id == null) {
-			throw new BusinessException("行を選択して下さい。");
-		}
-	}
-
-	void action(Work work, String actionName) throws BusinessException {
+	private void insert(Work work, String actionName) throws BusinessException {
 
 		WorkLogic logic = new WorkLogic();
 		LocalTime time;
-		switch (actionName) {
-
-		case "insert":
+		if ("insert".equals(actionName)) {
 			time = logic.getStartTime(work);
-			work.setStartTime(DateUtils.getParseTime(time));
-			work.setEndTime(DateUtils.getParseTime(time));
-
-			logic.insertWork(work);
-
-			break;
-
-		case "add":
+		} else {
 			time = logic.getEndTime(work);
-			work.setStartTime(DateUtils.getParseTime(time));
-			work.setEndTime(DateUtils.getParseTime(time));
-
-			logic.insertWork(work);
-
-			break;
-
-		case "delete":
-			logic.delete(work);
-			break;
 		}
+		work.setStartTime(DateUtils.getParseTime(time));
+		work.setEndTime(DateUtils.getParseTime(time));
+		logic.insertWork(work);
+	}
+
+	private void delete(Work work) throws BusinessException {
+
+		WorkLogic logic = new WorkLogic();
+		logic.delete(work);
 	}
 
 	/**
@@ -60,7 +43,7 @@ public class WorkHelper {
 	 * @return
 	 * @throws BusinessException
 	 */
-	void dateCheck(Work inputWork) throws BusinessException {
+	private void dateCheck(Work inputWork) throws BusinessException {
 
 		LocalDate workDate = inputWork.getWorkDate();
 		logger.info("入力日付:{}", workDate);
@@ -76,4 +59,26 @@ public class WorkHelper {
 		}
 	}
 
+	public void check(String actionName, Work inputWork)
+			throws BusinessException {
+
+		switch (actionName) {
+		case "insert":
+		case "add":
+			insert(inputWork, actionName);
+			break;
+
+		case "delete":
+			delete(inputWork);
+			break;
+
+		case "history":
+			dateCheck(inputWork);
+			break;
+
+		default:
+			logger.warn("想定外の処理");
+			break;
+		}
+	}
 }

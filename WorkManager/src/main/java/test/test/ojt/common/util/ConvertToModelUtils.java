@@ -33,7 +33,7 @@ public class ConvertToModelUtils {
 
 	public static boolean convertBoolean(String target)
 			throws BindFormatException {
-		return "true".equals(target);
+		return "on".equals(target);
 
 	}
 

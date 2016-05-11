@@ -70,6 +70,7 @@ public class WorkListServlet extends HttpServlet {
 			request.getSession().setAttribute("criteria", inputWork);
 		}
 
+		String workDate = null;
 		// パラメータをモデルに設定
 		try {
 			// ログインユーザ
@@ -78,7 +79,7 @@ public class WorkListServlet extends HttpServlet {
 			String id = request.getParameter("id");
 			inputWork.setId(ConvertToModelUtils.convertInt(id));
 			// 履歴の日付と削除対象チェック
-			String workDate = request.getParameter("workDate");
+			workDate = request.getParameter("workDate");
 
 			inputWork.setWorkDate(
 					ConvertToModelUtils.convertLocalDate(workDate, "workDate"));
@@ -104,24 +105,18 @@ public class WorkListServlet extends HttpServlet {
 			if ("挿入".equals(btnAction)) {
 				actionName = "insert";
 				logger.info("挿入処理開始:");
-				helper.idCheck(inputWork.getId());
-				helper.action(inputWork, actionName);
 			} else if ("追加".equals(btnAction)) {
 				actionName = "add";
 				logger.info("追加処理開始:");
-				helper.idCheck(inputWork.getId());
-				helper.action(inputWork, actionName);
 			} else if ("削除".equals(btnAction)) {
 				actionName = "delete";
 				logger.info("削除処理開始:");
-				helper.idCheck(inputWork.getId());
-				helper.action(inputWork, actionName);
 			} else if ("履歴".equals(btnAction)) {
 				actionName = "history";
 				logger.info("履歴表示処理開始:");
-				// 履歴日付入力チェック
-				helper.dateCheck(inputWork);
 			}
+			helper.check(actionName, inputWork);
+
 		} catch (BusinessException e) {
 			logger.warn("入力チェックエラー");
 			if (request.getAttribute("errMsg") == null) {
@@ -132,6 +127,9 @@ public class WorkListServlet extends HttpServlet {
 		// 作業リストの再表示
 		List<Work> workList = logic.findAllWork(inputWork);
 		request.setAttribute("workList", workList);
+		if (inputWork.getWorkDate() != null) {
+			listDate = DateUtils.formatDate(inputWork.getWorkDate());
+		}
 		request.setAttribute("listDate", listDate);
 
 		RequestDispatcher dispatcher = request
