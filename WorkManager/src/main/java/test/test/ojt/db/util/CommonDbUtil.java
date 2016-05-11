@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -226,7 +228,7 @@ public class CommonDbUtil {
 
 			ResultSet result = pstm.executeQuery();
 
-			dtoList = resultSetToWorkDtoList(result);
+			dtoList = resultSetToWorkDtoList(result, WorkDto.class);
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
@@ -374,69 +376,91 @@ public class CommonDbUtil {
 	/**
 	 * SQL実行結果をDtoに詰め替える
 	 * 
+	 * @param <T>
+	 * 
 	 * @param result
+	 * @param dtoClass
 	 * @return
 	 * @throws SQLException
 	 */
-	private static ArrayList<WorkDto> resultSetToWorkDtoList(ResultSet result)
-			throws SQLException {
-
-		String regex = "_[a-z]";
-		Pattern ptm = Pattern.compile(regex);
+	private static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
+			Class<T> dtoClass) throws SQLException {
 
 		HashMap<String, String> clmNameMap = new HashMap<String, String>();
 		ResultSetMetaData meta = result.getMetaData();
 		for (int i = 1; i < meta.getColumnCount() + 1; i++) {
 
 			meta.getColumnType(i);
-			clmNameMap.put(meta.getColumnClassName(i), meta.getColumnLabel(i));
+			clmNameMap.put(meta.getColumnLabel(i), meta.getColumnClassName(i));
 		}
 
-		ArrayList<WorkDto> dtoList = new ArrayList<>();
-		// Method[] dtoMethods = new WorkDto().getClass().getMethods();
-		HashMap<String, String> setterTypeMap = new HashMap<String, String>();
-		for (Entry<String, String> entry : clmNameMap.entrySet()) {
-			String clmNm = entry.getValue();
-			logger.info("clmNameMap内容[型]:ラベル     [{}]:{}", entry.getKey(),
-					clmNm);
-
-			// ラベル名からフィールド名へ変換
-			Matcher mat = ptm.matcher(clmNm);
-			if (mat.find()) {
-				clmNm = clmNm.replace(mat.group(),
-						mat.group().substring(1).toUpperCase());
-			}
-			String setter = "set" + clmNm.substring(0, 1).toUpperCase()
-					+ clmNm.substring(1);
-			logger.info("setter:{}", setter);
-			clmNameMap.replace(entry.getKey(), setter);
-
-		}
-		Object obj;
-		for (Entry<String, String> entry : clmNameMap.entrySet()) {
-			logger.info("clmNameMap内容[型]:setter     [{}]:{}", entry.getKey(),
-					entry.getValue());
-			try {
-				obj = Class.forName(entry.getValue()).getClass();
-			} catch (ClassNotFoundException e) {
-				logger.error("DBから取得した値の変換に失敗しました。");
-				throw new SystemException(e);
-			}
-		}
+		ArrayList<T> dtoList = new ArrayList<>();
 
 		while (result.next()) {
-			WorkDto dto = new WorkDto();
+			T dto;
+			try {
+				dto = dtoClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e1) {
+				logger.error("DTOのリフレクションに失敗");
+				throw new SystemException(e1);
+			}
+			for (Entry<String, String> entry : clmNameMap.entrySet()) {
+				String label = entry.getKey();
+				String typeStr = entry.getValue();
+				logger.info("clmNameMap内容[ラベル]:型     [{}]:{}", label, typeStr);
 
-			dto.setId((result.getInt("id")));
-			dto.setStartTime(result.getTime("start_time"));
-			dto.setEndTime(result.getTime("end_time"));
-			dto.setWorkingTime(result.getTime("working_time"));
-			dto.setContents(result.getString("contents"));
-			dto.setNote(result.getString("note"));
+				// ラベルからDB結果を取得
+				Object obj;
+				if (typeStr.contains("Integer")) {
+					obj = result.getInt(label);
+				} else if (typeStr.contains("Time")) {
+					obj = result.getTime(label);
+				} else {
+					obj = result.getString(label);
+				}
+
+				// setterを取得
+				Method setter = createSetter(label, dtoClass);
+
+				try {
+					setter.invoke(dto, obj);
+
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					logger.error("DBのバインドに失敗");
+					throw new SystemException(e);
+				}
+			}
 			dtoList.add(dto);
 		}
-
 		return dtoList;
 	}
 
+	private static <T> Method createSetter(String label, Class<T> dtoClass) {
+
+		// ラベルからsetter文字列を作成
+		String[] pieces = label.split("_");
+		StringBuilder setterStr = new StringBuilder();
+
+		for (int i = 0; i < pieces.length; i++) {
+			if (i == 0) {
+				setterStr.append("set");
+			}
+			setterStr.append(pieces[i].substring(0, 1).toUpperCase());
+			setterStr.append(pieces[i].substring(1));
+		}
+
+		Method[] methods = dtoClass.getDeclaredMethods();
+		Method setter = null;
+		for (Method tmpSetter : methods) {
+			if (tmpSetter.getName().equals(setterStr.toString())) {
+				setter = tmpSetter;
+				break;
+			}
+		}
+		if (setter == null) {
+			logger.warn("{}のsetterが見つかりませんでした。", setterStr);
+		}
+		return setter;
+	}
 }
