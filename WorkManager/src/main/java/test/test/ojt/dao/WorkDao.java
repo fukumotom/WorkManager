@@ -182,7 +182,7 @@ public class WorkDao {
 	private HashMap<Integer, Object> createParamMap(StringBuilder sql,
 			WorkDto dto) {
 
-		Map<String, Object> dtoMap = createDtoMap(dto);
+		Map<String, Object> dtoMap = CommonDbUtil.createDtoMap(dto, WorkDto.class);
 
 		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
 
@@ -201,43 +201,6 @@ public class WorkDao {
 		}
 		return paramMap;
 
-	}
-
-	private HashMap<String, Object> createDtoMap(WorkDto dto) {
-		// Dtoのフィールド名と値のMapを作成
-		String regex = "get(([A-Z][a-zA-Z\\d]*))";
-		Pattern ptm = Pattern.compile(regex);
-
-		// Dtoのgetterからフィールド名を取得
-		Method[] methods = dto.getClass().getMethods();
-		HashMap<String, Object> dtoMap = new HashMap<>();
-
-		for (Method method : methods) {
-			// getterを抽出
-			Matcher mat = ptm.matcher(method.getName());
-			if (mat.find()) {
-				String getter = method.getName();
-				if (!getter.contains("Class")) {
-					String fieldName = mat.group(1);
-					fieldName = fieldName.substring(0, 1).toLowerCase()
-							+ fieldName.substring(1);
-
-					Object value = null;
-					try {
-						value = method.invoke(dto, null);
-					} catch (IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException e) {
-						logger.info("リフレクション失敗", e);
-					}
-					dtoMap.put(fieldName, value);
-				}
-			}
-		}
-
-		for (Entry<String, Object> entry : dtoMap.entrySet()) {
-			logger.info("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
-		}
-		return dtoMap;
 	}
 
 	private static Work mappingDtoToModel(WorkDto dto) {
