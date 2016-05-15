@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<%@page import="test.test.ojt.model.Work"%>
+<%@page import="jp.kigami.ojt.model.Work"%>
 <%@page import="java.util.ArrayList"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"%>
 <html>

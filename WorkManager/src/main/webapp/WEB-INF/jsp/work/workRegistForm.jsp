@@ -1,5 +1,5 @@
-<%@page import="test.test.ojt.common.util.DateUtils"%>
-<%@page import="test.test.ojt.model.Work"%>
+<%@page import="jp.kigami.ojt.common.util.DateUtils"%>
+<%@page import="jp.kigami.ojt.model.Work"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
