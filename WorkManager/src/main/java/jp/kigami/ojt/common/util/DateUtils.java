@@ -36,9 +36,9 @@ public class DateUtils {
 		return LocalTime.parse(timeStr).truncatedTo(ChronoUnit.SECONDS);
 	}
 
-	public static LocalTime getFomatTime(String startTime) {
+	public static LocalTime getFomatTime(String time) {
 
-		return LocalTime.parse(startTime, timeFormatter);
+		return LocalTime.parse(time, timeFormatter);
 	}
 
 	public static String formatDate(LocalDate localDate) {

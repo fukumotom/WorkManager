@@ -36,6 +36,20 @@ public class WorkHelper {
 	}
 
 	/**
+	 * 編集する作業の呼び出し
+	 * 
+	 * @param inputWork
+	 *            編集する作業の検索条件
+	 * @return
+	 */
+	public Work getEditWork(Work inputWork) {
+
+		WorkLogic logic = new WorkLogic();
+		return logic.getEditWork(inputWork);
+
+	}
+
+	/**
 	 * 履歴取得用日付の入力チェック
 	 * 
 	 * @param historyDate
@@ -76,8 +90,11 @@ public class WorkHelper {
 			dateCheck(inputWork);
 			break;
 
-		default:
-			logger.warn("想定外の処理");
+		case "save":
+			break;
+
+		case "edit":
+			// 処理なし
 			break;
 		}
 	}

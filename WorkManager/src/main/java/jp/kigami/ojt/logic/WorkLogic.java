@@ -74,4 +74,30 @@ public class WorkLogic {
 		WorkDao dao = new WorkDao();
 		dao.startWork(inputWork);
 	}
+
+	/**
+	 * 編集作業検索処理
+	 * 
+	 * @param inputWork
+	 * @return
+	 */
+	public Work getEditWork(Work inputWork) {
+
+		WorkDao dao = new WorkDao();
+
+		// DBから取得
+		return dao.getEditWork(inputWork);
+	}
+
+	/**
+	 * 作業更新処理
+	 * 
+	 * @param inputWork
+	 */
+	public void updateWork(Work inputWork) {
+
+		WorkDao dao = new WorkDao();
+		dao.updateWork(inputWork);
+
+	}
 }

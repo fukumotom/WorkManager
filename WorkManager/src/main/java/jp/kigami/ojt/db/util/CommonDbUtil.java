@@ -79,6 +79,24 @@ public class CommonDbUtil {
 	}
 
 	/**
+	 * JNDIによりデータソースを取得
+	 * 
+	 * @return
+	 */
+	private static DataSource lookup() {
+
+		DataSource ds = null;
+		try {
+			Context context = new InitialContext();
+			ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
+		} catch (NamingException e) {
+			logger.error("JNDI接続エラー:{}", e);
+			throw new SystemException(e);
+		}
+		return ds;
+	}
+
+	/**
 	 * sql文からパラメータ用Map作成
 	 * 
 	 * @param sql
@@ -110,6 +128,170 @@ public class CommonDbUtil {
 	}
 
 	/**
+	 * dtoに変換したパラメータをSQL文に補完する。
+	 * 
+	 * @param pstm
+	 *            クエリーSQL文
+	 * @param paramMap
+	 *            補完用パラメータ
+	 * @throws SQLException
+	 */
+	private static void bindParam(PreparedStatement pstm,
+			Map<Integer, Object> paramMap) throws SQLException {
+
+		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
+
+			Object value = entry.getValue();
+
+			if (value instanceof String) {
+				pstm.setString(entry.getKey(), (String) entry.getValue());
+			} else if (value instanceof Integer) {
+				pstm.setInt(entry.getKey(),
+						((Integer) entry.getValue()).intValue());
+			} else if (value instanceof Time) {
+				pstm.setTime(entry.getKey(), (Time) entry.getValue());
+			} else if (value instanceof Date) {
+				pstm.setDate(entry.getKey(), (Date) entry.getValue());
+			} else {
+				// 想定外の型は一律String型に置換
+				pstm.setString(entry.getKey(), entry.getValue().toString());
+			}
+		}
+	}
+
+	/**
+	 * SQL実行結果をDtoに詰め替える
+	 * 
+	 * @param <T>
+	 * 
+	 * @param result
+	 * @param dtoClass
+	 * @return
+	 * @throws SQLException
+	 */
+	private static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
+			Class<T> dtoClass) throws SQLException {
+
+		HashMap<String, String> clmNameMap = new HashMap<String, String>();
+		ResultSetMetaData meta = result.getMetaData();
+		for (int i = 1; i < meta.getColumnCount() + 1; i++) {
+
+			meta.getColumnType(i);
+			clmNameMap.put(meta.getColumnLabel(i), meta.getColumnClassName(i));
+		}
+
+		ArrayList<T> dtoList = new ArrayList<>();
+
+		while (result.next()) {
+			T dto;
+			try {
+				dto = dtoClass.newInstance();
+			} catch (InstantiationException | IllegalAccessException e1) {
+				logger.error("DTOのリフレクションに失敗");
+				throw new SystemException(e1);
+			}
+			for (Entry<String, String> entry : clmNameMap.entrySet()) {
+				String label = entry.getKey();
+				String typeStr = entry.getValue();
+				logger.info("clmNameMap内容[ラベル]:型     [{}]:{}", label, typeStr);
+
+				// ラベルからDB結果を取得
+				Object obj;
+				if (typeStr.contains("Integer")) {
+					obj = result.getInt(label);
+				} else if (typeStr.contains("Time")) {
+					obj = result.getTime(label);
+				} else {
+					obj = result.getString(label);
+				}
+
+				// setterを取得
+				Method setter = createSetter(label, dtoClass);
+
+				try {
+					setter.invoke(dto, obj);
+
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					logger.error("DBのバインドに失敗");
+					throw new SystemException(e);
+				}
+			}
+			dtoList.add(dto);
+		}
+		return dtoList;
+	}
+
+	private static <T> Method createSetter(String label, Class<T> dtoClass) {
+
+		// ラベルからsetter文字列を作成
+		String[] pieces = label.split("_");
+		StringBuilder setterStr = new StringBuilder();
+
+		for (int i = 0; i < pieces.length; i++) {
+			if (i == 0) {
+				setterStr.append("set");
+			}
+			setterStr.append(pieces[i].substring(0, 1).toUpperCase());
+			setterStr.append(pieces[i].substring(1));
+		}
+
+		Method[] methods = dtoClass.getDeclaredMethods();
+		Method setter = null;
+		for (Method tmpSetter : methods) {
+			if (tmpSetter.getName().equals(setterStr.toString())) {
+				setter = tmpSetter;
+				break;
+			}
+		}
+		if (setter == null) {
+			logger.warn("{}のsetterが見つかりませんでした。", setterStr);
+		}
+		return setter;
+	}
+
+	public static <T> HashMap<String, Object> createDtoMap(T dto,
+			Class<T> dtoClass) {
+
+		// Dtoのフィールド名と値のMapを作成
+		String regex = "get(([A-Z][a-zA-Z\\d]*))";
+		Pattern ptm = Pattern.compile(regex);
+
+		// Dtoのgetterからフィールド名を取得
+		Method[] methods = dtoClass.getDeclaredMethods();
+		HashMap<String, Object> dtoMap = new HashMap<>();
+
+		for (Method method : methods) {
+			// getterを抽出
+			Matcher mat = ptm.matcher(method.getName());
+			if (mat.find()) {
+				String getter = method.getName();
+				if (!getter.contains("Class")) {
+					String fieldName = mat.group(1);
+					fieldName = fieldName.substring(0, 1).toLowerCase()
+							+ fieldName.substring(1);
+
+					Object value = null;
+					try {
+						value = method.invoke(dto, null);
+					} catch (IllegalAccessException | IllegalArgumentException
+							| InvocationTargetException e) {
+						logger.info("リフレクション失敗", e);
+					}
+					dtoMap.put(fieldName, value);
+				}
+			}
+		}
+
+		for (Entry<String, Object> entry : dtoMap.entrySet()) {
+			logger.info("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
+		}
+		return dtoMap;
+	}
+
+	/**
+	 * ユーザ登録処理実行
+	 * 
 	 * @param sql
 	 * @param paramMap
 	 */
@@ -323,183 +505,48 @@ public class CommonDbUtil {
 
 	}
 
-	/**
-	 * dtoに変換したパラメータをSQL文に補完する。
-	 * 
-	 * @param pstm
-	 *            クエリーSQL文
-	 * @param paramMap
-	 *            補完用パラメータ
-	 * @throws SQLException
-	 */
-	private static void bindParam(PreparedStatement pstm,
-			Map<Integer, Object> paramMap) throws SQLException {
+	public static WorkDto findEditWork(String sql,
+			HashMap<Integer, Object> paramMap) {
 
-		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
+		WorkDto dto = new WorkDto();
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql)) {
 
-			Object value = entry.getValue();
+			logger.info("発行SQL:{}", sql);
 
-			if (value instanceof String) {
-				pstm.setString(entry.getKey(), (String) entry.getValue());
-			} else if (value instanceof Integer) {
-				pstm.setInt(entry.getKey(),
-						((Integer) entry.getValue()).intValue());
-			} else if (value instanceof Time) {
-				pstm.setTime(entry.getKey(), (Time) entry.getValue());
-			} else if (value instanceof Date) {
-				pstm.setDate(entry.getKey(), (Date) entry.getValue());
-			} else {
-				// 想定外の型は一律String型に置換
-				pstm.setString(entry.getKey(), entry.getValue().toString());
-			}
-		}
-	}
+			bindParam(pstm, paramMap);
 
-	/**
-	 * JNDIによりデータソースを取得
-	 * 
-	 * @return
-	 */
-	private static DataSource lookup() {
+			ResultSet result = pstm.executeQuery();
+			ArrayList<WorkDto> dtolist = resultSetToWorkDtoList(result,
+					WorkDto.class);
+			dto = dtolist.get(0);
 
-		DataSource ds = null;
-		try {
-			Context context = new InitialContext();
-			ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
-		} catch (NamingException e) {
-			logger.error("JNDI接続エラー:{}", e);
+		} catch (SQLException e) {
+			logger.error("編集作業取得失敗", e);
 			throw new SystemException(e);
 		}
-		return ds;
+
+		return dto;
 	}
 
-	/**
-	 * SQL実行結果をDtoに詰め替える
-	 * 
-	 * @param <T>
-	 * 
-	 * @param result
-	 * @param dtoClass
-	 * @return
-	 * @throws SQLException
-	 */
-	private static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
-			Class<T> dtoClass) throws SQLException {
+	public static void updataWork(String sql,
+			HashMap<Integer, Object> paramMap) {
 
-		HashMap<String, String> clmNameMap = new HashMap<String, String>();
-		ResultSetMetaData meta = result.getMetaData();
-		for (int i = 1; i < meta.getColumnCount() + 1; i++) {
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
 
-			meta.getColumnType(i);
-			clmNameMap.put(meta.getColumnLabel(i), meta.getColumnClassName(i));
+			logger.info("発行SQL:{}", sql);
+
+			bindParam(pstm, paramMap);
+
+			pstm.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error("編集作業失敗", e);
+			throw new SystemException(e);
 		}
 
-		ArrayList<T> dtoList = new ArrayList<>();
-
-		while (result.next()) {
-			T dto;
-			try {
-				dto = dtoClass.newInstance();
-			} catch (InstantiationException | IllegalAccessException e1) {
-				logger.error("DTOのリフレクションに失敗");
-				throw new SystemException(e1);
-			}
-			for (Entry<String, String> entry : clmNameMap.entrySet()) {
-				String label = entry.getKey();
-				String typeStr = entry.getValue();
-				logger.info("clmNameMap内容[ラベル]:型     [{}]:{}", label, typeStr);
-
-				// ラベルからDB結果を取得
-				Object obj;
-				if (typeStr.contains("Integer")) {
-					obj = result.getInt(label);
-				} else if (typeStr.contains("Time")) {
-					obj = result.getTime(label);
-				} else {
-					obj = result.getString(label);
-				}
-
-				// setterを取得
-				Method setter = createSetter(label, dtoClass);
-
-				try {
-					setter.invoke(dto, obj);
-
-				} catch (IllegalAccessException | IllegalArgumentException
-						| InvocationTargetException e) {
-					logger.error("DBのバインドに失敗");
-					throw new SystemException(e);
-				}
-			}
-			dtoList.add(dto);
-		}
-		return dtoList;
-	}
-
-	private static <T> Method createSetter(String label, Class<T> dtoClass) {
-
-		// ラベルからsetter文字列を作成
-		String[] pieces = label.split("_");
-		StringBuilder setterStr = new StringBuilder();
-
-		for (int i = 0; i < pieces.length; i++) {
-			if (i == 0) {
-				setterStr.append("set");
-			}
-			setterStr.append(pieces[i].substring(0, 1).toUpperCase());
-			setterStr.append(pieces[i].substring(1));
-		}
-
-		Method[] methods = dtoClass.getDeclaredMethods();
-		Method setter = null;
-		for (Method tmpSetter : methods) {
-			if (tmpSetter.getName().equals(setterStr.toString())) {
-				setter = tmpSetter;
-				break;
-			}
-		}
-		if (setter == null) {
-			logger.warn("{}のsetterが見つかりませんでした。", setterStr);
-		}
-		return setter;
-	}
-
-	public static <T> HashMap<String, Object> createDtoMap(T dto,
-			Class<T> dtoClass) {
-
-		// Dtoのフィールド名と値のMapを作成
-		String regex = "get(([A-Z][a-zA-Z\\d]*))";
-		Pattern ptm = Pattern.compile(regex);
-
-		// Dtoのgetterからフィールド名を取得
-		Method[] methods = dtoClass.getDeclaredMethods();
-		HashMap<String, Object> dtoMap = new HashMap<>();
-
-		for (Method method : methods) {
-			// getterを抽出
-			Matcher mat = ptm.matcher(method.getName());
-			if (mat.find()) {
-				String getter = method.getName();
-				if (!getter.contains("Class")) {
-					String fieldName = mat.group(1);
-					fieldName = fieldName.substring(0, 1).toLowerCase()
-							+ fieldName.substring(1);
-
-					Object value = null;
-					try {
-						value = method.invoke(dto, null);
-					} catch (IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException e) {
-						logger.info("リフレクション失敗", e);
-					}
-					dtoMap.put(fieldName, value);
-				}
-			}
-		}
-
-		for (Entry<String, Object> entry : dtoMap.entrySet()) {
-			logger.info("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
-		}
-		return dtoMap;
 	}
 }

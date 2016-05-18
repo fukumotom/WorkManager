@@ -100,6 +100,8 @@ public class WorkListServlet extends HttpServlet {
 		WorkHelper helper = new WorkHelper();
 		String listDate = DateUtils.getTodayStr();
 
+		String requestPath = "/WEB-INF/jsp/work/workList.jsp";
+
 		try {
 
 			if ("挿入".equals(btnAction)) {
@@ -114,6 +116,16 @@ public class WorkListServlet extends HttpServlet {
 			} else if ("履歴".equals(btnAction)) {
 				actionName = "history";
 				logger.info("履歴表示処理開始:");
+			} else if ("保存".equals(btnAction)) {
+				actionName = "save";
+				logger.info("保存処理開始:");
+			} else {
+				// 編集
+				actionName = "edit";
+				logger.info("編集処理開始:");
+				requestPath = "/WEB-INF/jsp/work/workEditForm.jsp";
+				Work editWork = helper.getEditWork(inputWork);
+				request.setAttribute("editWork", editWork);
 			}
 			helper.check(actionName, inputWork);
 
@@ -124,16 +136,18 @@ public class WorkListServlet extends HttpServlet {
 			}
 		}
 
-		// 作業リストの再表示
-		List<Work> workList = logic.findAllWork(inputWork);
-		request.setAttribute("workList", workList);
-		if (inputWork.getWorkDate() != null) {
-			listDate = DateUtils.formatDate(inputWork.getWorkDate());
+		if (!"edit".equals(actionName)) {
+			// 作業リストの再表示
+			List<Work> workList = logic.findAllWork(inputWork);
+			request.setAttribute("workList", workList);
+			if (inputWork.getWorkDate() != null) {
+				listDate = DateUtils.formatDate(inputWork.getWorkDate());
+			}
+			request.setAttribute("listDate", listDate);
 		}
-		request.setAttribute("listDate", listDate);
 
 		RequestDispatcher dispatcher = request
-				.getRequestDispatcher("/WEB-INF/jsp/work/workList.jsp");
+				.getRequestDispatcher(requestPath);
 
 		try {
 			dispatcher.forward(request, response);

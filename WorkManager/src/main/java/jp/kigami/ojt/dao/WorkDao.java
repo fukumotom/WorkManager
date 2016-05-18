@@ -1,7 +1,5 @@
 package jp.kigami.ojt.dao;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.sql.Date;
 import java.sql.Time;
 import java.time.LocalTime;
@@ -10,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +21,95 @@ import jp.kigami.ojt.model.Work;
 public class WorkDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(Work.class);
+
+	private HashMap<Integer, Object> createParamMap(StringBuilder sql,
+			WorkDto dto) {
+
+		Map<String, Object> dtoMap = CommonDbUtil.createDtoMap(dto,
+				WorkDto.class);
+
+		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
+
+		HashMap<Integer, Object> paramMap = new HashMap<>();
+
+		for (Entry<String, Object> fieldEntry : dtoMap.entrySet()) {
+
+			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
+				if ((fieldEntry.getKey()).equals(sqlEntry.getValue())) {
+
+					paramMap.put(sqlEntry.getKey(), fieldEntry.getValue());
+					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(),
+							fieldEntry.getValue());
+				}
+			}
+		}
+		return paramMap;
+
+	}
+
+	private static Work mappingDtoToModel(WorkDto dto) {
+
+		Work work = new Work();
+
+		work.setId(dto.getId());
+		work.setUserName(dto.getUserName());
+		work.setStartTime(dto.getStartTime().toLocalTime());
+		if (dto.getEndTime() != null) {
+			work.setEndTime(dto.getEndTime().toLocalTime());
+		}
+		if (dto.getWorkingTime() != null) {
+			work.setWorkingTime(dto.getWorkingTime().toLocalTime());
+		}
+		work.setContents(dto.getContents());
+		work.setNote(dto.getNote());
+		return work;
+	}
+
+	private static WorkDto mappingModelToDto(Work work) {
+
+		WorkDto dto = new WorkDto();
+		dto.setId(work.getId());
+		dto.setUserName(work.getUserName());
+		if (work.getStartTime() != null) {
+			dto.setStartTime(Time.valueOf(work.getStartTime()));
+		}
+		if (work.getEndTime() != null) {
+			dto.setEndTime(Time.valueOf(work.getEndTime()));
+		}
+		if (work.getWorkingTime() != null) {
+			dto.setWorkingTime(Time.valueOf(work.getWorkingTime()));
+		}
+		dto.setContents(work.getContents());
+		dto.setNote(work.getNote());
+		if (work.getDeleteFlg()) {
+			dto.setDeleteFlg(1);
+		} else {
+			dto.setDeleteFlg(0);
+		}
+		if (work.getWorkDate() != null) {
+			dto.setWorkDate(Date.valueOf(work.getWorkDate()));
+		}
+		return dto;
+	}
+
+	/**
+	 * 編集するWork情報を取得
+	 * 
+	 * @param inputWork
+	 * @return
+	 */
+	public Work getEditWork(Work work) {
+
+		// load SQLfile
+		StringBuilder sql = CommonDbUtil.readSql("getEditWork.sql");
+
+		WorkDto dto = mappingModelToDto(work);
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		WorkDto resultDto = CommonDbUtil.findEditWork(sql.toString(), paramMap);
+
+		return mappingDtoToModel(resultDto);
+	}
 
 	public List<Work> findWorking(Work work) {
 
@@ -179,73 +264,17 @@ public class WorkDao {
 
 	}
 
-	private HashMap<Integer, Object> createParamMap(StringBuilder sql,
-			WorkDto dto) {
+	public void updateWork(Work inputWork) {
 
-		Map<String, Object> dtoMap = CommonDbUtil.createDtoMap(dto, WorkDto.class);
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("updataWork.sql");
 
-		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
+		WorkDto dto = mappingModelToDto(inputWork);
 
-		HashMap<Integer, Object> paramMap = new HashMap<>();
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		for (Entry<String, Object> fieldEntry : dtoMap.entrySet()) {
+		CommonDbUtil.updataWork(sql.toString(), paramMap);
 
-			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
-				if ((fieldEntry.getKey()).equals(sqlEntry.getValue())) {
-
-					paramMap.put(sqlEntry.getKey(), fieldEntry.getValue());
-					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(),
-							fieldEntry.getValue());
-				}
-			}
-		}
-		return paramMap;
-
-	}
-
-	private static Work mappingDtoToModel(WorkDto dto) {
-
-		Work work = new Work();
-
-		work.setId(dto.getId());
-		work.setUserName(dto.getUserName());
-		work.setStartTime(dto.getStartTime().toLocalTime());
-		if (dto.getEndTime() != null) {
-			work.setEndTime(dto.getEndTime().toLocalTime());
-		}
-		if (dto.getWorkingTime() != null) {
-			work.setWorkingTime(dto.getWorkingTime().toLocalTime());
-		}
-		work.setContents(dto.getContents());
-		work.setNote(dto.getNote());
-		return work;
-	}
-
-	private static WorkDto mappingModelToDto(Work work) {
-
-		WorkDto dto = new WorkDto();
-		dto.setId(work.getId());
-		dto.setUserName(work.getUserName());
-		if (work.getStartTime() != null) {
-			dto.setStartTime(Time.valueOf(work.getStartTime()));
-		}
-		if (work.getEndTime() != null) {
-			dto.setEndTime(Time.valueOf(work.getEndTime()));
-		}
-		if (work.getWorkingTime() != null) {
-			dto.setWorkingTime(Time.valueOf(work.getWorkingTime()));
-		}
-		dto.setContents(work.getContents());
-		dto.setNote(work.getNote());
-		if (work.getDeleteFlg()) {
-			dto.setDeleteFlg(1);
-		} else {
-			dto.setDeleteFlg(0);
-		}
-		if (work.getWorkDate() != null) {
-			dto.setWorkDate(Date.valueOf(work.getWorkDate()));
-		}
-		return dto;
 	}
 
 }
