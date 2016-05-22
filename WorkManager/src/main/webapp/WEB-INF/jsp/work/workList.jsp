@@ -73,6 +73,13 @@
 				}
 			%>
 		</table>
+		<%
+			if (workList.size() == 0) {
+		%>
+		<BR /> データがありません。<BR />
+		<%
+			}
+		%>
 		<table>
 			<tr>
 				<td><input type="submit" value="挿入" name="action"></td>

@@ -18,17 +18,22 @@ public class MenuServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Logger logger = LoggerFactory.getLogger(MenuServlet.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(MenuServlet.class);
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+	public void doGet(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		// 検索条件削除
 		HttpSession session = request.getSession();
 		session.removeAttribute("criteria");
 		logger.info("検索条件を削除。");
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/WEB-INF/jsp/menu.jsp");
+		// 未保存情報削除
+
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher("/WEB-INF/jsp/menu.jsp");
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {

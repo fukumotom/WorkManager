@@ -65,7 +65,11 @@ public class WorkRegister extends HttpServlet {
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 
-		dispatcher.forward(request, response);
+		try {
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
+			logger.error("フォワード失敗", e);
+		}
 	}
 
 	@Override

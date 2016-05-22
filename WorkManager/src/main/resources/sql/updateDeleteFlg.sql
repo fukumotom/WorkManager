@@ -5,3 +5,4 @@ SET
 	,status_flg = 1
 WHERE
 	id = ${id}
+	AND user_name = ${userName}

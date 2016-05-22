@@ -73,6 +73,11 @@ public class WorkHelper {
 		}
 	}
 
+	private void save(Work inputWork) {
+		WorkLogic logic = new WorkLogic();
+		logic.saveWork(inputWork);
+	}
+
 	public void check(String actionName, Work inputWork)
 			throws BusinessException {
 
@@ -91,6 +96,7 @@ public class WorkHelper {
 			break;
 
 		case "save":
+			save(inputWork);
 			break;
 
 		case "edit":
@@ -98,4 +104,5 @@ public class WorkHelper {
 			break;
 		}
 	}
+
 }

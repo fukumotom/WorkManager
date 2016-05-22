@@ -549,4 +549,22 @@ public class CommonDbUtil {
 		}
 
 	}
+
+	public static void saveWork(String sql, HashMap<Integer, Object> paramMap) {
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql);) {
+
+			logger.info("発行SQL:{}", sql);
+
+			bindParam(pstm, paramMap);
+
+			pstm.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error("編集作業失敗", e);
+			throw new SystemException(e);
+		}
+
+	}
 }

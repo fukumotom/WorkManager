@@ -10,3 +10,4 @@ SET
 	,uptime = Timestamp 'now'
 WHERE
 	id = ${id}
+	AND user_name = ${userName}

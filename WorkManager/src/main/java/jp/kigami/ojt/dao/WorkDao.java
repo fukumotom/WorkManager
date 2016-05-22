@@ -274,7 +274,17 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		CommonDbUtil.updataWork(sql.toString(), paramMap);
+	}
 
+	public void saveWork(Work inputWork) {
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("saveWork.sql");
+
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		CommonDbUtil.saveWork(sql.toString(), paramMap);
 	}
 
 }

@@ -100,4 +100,9 @@ public class WorkLogic {
 		dao.updateWork(inputWork);
 
 	}
+
+	public void saveWork(Work inputWork) {
+		WorkDao dao = new WorkDao();
+		dao.saveWork(inputWork);
+	}
 }
