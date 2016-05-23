@@ -287,4 +287,16 @@ public class WorkDao {
 		CommonDbUtil.saveWork(sql.toString(), paramMap);
 	}
 
+	public void deleteUnSaveWork(Work inputWork) {
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("deleteUnSaveWork.sql");
+
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		CommonDbUtil.deleteUnSaveWork(sql.toString(), paramMap);
+
+	}
+
 }

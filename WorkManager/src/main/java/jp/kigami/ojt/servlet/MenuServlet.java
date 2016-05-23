@@ -13,6 +13,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.kigami.ojt.model.Work;
+
 @WebServlet("/Menu")
 public class MenuServlet extends HttpServlet {
 
@@ -30,7 +32,12 @@ public class MenuServlet extends HttpServlet {
 		session.removeAttribute("criteria");
 		logger.info("検索条件を削除。");
 
-		// 未保存情報削除
+		// 未保存作業削除
+		Work work = new Work();
+		String userName = request.getUserPrincipal().getName();
+		work.setUserName(userName);
+		WorkHelper helper = new WorkHelper();
+		helper.deleteUnSaveWork(work);
 
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/menu.jsp");

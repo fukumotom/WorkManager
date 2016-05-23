@@ -105,4 +105,10 @@ public class WorkLogic {
 		WorkDao dao = new WorkDao();
 		dao.saveWork(inputWork);
 	}
+
+	public void deleteUnSaveWork(Work inputWork) {
+		WorkDao dao = new WorkDao();
+		dao.deleteUnSaveWork(inputWork);
+
+	}
 }

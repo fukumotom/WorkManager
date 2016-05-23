@@ -78,6 +78,11 @@ public class WorkHelper {
 		logic.saveWork(inputWork);
 	}
 
+	public void deleteUnSaveWork(Work inputWork) {
+		WorkLogic logic = new WorkLogic();
+		logic.deleteUnSaveWork(inputWork);
+	}
+
 	public void check(String actionName, Work inputWork)
 			throws BusinessException {
 
@@ -93,6 +98,7 @@ public class WorkHelper {
 
 		case "history":
 			dateCheck(inputWork);
+			deleteUnSaveWork(inputWork);
 			break;
 
 		case "save":

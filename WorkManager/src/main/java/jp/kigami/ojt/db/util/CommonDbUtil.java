@@ -565,6 +565,30 @@ public class CommonDbUtil {
 			logger.error("編集作業失敗", e);
 			throw new SystemException(e);
 		}
+	}
 
+	/**
+	 * 未保存作業削除SQL発行
+	 * 
+	 * @param string
+	 * @param paramMap
+	 */
+	public static void deleteUnSaveWork(String sql,
+			HashMap<Integer, Object> paramMap) {
+
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql)) {
+
+			logger.info("発行SQL:{}", sql);
+
+			bindParam(pstm, paramMap);
+
+			pstm.executeUpdate();
+
+		} catch (SQLException e) {
+			logger.error("未保存作業削除失敗", e);
+			throw new SystemException(e);
+		}
 	}
 }
