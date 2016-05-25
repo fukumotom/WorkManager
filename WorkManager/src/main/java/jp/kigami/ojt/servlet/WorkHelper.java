@@ -111,4 +111,15 @@ public class WorkHelper {
 		}
 	}
 
+	public void calcWorkTime(Work inputWork) {
+		LocalTime startTime = DateUtils.getParseTime(inputWork.getStartTime());
+		logger.info("開始時間:{}", startTime);
+
+		LocalTime endTime = DateUtils.getParseTime(inputWork.getEndTime());
+		LocalTime calcTime1 = endTime.minusHours(startTime.getHour());
+		LocalTime workingTime = calcTime1.minusMinutes(startTime.getMinute());
+		inputWork.setWorkingTime(DateUtils.getParseTime(workingTime));
+		logger.info("作業時間:{}", inputWork.getWorkingTime());
+	}
+
 }

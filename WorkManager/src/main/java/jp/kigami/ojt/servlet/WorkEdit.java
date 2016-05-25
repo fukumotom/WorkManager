@@ -1,11 +1,7 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.kigami.ojt.common.exception.BusinessException;
+import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConvertToModelUtils;
 import jp.kigami.ojt.common.util.DateUtils;
 import jp.kigami.ojt.logic.WorkLogic;
@@ -56,7 +52,12 @@ public class WorkEdit extends HttpServlet {
 		WorkLogic logic = new WorkLogic();
 
 		logic.updateWork(inputWork);
-		// TODO 作業リストへ戻る
-		doGet(request, response);
+
+		// 作業リストへ戻る
+		try {
+			response.sendRedirect("/WorkManager/WorkList");
+		} catch (IOException e) {
+			throw new SystemException(e);
+		}
 	}
 }
