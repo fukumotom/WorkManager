@@ -1,3 +1,7 @@
 #errMsg {
-color:red;
+	color: red;
+}
+
+.loginForm, .userForm {
+	width: 10em;
 }
