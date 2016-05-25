@@ -21,6 +21,10 @@ import jp.kigami.ojt.common.util.DateUtils;
 import jp.kigami.ojt.logic.WorkLogic;
 import jp.kigami.ojt.model.Work;
 
+/**
+ * 作業登録/完了処理
+ *
+ */
 @WebServlet("/WorkRegister")
 public class WorkRegister extends HttpServlet {
 
@@ -137,11 +141,21 @@ public class WorkRegister extends HttpServlet {
 		doGet(request, response);
 	}
 
+	/**
+	 * 作業完了処理
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
 	private void workFinish(Work inputWork) throws BusinessException {
 		WorkLogic logic = new WorkLogic();
 		inputWork.setEndTime(DateUtils.getNowTime());
 		LocalTime startTime = logic.getStartTime(inputWork);
 		inputWork.setStartTime(DateUtils.getParseTime(startTime));
+
+		WorkHelper helper = new WorkHelper();
+		helper.calcWorkTime(inputWork);
+
 		logic.finishWork(inputWork);
 	}
 }

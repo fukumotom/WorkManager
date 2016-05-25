@@ -111,6 +111,10 @@ public class WorkHelper {
 		}
 	}
 
+	/**
+	 * 作業時間の計算処理
+	 * @param inputWork
+	 */
 	public void calcWorkTime(Work inputWork) {
 		LocalTime startTime = DateUtils.getParseTime(inputWork.getStartTime());
 		logger.info("開始時間:{}", startTime);

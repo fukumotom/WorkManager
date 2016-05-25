@@ -3,6 +3,7 @@ UPDATE
 SET
 	start_time = ${startTime}
 	,end_time = ${endTime}
+	,working_time = ${workingTime}
 	,contents = ${contents}
 	,note = ${note}
 	,update_flg = 1
