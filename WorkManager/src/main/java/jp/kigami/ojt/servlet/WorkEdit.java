@@ -29,8 +29,6 @@ public class WorkEdit extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		request.setCharacterEncoding("UTF-8");
-
 		String userName = request.getUserPrincipal().getName();
 		String id = request.getParameter("id");
 		Work inputWork = new Work();

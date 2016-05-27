@@ -41,7 +41,7 @@ public class WorkListServlet extends HttpServlet {
 		work.setWorkDate(LocalDate.now());
 
 		WorkLogic logic = new WorkLogic();
-		List<Work> workList = null;
+		List<Work> workList = logic.findAllWork(work);
 		workList = logic.findAllWork(work);
 		request.setAttribute("workList", workList);
 
@@ -60,8 +60,6 @@ public class WorkListServlet extends HttpServlet {
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		request.setCharacterEncoding("UTF-8");
 
 		// 作業リスト表示条件をセッションに保持
 		Work inputWork = (Work) request.getSession().getAttribute("criteria");
