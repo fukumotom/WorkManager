@@ -118,7 +118,7 @@ public class UserRegister extends HttpServlet {
 
 		// 登録情報設定
 		User user = new User();
-		user.setUserName(request.getParameter("userName"));
+		user.setUserName(request.getParameter("j_username"));
 
 		// 暗号化
 		String plainPassword = request.getParameter("password");
@@ -138,7 +138,7 @@ public class UserRegister extends HttpServlet {
 	private ArrayList<ValidationResult> validation(HttpServletRequest request) {
 
 		ArrayList<ValidationResult> resultList = new ArrayList<>();
-		String userName = request.getParameter("userName");
+		String userName = request.getParameter("j_username");
 		String password = request.getParameter("password");
 		String passConfilm = request.getParameter("passwordConfirm");
 
