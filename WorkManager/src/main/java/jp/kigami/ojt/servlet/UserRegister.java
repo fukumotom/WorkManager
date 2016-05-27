@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.EncryptionUtils;
 import jp.kigami.ojt.common.util.InputValidation;
 import jp.kigami.ojt.common.util.ValidationResult;
@@ -79,6 +80,30 @@ public class UserRegister extends HttpServlet {
 	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) {
 
+		String actionBtn = request.getParameter("actionBtn");
+
+		try {
+
+			if ("戻る".equals(actionBtn)) {
+				response.sendRedirect("/WorkManager/Menu");
+			} else if ("確認".equals(actionBtn)) {
+				confilm(request, response);
+			}
+		} catch (IOException | ServletException e) {
+			throw new SystemException(e);
+		}
+	}
+
+	/**
+	 * 確認画面遷移
+	 * 
+	 * @param request
+	 * @param response
+	 * @throws IOException
+	 * @throws ServletException
+	 */
+	private void confilm(HttpServletRequest request,
+			HttpServletResponse response) throws ServletException, IOException {
 		String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
 
 		// 入力チェック
@@ -107,11 +132,7 @@ public class UserRegister extends HttpServlet {
 		// 確認画面へフォワード
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher(forwardPath);
-		try {
-			dispatcher.forward(request, response);
-		} catch (ServletException | IOException e) {
-			logger.error("フォワード失敗", e);
-		}
+		dispatcher.forward(request, response);
 	}
 
 	private ArrayList<ValidationResult> validation(HttpServletRequest request) {
