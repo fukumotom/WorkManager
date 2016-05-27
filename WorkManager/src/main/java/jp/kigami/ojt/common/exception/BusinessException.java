@@ -14,19 +14,19 @@ public class BusinessException extends Exception {
 	private static final Logger logger = LoggerFactory
 			.getLogger(BusinessException.class);
 
-	public BusinessException(String errMsg) {
-		super(errMsg);
-		logger.error(errMsg);
+	public BusinessException(String message) {
+		super(message, null);
+		logger.warn(message);
 	}
 
-	public BusinessException(Exception e) {
-		super(e);
-		logger.error("業務エラー", e);
+	public BusinessException(Throwable cause) {
+		super("業務エラー:{}", cause);
+		logger.warn("業務エラー:{}", cause);
 	}
 
-	public BusinessException(String errMsg, Exception e) {
-		super(errMsg, e);
-		logger.error(errMsg, e);
+	public BusinessException(String message, Throwable cause) {
+		super(message, cause);
+		logger.warn(message);
 	}
 
 }

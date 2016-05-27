@@ -20,7 +20,7 @@ public class BindFormatException extends Exception {
 		logger.warn("{}の値[{}]が不正です。", this.paramName, this.paramValue);
 	}
 
-	public BindFormatException(Exception e, String paramName,
+	public BindFormatException(Throwable e, String paramName,
 			String paramValue) {
 		this.paramName = paramName;
 		this.paramValue = paramValue;
