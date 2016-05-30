@@ -74,22 +74,30 @@
 			%>
 		</table>
 		<%
+			String display = null;
 			if (workList.size() == 0) {
+				display = "display:none";
 		%>
-		<BR /> データがありません。<BR />
+		<br /> データがありません。<br />
 		<%
 			}
 		%>
+		<br />
 		<table>
 			<tr>
-				<td><input type="submit" value="挿入" name="action"></td>
-				<td><input type="submit" value="追加" name="action"></td>
-				<td><input type="submit" value="編集" name="action"></td>
-				<td><input type="submit" value="削除" name="action"></td>
-				<td><input type="submit" value="保存" name="action"></td>
+				<td><input type="submit" value="挿入" name="actionBtn"
+					style=<%=display%>></td>
+				<td><input type="submit" value="追加" name="actionBtn"
+					style=<%=display%>></td>
+				<td><input type="submit" value="編集" name="actionBtn"
+					style=<%=display%>></td>
+				<td><input type="submit" value="削除" name="actionBtn"
+					style=<%=display%>></td>
+				<td><input type="submit" value="保存" name="action"
+					style=<%=display%>></td>
 				<td><input type="checkbox" name="deleteFlg"> 削除を含む <input
 					type="text" name="workDate"> (yyyy/MM/dd) <input
-					type="submit" value="履歴" name="action"></td>
+					type="submit" value="履歴" name="actionBtn"></td>
 			</tr>
 		</table>
 

@@ -15,7 +15,14 @@ public class WorkHelper {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkHelper.class);
 
-	private void insert(Work work, String actionName) throws BusinessException {
+	/**
+	 * 作業追加/挿入処理
+	 * 
+	 * @param work
+	 * @param actionName
+	 * @throws BusinessException
+	 */
+	public void insert(Work work, String actionName) throws BusinessException {
 
 		WorkLogic logic = new WorkLogic();
 		LocalTime time;
@@ -29,7 +36,13 @@ public class WorkHelper {
 		logic.insertWork(work);
 	}
 
-	private void delete(Work work) throws BusinessException {
+	/**
+	 * 作業削除処理
+	 * 
+	 * @param work
+	 * @throws BusinessException
+	 */
+	public void delete(Work work) throws BusinessException {
 
 		WorkLogic logic = new WorkLogic();
 		logic.delete(work);
@@ -57,7 +70,7 @@ public class WorkHelper {
 	 * @return
 	 * @throws BusinessException
 	 */
-	private void dateCheck(Work inputWork) throws BusinessException {
+	public void dateCheck(Work inputWork) throws BusinessException {
 
 		LocalDate workDate = inputWork.getWorkDate();
 		logger.info("入力日付:{}", workDate);
@@ -73,7 +86,7 @@ public class WorkHelper {
 		}
 	}
 
-	private void save(Work inputWork) {
+	public void save(Work inputWork) {
 		WorkLogic logic = new WorkLogic();
 		logic.saveWork(inputWork);
 	}
@@ -83,36 +96,9 @@ public class WorkHelper {
 		logic.deleteUnSaveWork(inputWork);
 	}
 
-	public void check(String actionName, Work inputWork)
-			throws BusinessException {
-
-		switch (actionName) {
-		case "insert":
-		case "add":
-			insert(inputWork, actionName);
-			break;
-
-		case "delete":
-			delete(inputWork);
-			break;
-
-		case "history":
-			dateCheck(inputWork);
-			deleteUnSaveWork(inputWork);
-			break;
-
-		case "save":
-			save(inputWork);
-			break;
-
-		case "edit":
-			// 処理なし
-			break;
-		}
-	}
-
 	/**
 	 * 作業時間の計算処理
+	 * 
 	 * @param inputWork
 	 */
 	public void calcWorkTime(Work inputWork) {

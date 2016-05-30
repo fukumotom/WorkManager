@@ -90,11 +90,10 @@ public class WorkListServlet extends HttpServlet {
 			request.setAttribute("errMsg", e.getErrMsg());
 		}
 
-		String btnAction = request.getParameter("action");
+		// submitボタン判定
+		String actionBtn = request.getParameter("actionBtn");
 		WorkLogic logic = new WorkLogic();
 
-		// submitボタン判定
-		String actionName = "";
 		WorkHelper helper = new WorkHelper();
 		String listDate = DateUtils.getTodayStr();
 
@@ -102,30 +101,29 @@ public class WorkListServlet extends HttpServlet {
 
 		try {
 
-			if ("挿入".equals(btnAction)) {
-				actionName = "insert";
+			if ("挿入".equals(actionBtn)) {
 				logger.info("挿入処理開始:");
-			} else if ("追加".equals(btnAction)) {
-				actionName = "add";
+				helper.insert(inputWork, "insert");
+			} else if ("追加".equals(actionBtn)) {
 				logger.info("追加処理開始:");
-			} else if ("削除".equals(btnAction)) {
-				actionName = "delete";
+				helper.insert(inputWork, "add");
+			} else if ("削除".equals(actionBtn)) {
 				logger.info("削除処理開始:");
-			} else if ("履歴".equals(btnAction)) {
-				actionName = "history";
+				helper.delete(inputWork);
+			} else if ("履歴".equals(actionBtn)) {
 				logger.info("履歴表示処理開始:");
-			} else if ("保存".equals(btnAction)) {
-				actionName = "save";
+				helper.dateCheck(inputWork);
+				helper.deleteUnSaveWork(inputWork);
+			} else if ("保存".equals(actionBtn)) {
 				logger.info("保存処理開始:");
+				helper.save(inputWork);
 			} else {
 				// 編集
-				actionName = "edit";
 				logger.info("編集処理開始:");
 				requestPath = "/WEB-INF/jsp/work/workEditForm.jsp";
 				Work editWork = helper.getEditWork(inputWork);
 				request.setAttribute("editWork", editWork);
 			}
-			helper.check(actionName, inputWork);
 
 		} catch (BusinessException e) {
 			logger.warn("入力チェックエラー");
@@ -134,7 +132,7 @@ public class WorkListServlet extends HttpServlet {
 			}
 		}
 
-		if (!"edit".equals(actionName)) {
+		if (!"編集".equals(actionBtn)) {
 			// 作業リストの再表示
 			List<Work> workList = logic.findAllWork(inputWork);
 			request.setAttribute("workList", workList);
@@ -152,7 +150,5 @@ public class WorkListServlet extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException(e);
 		}
-
 	}
-
 }
