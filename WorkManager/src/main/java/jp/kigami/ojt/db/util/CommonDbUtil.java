@@ -172,7 +172,7 @@ public class CommonDbUtil {
 	private static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
 			Class<T> dtoClass) throws SQLException {
 
-		HashMap<String, String> clmNameMap = new HashMap<String, String>();
+		HashMap<String, String> clmNameMap = new HashMap<>();
 		ResultSetMetaData meta = result.getMetaData();
 		for (int i = 1; i < meta.getColumnCount() + 1; i++) {
 
