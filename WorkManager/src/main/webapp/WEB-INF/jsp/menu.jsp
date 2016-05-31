@@ -13,7 +13,7 @@
 </head>
 <body>
 	<form method="get" action="/WorkManager/Logout">
-		<input type="submit" value="ログアウト">
+		<input type="submit" value="ログアウト" />
 	</form>
 	<p>
 		ようこそ！
@@ -22,11 +22,11 @@
 	</p>
 
 	<form method="get" action="/WorkManager/WorkRegister">
-		<input type="submit" value="作業登録/終了">
+		<input type="submit" value="作業登録/終了" />
 	</form>
 	<br />
 	<form method="get" action="/WorkManager/WorkList">
-		<input type="submit" value="作業リスト">
+		<input type="submit" value="作業リスト" />
 	</form>
 </body>
 </html>

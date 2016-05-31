@@ -20,9 +20,9 @@
 		</tr>
 		<tr>
 			<td><a href="/WorkManager/RegisterForm"><input type="button"
-					value="戻る"></a></td>
+					value="戻る" /></a></td>
 			<td><a href="/WorkManager/RegisterForm?action=confirm"><input
-					type="button" value="登録"></a></td>
+					type="button" value="登録" /></a></td>
 		</tr>
 	</table>
 </body>

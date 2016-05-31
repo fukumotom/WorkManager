@@ -19,7 +19,7 @@
 			<tr>
 				<td><label for="j_username" class="userForm">ユーザ名：</label></td>
 				<td><input type="text" name="j_username" id="j_username"
-					style="ime-mode: disabled" maxlength="20" class="loginForm"></td>
+					style="ime-mode: disabled" maxlength="20" class="loginForm" /></td>
 				<%
 					if (errMsg != null) {
 				%>
@@ -32,7 +32,7 @@
 			<tr>
 				<td><label for="password" class="userForm">パスワード：</label></td>
 				<td><input type="password" name="password" id="password"
-					class="userForm"></td>
+					class="userForm" /></td>
 				<%
 					if (errMsg2 != null) {
 				%>
@@ -48,14 +48,14 @@
 			<tr>
 				<td><label for="passwordConfirm" class="userForm">パスワード確認：</label></td>
 				<td><input type="password" name="passwordConfirm"
-					id="passwordConfirm" class="userForm"></td>
+					id="passwordConfirm" class="userForm" /></td>
 			</tr>
 			<tr>
 				<td><div align="center">
-						<input type="submit" name="actionBtn" value="戻る">
+						<input type="submit" name="actionBtn" value="戻る" />
 					</div></td>
 				<td><div align="center">
-						<input type="submit" name="actionBtn" value="確認">
+						<input type="submit" name="actionBtn" value="確認" />
 					</div></td>
 			</tr>
 		</table>
