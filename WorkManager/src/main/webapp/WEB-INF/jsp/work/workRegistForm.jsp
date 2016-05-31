@@ -1,5 +1,5 @@
-<%@page import="jp.kigami.ojt.common.util.DateUtils"%>
-<%@page import="jp.kigami.ojt.model.Work"%>
+<%@page import="jp.kigami.ojt.common.util.ConstantDef"%>
+<%@page import="jp.kigami.ojt.form.WorkRegisterForm"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -12,34 +12,20 @@
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
-	<%
-		String state = (String) request.getAttribute("state");
-		String stateStr = "";
-		if ("working".equals(state)) {
-			stateStr = "作業中";
 
-			Object obj = request.getAttribute("working");
-			Work work;
-			if (obj instanceof Work) {
-				work = (Work) obj;
-				request.setAttribute("work", work);
-			}
-
-		} else {
-			stateStr = "未作業";
-		}
-		request.setAttribute("stateStr", stateStr);
-	%>
-	<h2>現在の状況:${stateStr}</h2>
+	<h2>現在の状況:${form.workingStates}</h2>
 	<%
-		if ("作業中".equals(stateStr)) {
+		WorkRegisterForm form = (WorkRegisterForm) request
+				.getAttribute("form");
+		if (ConstantDef.WOKING_STATE_WORKING
+				.equals(form.getWorkingStates())) {
 	%>
 	<table>
 		<tr>
 			<th>開始時間</th>
 		</tr>
 		<tr>
-			<td>${work.startTime}</td>
+			<td>${form.work.startTime}</td>
 		</tr>
 	</table>
 	<br />
@@ -49,8 +35,8 @@
 			<th>備考</th>
 		</tr>
 		<tr>
-			<td>${work.contents}</td>
-			<td>${work.note}</td>
+			<td>${form.work.contents}</td>
+			<td>${form.work.note}</td>
 		</tr>
 	</table>
 	<form method="post" action="/WorkManager/WorkRegister">
@@ -59,8 +45,6 @@
 	</form>
 	<%
 		}
-		String now = DateUtils.getNowTimeStr();
-		request.setAttribute("now", now);
 	%>
 	<form method="post" action="/WorkManager/WorkRegister">
 		<table>
@@ -68,7 +52,7 @@
 				<th>開始時間</th>
 			</tr>
 			<tr>
-				<td><input type="text" name="startTime" value="${now}"></td>
+				<td><input type="text" name="startTime" value="${form.nowTime}"></td>
 			</tr>
 		</table>
 		<br />
@@ -82,9 +66,10 @@
 				<td><input type="text" name="note"></td>
 			</tr>
 		</table>
-		<input type="hidden" name="state" value="${stateStr}"> <input
-			type="hidden" name="id" value="${work.id}"><input
-			type="submit" name="action" value="作業開始">
+		<input type="hidden" name="workingStates"
+			value="${form.workingStates}"> <input type="hidden" name="id"
+			value="${form.work.id}"><input type="submit" name="action"
+			value="作業開始">
 	</form>
 </body>
 </html>
