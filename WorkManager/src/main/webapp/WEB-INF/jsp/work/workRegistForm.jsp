@@ -67,9 +67,8 @@
 			</tr>
 		</table>
 		<input type="hidden" name="workingStates"
-			value="${form.workingStates}"> <input type="hidden" name="id"
-			value="${form.work.id}"><input type="submit" name="action"
-			value="作業開始">
+			value="${form.workingStates}"><input type="submit"
+			name="action" value="作業開始">
 	</form>
 </body>
 </html>
