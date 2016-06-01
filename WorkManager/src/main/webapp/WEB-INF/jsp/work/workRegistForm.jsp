@@ -54,8 +54,8 @@
 		</tr>
 	</table>
 	<form method="post" action="/WorkManager/WorkRegister">
-		<input type="hidden" name="id" value="${work.id}"> <input
-			type="submit" name="action" value="作業終了">
+		<input type="hidden" name="id" value="${work.id}" /> <input
+			type="submit" name="action" value="作業終了" />
 	</form>
 	<%
 		}
@@ -68,7 +68,7 @@
 				<th>開始時間</th>
 			</tr>
 			<tr>
-				<td><input type="text" name="startTime" value="${now}"></td>
+				<td><input type="text" name="startTime" value="${now}" /></td>
 			</tr>
 		</table>
 		<br />
@@ -78,13 +78,13 @@
 				<th>備考</th>
 			</tr>
 			<tr>
-				<td><input type="text" name="contents"></td>
-				<td><input type="text" name="note"></td>
+				<td><input type="text" name="contents" /></td>
+				<td><input type="text" name="note" /></td>
 			</tr>
 		</table>
-		<input type="hidden" name="state" value="${stateStr}"> <input
-			type="hidden" name="id" value="${work.id}"><input
-			type="submit" name="action" value="作業開始">
+		<input type="hidden" name="state" value="${stateStr}" /> <input
+			type="hidden" name="id" value="${work.id}" /><input type="submit"
+			name="action" value="作業開始" />
 	</form>
 </body>
 </html>
