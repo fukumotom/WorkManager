@@ -53,7 +53,7 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("フォワード失敗:", e);
 		}
 	}
 
@@ -148,7 +148,7 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("フォワード失敗:", e);
 		}
 	}
 }

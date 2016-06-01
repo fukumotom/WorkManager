@@ -13,6 +13,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.model.Work;
 
 @WebServlet("/Menu")
@@ -44,7 +45,7 @@ public class MenuServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			logger.error("フォワード失敗", e);
+			throw new SystemException("フォワード失敗:", e);
 		}
 	}
 }

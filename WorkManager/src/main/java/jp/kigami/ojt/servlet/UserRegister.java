@@ -90,7 +90,7 @@ public class UserRegister extends HttpServlet {
 				confilm(request, response);
 			}
 		} catch (IOException | ServletException e) {
-			throw new SystemException(e);
+			throw new SystemException("画面遷移失敗:", e);
 		}
 	}
 
@@ -132,6 +132,7 @@ public class UserRegister extends HttpServlet {
 		// 確認画面へフォワード
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher(forwardPath);
+
 		dispatcher.forward(request, response);
 	}
 
