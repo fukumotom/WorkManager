@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.BusinessException;
+import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.common.util.ConvertToModelUtils;
 import jp.kigami.ojt.common.util.DateUtils;
@@ -139,7 +140,12 @@ public class WorkRegister extends HttpServlet {
 				request.setAttribute("errMsg", e.getMessage());
 			}
 		}
-		doGet(request, response);
+		// 登録画面の再表示
+		try {
+			response.sendRedirect("/WorkManager/WorkRegister");
+		} catch (IOException e) {
+			throw new SystemException(e);
+		}
 	}
 
 	/**
