@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.model.Work;
 
 @WebServlet("/Logout")
@@ -40,7 +41,7 @@ public class LogoutServlet extends HttpServlet {
 		try {
 			response.sendRedirect("/WorkManager/Menu");
 		} catch (IOException e) {
-			logger.error("redirect失敗:", e);
+			throw new SystemException("リダイレクト失敗:", e);
 		}
 	}
 

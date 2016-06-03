@@ -61,7 +61,7 @@ public class WorkEdit extends HttpServlet {
 		try {
 			response.sendRedirect("/WorkManager/WorkList");
 		} catch (IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("リダイレクト失敗:", e);
 		}
 	}
 }
