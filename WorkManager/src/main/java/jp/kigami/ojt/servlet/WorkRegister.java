@@ -72,7 +72,7 @@ public class WorkRegister extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			logger.error("フォワード失敗", e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 
