@@ -141,9 +141,11 @@ public class WorkRegister extends HttpServlet {
 			}
 		}
 		// 登録画面の再表示
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 		try {
-			response.sendRedirect("/WorkManager/WorkRegister");
-		} catch (IOException e) {
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
 			throw new SystemException(e);
 		}
 	}
