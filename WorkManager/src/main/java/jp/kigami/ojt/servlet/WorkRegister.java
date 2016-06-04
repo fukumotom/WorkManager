@@ -84,7 +84,7 @@ public class WorkRegister extends HttpServlet {
 		String id = request.getParameter("id");
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
-		if (id != "") {
+		if (id.isEmpty()) {
 			// ID取得時に型変換
 			inputWork.setId(ConvertToModelUtils.convertInt(id));
 		}
@@ -120,7 +120,7 @@ public class WorkRegister extends HttpServlet {
 				}
 			}
 
-			if (startTime != "") {
+			if (startTime.isEmpty()) {
 				inputWork.setStartTime(DateUtils.getFomatTime(startTime));
 			} else {
 				// 未入力の場合、現在時間で開始
