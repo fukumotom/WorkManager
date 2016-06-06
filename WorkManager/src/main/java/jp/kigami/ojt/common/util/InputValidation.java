@@ -81,4 +81,14 @@ public class InputValidation {
 
 	}
 
+	public static boolean idCheck(String id) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public static boolean isTime(String startTime) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }
