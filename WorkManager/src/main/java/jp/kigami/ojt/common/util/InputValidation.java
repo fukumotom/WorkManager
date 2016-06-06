@@ -1,11 +1,16 @@
 package jp.kigami.ojt.common.util;
 
+import java.time.DateTimeException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InputValidation {
 
-	private static final Logger logger = LoggerFactory.getLogger(InputValidation.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(InputValidation.class);
 
 	private InputValidation() {
 	}
@@ -17,8 +22,8 @@ public class InputValidation {
 	 *            check data
 	 * @param min
 	 *            data's minimum size
-	 * @param maxdata's
-	 *            maximum size
+	 * @param maxdata
+	 *            's maximum size
 	 * @return
 	 */
 	public static ValidationResult inputSize(String target, int min, int max) {
@@ -59,8 +64,7 @@ public class InputValidation {
 		}
 		return result;
 	}
-	
-	
+
 	/**
 	 * 数字かどうかのチェック
 	 * 
@@ -77,4 +81,42 @@ public class InputValidation {
 
 	}
 
+	/**
+	 * 時間確認
+	 * 
+	 * @param startTime
+	 * @return
+	 */
+	public static boolean isTime(String startTime) {
+
+		try {
+			DateUtils.getFomatTime(startTime);
+			return true;
+		} catch (DateTimeException e) {
+			return false;
+		}
+
+	}
+
+	/**
+	 * id確認
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public static boolean idCheck(String id) {
+
+		boolean result = true;
+
+		if (id == null) {
+			result = false;
+		} else if (!id.isEmpty() & id != null) {
+
+			if (!InputValidation.isNumber(id)) {
+				result = false;
+			}
+		}
+
+		return result;
+	}
 }
