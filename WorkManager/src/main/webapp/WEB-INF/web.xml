@@ -5,18 +5,6 @@
                       http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
 	version="3.1">
 
-	<!-- =============================== sample ▼▼▼ =============================== -->
-	<servlet>
-		<servlet-name>dispatcherServlet_re</servlet-name>
-		<servlet-class>jp.co.ojt.servlet.TaskRedirectServlet</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>dispatcherServlet_re</servlet-name>
-		<url-pattern>/TaskRedirectServlet</url-pattern>
-	</servlet-mapping>
-
-	<!-- =============================== sample ▲▲▲ =============================== -->
-
 	<!-- 認証範囲 -->
 	<security-constraint>
 		<web-resource-collection>
@@ -54,7 +42,7 @@
 		<location>/WEB-INF/jsp/error/error.jsp</location>
 	</error-page>
 	<error-page>
-		<exception-type>jp.co.ojt.common.exception.SystemException</exception-type>
+		<exception-type>jp.kigami.ojt.common.exception.SystemException</exception-type>
 		<location>/WEB-INF/jsp/error/systemError.jsp</location>
 	</error-page>
 	<error-page>
