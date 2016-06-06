@@ -36,6 +36,13 @@ public class WorkRegister extends HttpServlet {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkRegister.class);
 
+	/*
+	 * 作業登録画面表示用
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -80,6 +87,13 @@ public class WorkRegister extends HttpServlet {
 		}
 	}
 
+	/*
+	 * 作業登録画面画面更新用
+	 * 
+	 * @see
+	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
+	 * , javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
