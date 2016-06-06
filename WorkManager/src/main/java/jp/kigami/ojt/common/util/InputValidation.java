@@ -1,11 +1,15 @@
 package jp.kigami.ojt.common.util;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class InputValidation {
 
-	private static final Logger logger = LoggerFactory.getLogger(InputValidation.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(InputValidation.class);
 
 	private InputValidation() {
 	}
@@ -55,12 +59,12 @@ public class InputValidation {
 			result.setCheckResult(true);
 		} else {
 			result.setCheckResult(false);
-			result.setErrorMsg(PropertyUtils.getValue(MsgCodeDef.CONFIRM_ERROR));
+			result.setErrorMsg(
+					PropertyUtils.getValue(MsgCodeDef.CONFIRM_ERROR));
 		}
 		return result;
 	}
-	
-	
+
 	/**
 	 * 数字かどうかのチェック
 	 * 
