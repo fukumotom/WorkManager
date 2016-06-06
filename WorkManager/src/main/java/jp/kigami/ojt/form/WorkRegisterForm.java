@@ -14,6 +14,11 @@ import jp.kigami.ojt.model.Work;
 public class WorkRegisterForm {
 
 	/**
+	 * 作業ID
+	 */
+	private String id;
+
+	/**
 	 * 開始時間
 	 */
 	private LocalTime startTime;
@@ -39,9 +44,9 @@ public class WorkRegisterForm {
 	private ArrayList<String> noteList;
 
 	/**
-	 * 作業状況
+	 * 作業中フラグ
 	 */
-	private String workingStates;
+	private boolean workingFlg;
 
 	/**
 	 * 仕掛り作業
@@ -54,6 +59,25 @@ public class WorkRegisterForm {
 	private String nowTime;
 
 	/**
+	 * <<<<<<< 2ccf9461d1d6aa88c8e43d90baa73b229439ab58 =======
+	 * 
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * >>>>>>> fix conflict
+	 * 
 	 * @return the startTime
 	 */
 	public LocalTime getStartTime() {
@@ -129,18 +153,18 @@ public class WorkRegisterForm {
 	}
 
 	/**
-	 * @return the workingStates
+	 * @return the workingFlg
 	 */
-	public String getWorkingStates() {
-		return workingStates;
+	public boolean isWorkingFlg() {
+		return workingFlg;
 	}
 
 	/**
-	 * @param workingStates
-	 *            the workingStates to set
+	 * @param workingFlg
+	 *            the workingFlg to set
 	 */
-	public void setWorkingStates(String workingStates) {
-		this.workingStates = workingStates;
+	public void setWorkingFlg(boolean workingFlg) {
+		this.workingFlg = workingFlg;
 	}
 
 	/**
