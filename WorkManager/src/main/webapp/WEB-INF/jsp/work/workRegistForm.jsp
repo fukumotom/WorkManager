@@ -13,13 +13,20 @@
 <body>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
 
-	<h2 align="center">現在の状況:${form.workingStates}</h2>
+	<h1>
+		<label>作業登録フォーム</label>
+	</h1>
+
+
 	<%
 		WorkRegisterForm form = (WorkRegisterForm) request
 				.getAttribute("form");
-		if (ConstantDef.WOKING_STATE_WORKING
-				.equals(form.getWorkingStates())) {
+		String workState = form.isWorkingFlg() ? "作業中" : "未作業中";
+		out.print("<h2 align='center'>現在の状況:" + workState + "</h2>");
+
+		if (form.isWorkingFlg()) {
 	%>
+
 	<table class="centerTable" border="1">
 		<tr>
 			<td align="left">
@@ -51,7 +58,7 @@
 			<td colspan="2">
 				<form method="post" action="/WorkManager/WorkRegister">
 					<input type="hidden" name="id" value="${form.work.id}" /> <input
-						type="submit" name="action" value="作業終了" />
+						type="submit" name="finishBtn" value="作業終了" />
 				</form>
 			</td>
 		</tr>
@@ -70,7 +77,7 @@
 							<th>開始時間</th>
 						</tr>
 						<tr>
-							<td><input type="text" name="startTime"
+							<td><input type="time" name="startTime"
 								value="${form.nowTime}" /></td>
 						</tr>
 					</table> <br />
@@ -92,9 +99,9 @@
 			</tr>
 			<tr>
 				<td colspan="2" align="center"><input type="hidden"
-					name="workingStates" value="${form.workingStates}" /> <input
-					type="hidden" name="id" value="${form.work.id}" /><input type="submit"
-					name="action" value="作業開始" /></td>
+					name="workingFlg" value="${form.workingFlg}" /> <input
+					type="hidden" name="id" value="${form.work.id}" /><input
+					type="submit" name="startBtn" value="作業開始" /></td>
 			</tr>
 		</table>
 	</form>

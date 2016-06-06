@@ -14,6 +14,11 @@ import jp.kigami.ojt.model.Work;
 public class WorkRegisterForm {
 
 	/**
+	 * 作業ID
+	 */
+	private String id;
+
+	/**
 	 * 開始時間
 	 */
 	private LocalTime startTime;
@@ -39,9 +44,9 @@ public class WorkRegisterForm {
 	private ArrayList<String> noteList;
 
 	/**
-	 * 作業状況
+	 * 作業中フラグ
 	 */
-	private String workingStates;
+	private boolean workingFlg;
 
 	/**
 	 * 仕掛り作業
@@ -53,67 +58,139 @@ public class WorkRegisterForm {
 	 */
 	private String nowTime;
 
+	/**
+	 * @return the id
+	 */
+	public String getId() {
+		return id;
+	}
+
+	/**
+	 * @param id
+	 *            the id to set
+	 */
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	/**
+	 * @return the startTime
+	 */
 	public LocalTime getStartTime() {
 		return startTime;
 	}
 
+	/**
+	 * @param startTime
+	 *            the startTime to set
+	 */
 	public void setStartTime(LocalTime startTime) {
 		this.startTime = startTime;
 	}
 
+	/**
+	 * @return the contents
+	 */
 	public String getContents() {
 		return contents;
 	}
 
+	/**
+	 * @param contents
+	 *            the contents to set
+	 */
 	public void setContents(String contents) {
 		this.contents = contents;
 	}
 
+	/**
+	 * @return the contentList
+	 */
 	public ArrayList<String> getContentList() {
 		return contentList;
 	}
 
+	/**
+	 * @param contentList
+	 *            the contentList to set
+	 */
 	public void setContentList(ArrayList<String> contentList) {
 		this.contentList = contentList;
 	}
 
+	/**
+	 * @return the note
+	 */
 	public String getNote() {
 		return note;
 	}
 
+	/**
+	 * @param note
+	 *            the note to set
+	 */
 	public void setNote(String note) {
 		this.note = note;
 	}
 
+	/**
+	 * @return the noteList
+	 */
 	public ArrayList<String> getNoteList() {
 		return noteList;
 	}
 
+	/**
+	 * @param noteList
+	 *            the noteList to set
+	 */
 	public void setNoteList(ArrayList<String> noteList) {
 		this.noteList = noteList;
 	}
 
-	public String getWorkingStates() {
-		return workingStates;
+	/**
+	 * @return the workingFlg
+	 */
+	public boolean isWorkingFlg() {
+		return workingFlg;
 	}
 
-	public void setWorkingStates(String workingStates) {
-		this.workingStates = workingStates;
+	/**
+	 * @param workingFlg
+	 *            the workingFlg to set
+	 */
+	public void setWorkingFlg(boolean workingFlg) {
+		this.workingFlg = workingFlg;
 	}
 
+	/**
+	 * @return the work
+	 */
 	public Work getWork() {
 		return work;
 	}
 
+	/**
+	 * @param work
+	 *            the work to set
+	 */
 	public void setWork(Work work) {
 		this.work = work;
 	}
 
+	/**
+	 * @return the nowTime
+	 */
 	public String getNowTime() {
 		return nowTime;
 	}
 
+	/**
+	 * @param nowTime
+	 *            the nowTime to set
+	 */
 	public void setNowTime(String nowTime) {
 		this.nowTime = nowTime;
 	}
+
 }
