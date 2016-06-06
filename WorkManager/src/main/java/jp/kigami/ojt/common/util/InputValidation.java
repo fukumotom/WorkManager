@@ -11,7 +11,7 @@ public class InputValidation {
 	}
 
 	/**
-	 * data size check
+	 * データサイズチェック
 	 * 
 	 * @param target
 	 *            check data
@@ -39,7 +39,7 @@ public class InputValidation {
 	}
 
 	/**
-	 * password confirm
+	 * パスワード入力確認
 	 * 
 	 * @param target1
 	 *            password
@@ -58,6 +58,23 @@ public class InputValidation {
 			result.setErrorMsg(PropertyUtils.getValue(MsgCodeDef.CONFIRM_ERROR));
 		}
 		return result;
+	}
+	
+	
+	/**
+	 * 数字かどうかのチェック
+	 * 
+	 * @param id
+	 */
+	public static boolean isNumber(String id) {
+
+		String regex = "^[1-9]+[0-9]*$";
+		Pattern ptn = Pattern.compile(regex);
+		Matcher matcher = ptn.matcher(id);
+		boolean result = matcher.matches();
+
+		return result;
+
 	}
 
 }
