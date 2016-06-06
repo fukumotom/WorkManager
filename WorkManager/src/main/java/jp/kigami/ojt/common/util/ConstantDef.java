@@ -24,4 +24,9 @@ public class ConstantDef {
 	 */
 	public static final String WOKING_STATE_NONWORKING = "未作業";
 
+	/**
+	 * エラーメッセージ（属性）
+	 */
+	public static final String ERROR_MSG = "errorMsg";
+
 }
