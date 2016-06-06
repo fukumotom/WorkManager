@@ -98,16 +98,22 @@ public class WorkRegister extends HttpServlet {
 			throws ServletException, IOException {
 
 		String userName = request.getUserPrincipal().getName();
-		String id = request.getParameter("id");
+
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
-		if (!id.isEmpty()) {
-			// ID取得時に型変換
-			inputWork.setId(ConvertToModelUtils.convertInt(id));
-		}
 
 		String action = request.getParameter("action");
-		// 作業終了処理
+
+		String id = request.getParameter("id");
+		// idチェック
+		if (!id.isEmpty() & id != null) {
+
+			if (!InputValidation.isNumber(id)) {
+				throw new SystemException("不正な入力値です。");
+			}
+			// id正常取得時に設定
+			inputWork.setId(Integer.valueOf(id));
+		}		// 作業終了処理
 		if ("作業終了".equals(action)) {
 
 			try {
