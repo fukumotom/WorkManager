@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory;
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
-import jp.kigami.ojt.common.util.ConvertToModelUtils;
 import jp.kigami.ojt.common.util.DateUtils;
+import jp.kigami.ojt.common.util.InputValidation;
 import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.logic.WorkLogic;
 import jp.kigami.ojt.model.Work;
@@ -39,9 +39,8 @@ public class WorkRegister extends HttpServlet {
 	/*
 	 * 作業登録画面表示用
 	 * 
-	 * @see
-	 * javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest
-	 * , javax.servlet.http.HttpServletResponse)
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
+	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -90,25 +89,30 @@ public class WorkRegister extends HttpServlet {
 	/*
 	 * 作業登録画面画面更新用
 	 * 
-	 * @see
-	 * javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest
-	 * , javax.servlet.http.HttpServletResponse)
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.
+	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
 		String userName = request.getUserPrincipal().getName();
-		String id = request.getParameter("id");
+
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
-		if (id != "") {
-			// ID取得時に型変換
-			inputWork.setId(ConvertToModelUtils.convertInt(id));
-		}
 
 		String action = request.getParameter("action");
-		// 作業終了処理
+
+		String id = request.getParameter("id");
+		// idチェック
+		if (!id.isEmpty() & id != null) {
+
+			if (!InputValidation.isNumber(id)) {
+				throw new SystemException("不正な入力値です。");
+			}
+			// id正常取得時に設定
+			inputWork.setId(Integer.valueOf(id));
+		} // 作業終了処理
 		if ("作業終了".equals(action)) {
 
 			try {
