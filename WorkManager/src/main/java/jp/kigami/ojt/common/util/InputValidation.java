@@ -66,7 +66,7 @@ public class InputValidation {
 	}
 
 	/**
-	 * 数字かどうかのチェック
+	 * 数字判定
 	 * 
 	 * @param id
 	 */
@@ -81,14 +81,41 @@ public class InputValidation {
 
 	}
 
-	public static boolean idCheck(String id) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
+	/**
+	 * 時間（HH:mm）判定
+	 * 
+	 * @param startTime
+	 * @return
+	 */
 	public static boolean isTime(String startTime) {
-		// TODO Auto-generated method stub
-		return false;
+
+		try {
+			DateUtils.getFomatTime(startTime);
+			return true;
+		} catch (DateTimeException e) {
+			return false;
+		}
 	}
 
+	/**
+	 * 作業idチェック
+	 * 
+	 * @param id
+	 * @return
+	 */
+	public static boolean idCheck(String id) {
+
+		boolean result = true;
+
+		if (id == null) {
+			result = false;
+		} else if (!id.isEmpty() & id != null) {
+
+			if (!InputValidation.isNumber(id)) {
+				result = false;
+			}
+		}
+		return result;
+	}
 }
