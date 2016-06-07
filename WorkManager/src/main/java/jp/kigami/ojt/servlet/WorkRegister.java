@@ -16,8 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.BusinessException;
+import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.common.util.ConvertToModelUtils;
 import jp.kigami.ojt.common.util.DateUtils;
+import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.logic.WorkLogic;
 import jp.kigami.ojt.model.Work;
 
@@ -37,6 +39,7 @@ public class WorkRegister extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// 初期表示情報取得
 		String userName = request.getUserPrincipal().getName();
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
@@ -46,26 +49,26 @@ public class WorkRegister extends HttpServlet {
 		WorkLogic logic = new WorkLogic();
 
 		List<Work> workList = logic.findWorking(inputWork);
-		Work work;
-		String state;
+
+		WorkRegisterForm form = new WorkRegisterForm();
 		if (workList.size() == 0) {
 			logger.info("仕掛処理なし");
-			work = null;
-			state = null;
+			form.setWork(null);
+			form.setWorkingStates(ConstantDef.WOKING_STATE_NONWORKING);
 		} else if (workList.size() == 1) {
 			logger.info("仕掛処理あり");
-			work = workList.get(0);
-			state = "working";
+			form.setWork(workList.get(0));
+			form.setWorkingStates(ConstantDef.WOKING_STATE_WORKING);
 		} else {
 			logger.warn("仕掛処理が複数あります。");
 			request.setAttribute("errMsg", "仕掛処理が複数あります。");
-			work = workList.get(0);
-			state = "working";
+			form.setWork(workList.get(0));
+			form.setWorkingStates(ConstantDef.WOKING_STATE_WORKING);
 		}
-		if (state != null) {
-			request.setAttribute("state", state);
-		}
-		request.setAttribute("working", work);
+
+		// 作業開始時間に初期表示用
+		form.setNowTime(DateUtils.getNowTimeStr());
+		request.setAttribute("form", form);
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 
