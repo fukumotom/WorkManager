@@ -1,12 +1,7 @@
 package jp.kigami.ojt.form;
 
-import java.time.LocalTime;
-import java.util.ArrayList;
-
-import jp.kigami.ojt.model.Work;
-
 /**
- * 作業登録画面のフォーム
+ * 作業登録処理のフォーム
  * 
  * @author kigami
  *
@@ -21,7 +16,7 @@ public class WorkRegisterForm {
 	/**
 	 * 開始時間
 	 */
-	private LocalTime startTime;
+	private String startTime;
 
 	/**
 	 * 作業内容
@@ -29,34 +24,14 @@ public class WorkRegisterForm {
 	private String contents;
 
 	/**
-	 * 選択用作業内容リスト
-	 */
-	private ArrayList<String> contentList;
-
-	/**
 	 * 備考
 	 */
 	private String note;
 
 	/**
-	 * 選択用備考リスト
+	 * 作業中フラグの文字列(true/false)
 	 */
-	private ArrayList<String> noteList;
-
-	/**
-	 * 作業中フラグ
-	 */
-	private boolean workingFlg;
-
-	/**
-	 * 仕掛り作業
-	 */
-	private Work work;
-
-	/**
-	 * 作業開始時間に初期表示用
-	 */
-	private String nowTime;
+	private String workingFlgStr;
 
 	/**
 	 * <<<<<<< 2ccf9461d1d6aa88c8e43d90baa73b229439ab58 =======
@@ -80,7 +55,7 @@ public class WorkRegisterForm {
 	 * 
 	 * @return the startTime
 	 */
-	public LocalTime getStartTime() {
+	public String getStartTime() {
 		return startTime;
 	}
 
@@ -88,7 +63,7 @@ public class WorkRegisterForm {
 	 * @param startTime
 	 *            the startTime to set
 	 */
-	public void setStartTime(LocalTime startTime) {
+	public void setStartTime(String startTime) {
 		this.startTime = startTime;
 	}
 
@@ -108,21 +83,6 @@ public class WorkRegisterForm {
 	}
 
 	/**
-	 * @return the contentList
-	 */
-	public ArrayList<String> getContentList() {
-		return contentList;
-	}
-
-	/**
-	 * @param contentList
-	 *            the contentList to set
-	 */
-	public void setContentList(ArrayList<String> contentList) {
-		this.contentList = contentList;
-	}
-
-	/**
 	 * @return the note
 	 */
 	public String getNote() {
@@ -138,62 +98,17 @@ public class WorkRegisterForm {
 	}
 
 	/**
-	 * @return the noteList
+	 * @return the workingFlgStr
 	 */
-	public ArrayList<String> getNoteList() {
-		return noteList;
+	public String getWorkingFlgStr() {
+		return workingFlgStr;
 	}
 
 	/**
-	 * @param noteList
-	 *            the noteList to set
+	 * @param workingFlgStr
+	 *            the workingFlgStr to set
 	 */
-	public void setNoteList(ArrayList<String> noteList) {
-		this.noteList = noteList;
-	}
-
-	/**
-	 * @return the workingFlg
-	 */
-	public boolean isWorkingFlg() {
-		return workingFlg;
-	}
-
-	/**
-	 * @param workingFlg
-	 *            the workingFlg to set
-	 */
-	public void setWorkingFlg(boolean workingFlg) {
-		this.workingFlg = workingFlg;
-	}
-
-	/**
-	 * @return the work
-	 */
-	public Work getWork() {
-		return work;
-	}
-
-	/**
-	 * @param work
-	 *            the work to set
-	 */
-	public void setWork(Work work) {
-		this.work = work;
-	}
-
-	/**
-	 * @return the nowTime
-	 */
-	public String getNowTime() {
-		return nowTime;
-	}
-
-	/**
-	 * @param nowTime
-	 *            the nowTime to set
-	 */
-	public void setNowTime(String nowTime) {
-		this.nowTime = nowTime;
+	public void setWorkingFlgStr(String workingFlgStr) {
+		this.workingFlgStr = workingFlgStr;
 	}
 }
