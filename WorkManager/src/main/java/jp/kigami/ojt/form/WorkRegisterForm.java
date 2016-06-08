@@ -9,6 +9,7 @@ package jp.kigami.ojt.form;
 public class WorkRegisterForm {
 
 	/**
+	 * 
 	 * 作業ID
 	 */
 	private String id;
@@ -29,13 +30,6 @@ public class WorkRegisterForm {
 	private String note;
 
 	/**
-	 * 作業中フラグの文字列(true/false)
-	 */
-	private String workingFlgStr;
-
-	/**
-	 * <<<<<<< 2ccf9461d1d6aa88c8e43d90baa73b229439ab58 =======
-	 * 
 	 * @return the id
 	 */
 	public String getId() {
@@ -51,8 +45,6 @@ public class WorkRegisterForm {
 	}
 
 	/**
-	 * >>>>>>> fix conflict
-	 * 
 	 * @return the startTime
 	 */
 	public String getStartTime() {
@@ -97,18 +89,4 @@ public class WorkRegisterForm {
 		this.note = note;
 	}
 
-	/**
-	 * @return the workingFlgStr
-	 */
-	public String getWorkingFlgStr() {
-		return workingFlgStr;
-	}
-
-	/**
-	 * @param workingFlgStr
-	 *            the workingFlgStr to set
-	 */
-	public void setWorkingFlgStr(String workingFlgStr) {
-		this.workingFlgStr = workingFlgStr;
-	}
 }
