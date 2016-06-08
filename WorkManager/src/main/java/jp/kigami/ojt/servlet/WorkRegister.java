@@ -1,8 +1,6 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -17,8 +15,6 @@ import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.common.util.DateUtils;
 import jp.kigami.ojt.common.util.InputValidation;
-import jp.kigami.ojt.common.util.MsgCodeDef;
-import jp.kigami.ojt.common.util.PropertyUtils;
 import jp.kigami.ojt.common.util.ValidationResult;
 import jp.kigami.ojt.form.WorkFinishForm;
 import jp.kigami.ojt.form.WorkRegisterForm;
@@ -57,38 +53,9 @@ public class WorkRegister extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// 初期表示情報取得
-		String userName = request.getUserPrincipal().getName();
-		Work inputWork = new Work();
-		inputWork.setUserName(userName);
-		inputWork.setWorkDate(LocalDate.now());
-		logger.info("ユーザ名:{}", userName);
+		// 仕掛処理取得
+		getWorking(request);
 
-		WorkLogic logic = new WorkLogic();
-
-		// formに仕掛作業と作業状態フラグを設定
-		WorkRegisterViewForm form = new WorkRegisterViewForm();
-		List<Work> workList = logic.findWorking(inputWork);
-
-		if (workList.size() == 0) {
-			logger.info("仕掛処理なし");
-			form.setWork(null);
-			form.setWorkingFlg(false);
-		} else if (workList.size() == 1) {
-			logger.info("仕掛処理あり");
-			form.setWork(workList.get(0));
-			form.setWorkingFlg(true);
-		} else {
-			logger.warn("仕掛処理が複数あります。");
-			request.setAttribute(ConstantDef.ERROR_MSG,
-					PropertyUtils.getValue(MsgCodeDef.MULTI_DATE_EXIT));
-			form.setWork(workList.get(0));
-			form.setWorkingFlg(true);
-		}
-
-		// 作業開始時間(初期表示用)を設定
-		form.setNowTime(DateUtils.getNowTimeStr());
-		request.setAttribute("viewForm", form);
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 
@@ -97,6 +64,24 @@ public class WorkRegister extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException("フォワード失敗", e);
 		}
+	}
+
+	/**
+	 * 仕掛処理取得
+	 * 
+	 * @param request
+	 */
+	private void getWorking(HttpServletRequest request) {
+
+		String userName = request.getUserPrincipal().getName();
+		logger.info("ユーザ名:{}", userName);
+
+		// 画面表示データ取得
+		WorkLogic logic = new WorkLogic();
+		WorkRegisterViewForm form = logic.getWorkRegisterViewForm(userName);
+
+		request.setAttribute("viewForm", form);
+
 	}
 
 	/*
@@ -122,17 +107,18 @@ public class WorkRegister extends HttpServlet {
 			String id = finshForm.getId();
 			if (!InputValidation.idCheck(id)) {
 				throw new SystemException("不正な入力");
-			} else {
-				// IDを設定
-				inputWork.setId(Integer.valueOf(id));
-
-				try {
-					workFinish(inputWork);
-				} catch (BusinessException e) {
-					request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
-				}
 			}
 
+			// IDを設定
+			inputWork.setId(Integer.valueOf(id));
+			try {
+				WorkLogic logic = new WorkLogic();
+				logic.finishWork(inputWork);
+			} catch (BusinessException e) {
+				request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
+			}
+
+			// 作業開始処理
 		} else if (request.getParameter("startBtn") != null) {
 
 			WorkRegisterForm registerForm = setRegisterForm(request);
@@ -143,34 +129,22 @@ public class WorkRegister extends HttpServlet {
 			if (!result.isCheckResult()) {
 				request.setAttribute(ConstantDef.ERROR_MSG,
 						result.getErrorMsg());
-			}
+			} else {
 
-			logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]",
-					registerForm.getStartTime(), registerForm.getContents(),
-					registerForm.getNote());
-
-			if (ConstantDef.FLG_ON.equals(registerForm.getWorkingFlgStr())) {
-
-				// 仕掛作業ありの場合、終了する
+				// 入力エラーなしの場合
+				logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]",
+						registerForm.getStartTime(), registerForm.getContents(),
+						registerForm.getNote());
 				try {
-					workFinish(inputWork);
+					register(inputWork);
 				} catch (BusinessException e) {
 					request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
 				}
 			}
-
-			inputWork.setContents(registerForm.getContents());
-			inputWork.setNote(registerForm.getNote());
-			WorkLogic logic = new WorkLogic();
-
-			try {
-				logic.startWork(inputWork);
-			} catch (BusinessException e) {
-				request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
-			}
 		}
-<<<<<<< ba95d4742718b3dd24a319482f4cf911f9117ea0
+
 		// 登録画面の再表示
+		getWorking(request);
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 		try {
@@ -178,9 +152,30 @@ public class WorkRegister extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException(e);
 		}
-=======
-		response.sendRedirect("/WorkManager/WorkRegister");
->>>>>>> 作業登録画面に入力チェックを実装
+
+	}
+
+	/**
+	 * 作業開始処理（同期処理） 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	private synchronized void register(Work inputWork)
+			throws BusinessException {
+
+		WorkLogic logic = new WorkLogic();
+
+		// 仕掛処理確認
+		List<Work> workList = logic.findWorking(inputWork);
+		if (workList.size() == 1) {
+			// 仕掛処理がある場合、終了
+			logic.findWorking(inputWork);
+		}
+
+		// 作業開始
+		logic.startWork(inputWork);
+
 	}
 
 	/**
@@ -220,11 +215,6 @@ public class WorkRegister extends HttpServlet {
 			}
 		}
 
-		// 作業中フラグチェック
-		if (!InputValidation.flgCheck(form.getWorkingFlgStr())) {
-			throw new SystemException("不正な入力");
-		}
-
 		// 開始時間チェック
 		String startTime = form.getStartTime();
 		if (startTime == null) {
@@ -242,25 +232,29 @@ public class WorkRegister extends HttpServlet {
 			result.setErrorMsg("入力してください。");
 		}
 
-		// 作業内容
-		String contents = form.getContents();
-		if (contents == null) {
-			throw new SystemException("不正な入力");
-		} else {
-			result = InputValidation.inputSize(contents, 0, 40);
-			if (result.isCheckResult()) {
-				inputWork.setContents(contents);
+		if (result.isCheckResult()) {
+			// 作業内容
+			String contents = form.getContents();
+			if (contents == null) {
+				throw new SystemException("不正な入力");
+			} else {
+				result = InputValidation.inputSize(contents, 0, 40);
+				if (result.isCheckResult()) {
+					inputWork.setContents(contents);
+				}
 			}
 		}
 
-		// 備考チェック
-		String note = form.getNote();
-		if (note == null) {
-			throw new SystemException("不正な入力");
-		} else {
-			result = InputValidation.inputSize(contents, 0, 40);
-			if (result.isCheckResult()) {
-				inputWork.setNote(note);
+		if (result.isCheckResult()) {
+			// 備考チェック
+			String note = form.getNote();
+			if (note == null) {
+				throw new SystemException("不正な入力");
+			} else {
+				result = InputValidation.inputSize(note, 0, 40);
+				if (result.isCheckResult()) {
+					inputWork.setNote(note);
+				}
 			}
 		}
 
@@ -278,28 +272,10 @@ public class WorkRegister extends HttpServlet {
 		WorkRegisterForm form = new WorkRegisterForm();
 		form.setId(request.getParameter("id"));
 		form.setStartTime(request.getParameter("startTime"));
-		form.setWorkingFlgStr(request.getParameter("workingFlg"));
 		form.setContents(request.getParameter("contents"));
 		form.setNote(request.getParameter("note"));
 
 		return form;
 	}
 
-	/**
-	 * 作業完了処理
-	 * 
-	 * @param inputWork
-	 * @throws BusinessException
-	 */
-	private void workFinish(Work inputWork) throws BusinessException {
-		WorkLogic logic = new WorkLogic();
-		inputWork.setEndTime(DateUtils.getNowTime());
-		LocalTime startTime = logic.getStartTime(inputWork);
-		inputWork.setStartTime(DateUtils.getParseTime(startTime));
-
-		WorkHelper helper = new WorkHelper();
-		helper.calcWorkTime(inputWork);
-
-		logic.finishWork(inputWork);
-	}
 }
