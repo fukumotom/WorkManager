@@ -1,13 +1,26 @@
 package jp.kigami.ojt.logic;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jp.kigami.ojt.common.exception.BusinessException;
+import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.DateUtils;
+import jp.kigami.ojt.common.util.InputValidation;
+import jp.kigami.ojt.common.util.ValidationResult;
 import jp.kigami.ojt.dao.WorkDao;
+import jp.kigami.ojt.form.WorkRegisterForm;
+import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.model.Work;
+import jp.kigami.ojt.servlet.WorkHelper;
 
 public class WorkLogic {
+
+	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
 
 	public List<Work> findAllWork(Work work) {
 		WorkDao dao = new WorkDao();
@@ -37,13 +50,6 @@ public class WorkLogic {
 	public void delete(Work inputWork) throws BusinessException {
 		WorkDao dao = new WorkDao();
 		dao.delete(inputWork);
-	}
-
-	public List<Work> findWorking(Work inputWork) {
-
-		WorkDao dao = new WorkDao();
-		List<Work> workList = dao.findWorking(inputWork);
-		return workList;
 	}
 
 	public void finishWork(Work inputWork) throws BusinessException {
@@ -92,7 +98,7 @@ public class WorkLogic {
 		WorkDao dao = new WorkDao();
 		dao.deleteUnSaveWork(inputWork);
 	}
-	
+
 	/**
 	 * 画面表示用フォームの取得
 	 * 
@@ -144,10 +150,24 @@ public class WorkLogic {
 	/**
 	 * 作業完了処理
 	 * 
+	 * @param finshForm
+	 * 
 	 * @param inputWork
 	 * @throws BusinessException
 	 */
-	public void finishWork(Work inputWork) throws BusinessException {
+	public void finishWork(String userName, String deleteId)
+			throws BusinessException {
+
+		// 入力(id)チェック
+		if (!InputValidation.idCheck(deleteId)) {
+			throw new SystemException("不正な入力");
+		}
+
+		Work inputWork = new Work();
+		// ユーザ名を設定
+		inputWork.setUserName(userName);
+		// IDを設定
+		inputWork.setId(Integer.valueOf(deleteId));
 
 		// 終了時間を設定
 		inputWork.setEndTime(DateUtils.getNowTime());
@@ -163,6 +183,97 @@ public class WorkLogic {
 		WorkDao dao = new WorkDao();
 		dao.finishWork(inputWork);
 	}
-	
-	
+
+	/**
+	 * 作業開始処理（同期処理） 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * 
+	 * @param userName
+	 * 
+	 * @param registerForm
+	 * @throws BusinessException
+	 */
+	public synchronized void register(String userName,
+			WorkRegisterForm registerForm) throws BusinessException {
+
+		Work inputWork = new Work();
+
+		// 登録情報を設定
+		inputWork.setUserName(userName);
+		if (!registerForm.getId().isEmpty()) {
+			inputWork.setId(Integer.valueOf(registerForm.getId()));
+		}
+		inputWork.setStartTime(
+				DateUtils.getFomatTime(registerForm.getStartTime()));
+		inputWork.setContents(registerForm.getContents());
+		inputWork.setNote(registerForm.getNote());
+
+		WorkLogic logic = new WorkLogic();
+
+		// 仕掛処理確認
+		List<Work> workList = logic.findWorking(inputWork);
+		if (workList.size() == 1) {
+			// 仕掛処理がある場合、終了
+			logic.finishWork(userName, registerForm.getId());
+		}
+
+		// 作業開始
+		logic.startWork(inputWork);
+	}
+
+	/**
+	 * 作業開始ボタン押下時の入力チェック
+	 * 
+	 * @param form
+	 * @param inputWork
+	 * @return
+	 */
+	public ValidationResult inputCheckWhenStart(WorkRegisterForm form) {
+
+		ValidationResult result = new ValidationResult();
+		result.setCheckResult(true);
+
+		logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", form.getStartTime(),
+				form.getContents(), form.getNote());
+
+		// idチェック
+		String id = form.getId();
+		if (!InputValidation.idCheck(id)) {
+			throw new SystemException("不正な入力");
+		}
+
+		// 開始時間チェック
+		String startTime = form.getStartTime();
+		if (startTime == null) {
+			throw new SystemException("不正な入力");
+		}
+		if (!startTime.isEmpty()) {
+			// 入力check
+			result = InputValidation.isTime(startTime);
+		} else {
+			// 未入力の場合、再入力
+			result.setCheckResult(false);
+			result.setErrorMsg("入力してください。");
+
+			if (result.isCheckResult()) {
+				// 作業内容
+				String contents = form.getContents();
+				if (contents == null) {
+					throw new SystemException("不正な入力");
+				} else {
+					result = InputValidation.inputSize(contents, 0, 40);
+				}
+			}
+
+			if (result.isCheckResult()) {
+				// 備考チェック
+				String note = form.getNote();
+				if (note == null) {
+					throw new SystemException("不正な入力");
+				} else {
+					result = InputValidation.inputSize(note, 0, 40);
+				}
+			}
+		}
+		return result;
+	}
 }

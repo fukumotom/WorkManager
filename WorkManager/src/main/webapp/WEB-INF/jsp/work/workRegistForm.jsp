@@ -1,3 +1,4 @@
+<%@page import="jp.kigami.ojt.form.WorkRegisterViewForm"%>
 <%@page import="jp.kigami.ojt.common.util.ConstantDef"%>
 <%@page import="jp.kigami.ojt.form.WorkRegisterForm"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
@@ -16,10 +17,8 @@
 	<h1>
 		<label>作業登録フォーム</label>
 	</h1>
-
-
 	<%
-		WorkRegisterForm form = (WorkRegisterForm) request
+		WorkRegisterViewForm form = (WorkRegisterViewForm) request
 				.getAttribute("form");
 		String workState = form.isWorkingFlg() ? "作業中" : "未作業中";
 		out.print("<h2 align='center'>現在の状況:" + workState + "</h2>");
