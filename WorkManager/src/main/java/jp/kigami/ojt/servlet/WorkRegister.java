@@ -94,26 +94,18 @@ public class WorkRegister extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
-		// ログインユーザ名を設定
-		Work inputWork = new Work();
+		// ログインユーザ名を取得
 		String userName = request.getUserPrincipal().getName();
-		inputWork.setUserName(userName);
+
+		WorkLogic logic = new WorkLogic();
 
 		// 作業終了処理
 		if (request.getParameter("finishBtn") != null) {
+
 			WorkFinishForm finshForm = setfinishForm(request);
 
-			// 入力(id)チェック
-			String id = finshForm.getId();
-			if (!InputValidation.idCheck(id)) {
-				throw new SystemException("不正な入力");
-			}
-
-			// IDを設定
-			inputWork.setId(Integer.valueOf(id));
 			try {
-				WorkLogic logic = new WorkLogic();
-				logic.finishWork(inputWork);
+				logic.finishWork(userName, finshForm.getId());
 			} catch (BusinessException e) {
 				request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
 			}
@@ -124,19 +116,17 @@ public class WorkRegister extends HttpServlet {
 			WorkRegisterForm registerForm = setRegisterForm(request);
 
 			// 入力チェック
-			ValidationResult result = inputCheckWhenStart(registerForm,
-					inputWork);
+			ValidationResult result = logic.inputCheckWhenStart(registerForm);
 			if (!result.isCheckResult()) {
+
+				// 入力チェックエラーの場合、エラーメッセージを表示
 				request.setAttribute(ConstantDef.ERROR_MSG,
 						result.getErrorMsg());
 			} else {
 
 				// 入力エラーなしの場合
-				logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]",
-						registerForm.getStartTime(), registerForm.getContents(),
-						registerForm.getNote());
 				try {
-					register(inputWork);
+					logic.register(userName, registerForm);
 				} catch (BusinessException e) {
 					request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
 				}
@@ -152,30 +142,6 @@ public class WorkRegister extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException(e);
 		}
-
-	}
-
-	/**
-	 * 作業開始処理（同期処理） 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
-	 * 
-	 * @param inputWork
-	 * @throws BusinessException
-	 */
-	private synchronized void register(Work inputWork)
-			throws BusinessException {
-
-		WorkLogic logic = new WorkLogic();
-
-		// 仕掛処理確認
-		List<Work> workList = logic.findWorking(inputWork);
-		if (workList.size() == 1) {
-			// 仕掛処理がある場合、終了
-			logic.findWorking(inputWork);
-		}
-
-		// 作業開始
-		logic.startWork(inputWork);
-
 	}
 
 	/**
@@ -190,75 +156,6 @@ public class WorkRegister extends HttpServlet {
 		form.setId(request.getParameter("id"));
 
 		return form;
-	}
-
-	/**
-	 * 作業開始ボタン押下時の入力チェック
-	 * 
-	 * @param form
-	 * @param inputWork
-	 * @return
-	 */
-	private ValidationResult inputCheckWhenStart(WorkRegisterForm form,
-			Work inputWork) {
-
-		ValidationResult result = new ValidationResult();
-		result.setCheckResult(true);
-
-		// idチェック
-		String id = form.getId();
-		if (!InputValidation.idCheck(id)) {
-			throw new SystemException("不正な入力");
-		} else {
-			if (!id.isEmpty()) {
-				inputWork.setId(Integer.valueOf(id));
-			}
-		}
-
-		// 開始時間チェック
-		String startTime = form.getStartTime();
-		if (startTime == null) {
-			throw new SystemException("不正な入力");
-		}
-		if (!startTime.isEmpty()) {
-			// 入力check
-			result = InputValidation.isTime(startTime);
-			if (result.isCheckResult()) {
-				inputWork.setStartTime(DateUtils.getFomatTime(startTime));
-			}
-		} else {
-			// 未入力の場合、再入力
-			result.setCheckResult(false);
-			result.setErrorMsg("入力してください。");
-		}
-
-		if (result.isCheckResult()) {
-			// 作業内容
-			String contents = form.getContents();
-			if (contents == null) {
-				throw new SystemException("不正な入力");
-			} else {
-				result = InputValidation.inputSize(contents, 0, 40);
-				if (result.isCheckResult()) {
-					inputWork.setContents(contents);
-				}
-			}
-		}
-
-		if (result.isCheckResult()) {
-			// 備考チェック
-			String note = form.getNote();
-			if (note == null) {
-				throw new SystemException("不正な入力");
-			} else {
-				result = InputValidation.inputSize(note, 0, 40);
-				if (result.isCheckResult()) {
-					inputWork.setNote(note);
-				}
-			}
-		}
-
-		return result;
 	}
 
 	/**
