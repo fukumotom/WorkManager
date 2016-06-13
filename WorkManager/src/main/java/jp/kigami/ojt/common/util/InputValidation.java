@@ -73,7 +73,7 @@ public class InputValidation {
 	 */
 	public static boolean isNumber(String id) {
 
-		String regex = "^[1-9]+[0-9]*$";
+		String regex = "^\\d+$";
 		Pattern ptn = Pattern.compile(regex);
 		Matcher matcher = ptn.matcher(id);
 		boolean result = matcher.matches();
