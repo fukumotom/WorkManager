@@ -2,3 +2,5 @@ target
 .settings
 .project
 .classpath
+.sonar
+sonar-project.properties
