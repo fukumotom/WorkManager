@@ -18,4 +18,9 @@ public class ConstantDef {
 	 * エラーメッセージ（属性）
 	 */
 	public static final String ERROR_MSG = "errorMsg";
+
+	/**
+	 * フォーム（属性）
+	 */
+	public static final String ATTR_FORM = "form";
 }
