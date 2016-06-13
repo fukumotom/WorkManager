@@ -1,7 +1,6 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -10,20 +9,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
-import jp.kigami.ojt.common.util.DateUtils;
-import jp.kigami.ojt.common.util.InputValidation;
 import jp.kigami.ojt.common.util.ValidationResult;
 import jp.kigami.ojt.form.WorkFinishForm;
 import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.logic.WorkLogic;
-import jp.kigami.ojt.model.Work;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * 作業登録/完了処理
@@ -80,7 +76,7 @@ public class WorkRegister extends HttpServlet {
 		WorkLogic logic = new WorkLogic();
 		WorkRegisterViewForm form = logic.getWorkRegisterViewForm(userName);
 
-		request.setAttribute("viewForm", form);
+		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
 	}
 
