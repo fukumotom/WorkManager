@@ -86,10 +86,12 @@ public class PropertyUtils {
 	}
 
 	/**
-	 * 独自プロパティからの値取得(メッセージ引数あり)
+	 * 独自プロパティからの値取得
 	 * 
 	 * @param key
 	 *            取得する値のkey
+	 * @param args
+	 *            メッセージ引数
 	 * @return 取得する値
 	 */
 	public static String getValue(String key, String... args) {
@@ -99,22 +101,6 @@ public class PropertyUtils {
 		}
 
 		return propertyUtils.getProperty(key, args);
-	}
-
-	/**
-	 * 独自プロパティからの値取得
-	 * 
-	 * @param key
-	 *            取得する値のkey
-	 * @return 取得する値
-	 */
-	public static String getValue(String key) {
-
-		if (propertyUtils == null) {
-			throw new SystemException("プロパティファイル読み込み失敗");
-		}
-
-		return propertyUtils.getProperty(key, null);
 	}
 
 }
