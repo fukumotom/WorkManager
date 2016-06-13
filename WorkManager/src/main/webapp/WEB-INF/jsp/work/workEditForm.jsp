@@ -27,31 +27,31 @@
 			</tr>
 			<tr>
 				<td><input type="text" name="startTime"
-					value="${editWork.startTime}"></td>
+					value="${editWork.startTime}" /></td>
 			</tr>
 			<tr>
 				<th>終了時間</th>
 			</tr>
 			<tr>
 				<td><input type="text" name="endTime"
-					value="${editWork.endTime}"></td>
+					value="${editWork.endTime}" /></td>
 			</tr>
 			<tr>
 				<th>作業内容</th>
 			</tr>
 			<tr>
 				<td><input type="text" name="contents"
-					value="${editWork.contents}"></td>
+					value="${editWork.contents}" /></td>
 			</tr>
 			<tr>
 				<th>備考</th>
 			</tr>
 			<tr>
-				<td><input type="text" name="note" value="${editWork.note}"></td>
+				<td><input type="text" name="note" value="${editWork.note}" /></td>
 			</tr>
 		</table>
-		<input type="hidden" name="id" value="${editWork.id}"><input
-			type="submit" value="更新">
+		<input type="hidden" name="id" value="${editWork.id}" /><input
+			type="submit" value="更新" />
 	</form>
 </body>
 </html>

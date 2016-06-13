@@ -55,13 +55,11 @@
 					<%
 						if (index == 0) {
 					%> <input type="radio" name="id" value="${work.id}"
-					checked="checked">
-					<%
-						} else {
-					%> <input type="radio" name="id" value="${work.id}">
-					<%
-						}
-					%>
+					checked="checked" /> <%
+ 	} else {
+ %> <input type="radio" name="id" value="${work.id}" /> <%
+ 	}
+ %>
 				</td>
 				<td>${work.startTime}</td>
 				<td>${work.endTime}</td>
@@ -86,18 +84,18 @@
 		<table>
 			<tr>
 				<td><input type="submit" value="挿入" name="actionBtn"
-					style=<%=display%>></td>
+					style=<%=display%> /></td>
 				<td><input type="submit" value="追加" name="actionBtn"
-					style=<%=display%>></td>
+					style=<%=display%> /></td>
 				<td><input type="submit" value="編集" name="actionBtn"
-					style=<%=display%>></td>
+					style=<%=display%> /></td>
 				<td><input type="submit" value="削除" name="actionBtn"
-					style=<%=display%>></td>
+					style=<%=display%> /></td>
 				<td><input type="submit" value="保存" name="action"
-					style=<%=display%>></td>
-				<td><input type="checkbox" name="deleteFlg"> 削除を含む <input
-					type="text" name="workDate"> (yyyy/MM/dd) <input
-					type="submit" value="履歴" name="actionBtn"></td>
+					style=<%=display%> /></td>
+				<td><input type="checkbox" name="deleteFlg" /> 削除を含む <input
+					type="text" name="workDate" /> (yyyy/MM/dd) <input type="submit"
+					value="履歴" name="actionBtn" /></td>
 			</tr>
 		</table>
 
