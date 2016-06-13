@@ -42,7 +42,7 @@ public class PropertyUtils {
 	private PropertyUtils() {
 	}
 
-	public void loadProperty() {
+	private void loadProperty() {
 
 		try (InputStream iStream = PropertyUtils.class.getClassLoader()
 				.getResourceAsStream("messages.properties")) {
