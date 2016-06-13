@@ -82,7 +82,6 @@ public class InputValidation {
 
 	}
 
-
 	/**
 	 * 時間（HH:mm）判定
 	 * 
@@ -126,20 +125,12 @@ public class InputValidation {
 
 	/**
 	 * 作業中フラグチェック
+	 * 
 	 * @param workingFlgStr
 	 * @return
 	 */
 	public static boolean flgCheck(String workingFlgStr) {
 
-		boolean result = true;
-
-		if (ConstantDef.FLG_ON.equals(workingFlgStr)) {
-			result = true;
-		} else if (ConstantDef.FLG_OFF.equals(workingFlgStr)) {
-			result = true;
-		} else {
-			result = false;
-		}
-		return result;
+		return Boolean.parseBoolean(workingFlgStr);
 	}
 }
