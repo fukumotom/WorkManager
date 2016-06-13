@@ -114,7 +114,7 @@ public class InputValidation {
 
 		if (id == null) {
 			result = false;
-		} else if (!id.isEmpty() & id != null) {
+		} else if (!id.isEmpty()) {
 
 			if (!InputValidation.isNumber(id)) {
 				result = false;
