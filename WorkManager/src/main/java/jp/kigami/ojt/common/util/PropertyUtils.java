@@ -74,15 +74,8 @@ public class PropertyUtils {
 	 */
 	private String getProperty(String key, Object[] args) {
 
-		String value;
-		if (args == null) {
-
-			value = prop.getProperty(key);
-
-		}
-		value = MessageFormat.format(prop.getProperty(key), args);
-
-		return value;
+		// メッセージプロパティの値と引数をバインド
+		return MessageFormat.format(prop.getProperty(key), args);
 	}
 
 	/**
