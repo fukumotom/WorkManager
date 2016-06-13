@@ -42,6 +42,9 @@ public class PropertyUtils {
 	private PropertyUtils() {
 	}
 
+	/**
+	 * メッセージプロパティファイルをエンコードして読み込む
+	 */
 	private void loadProperty() {
 
 		try (InputStream iStream = PropertyUtils.class.getClassLoader()
