@@ -50,25 +50,6 @@ public class WorkRegister extends HttpServlet {
 			throws ServletException, IOException {
 
 		// 仕掛処理取得
-		getWorking(request);
-
-		RequestDispatcher dispatcher = request
-				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
-
-		try {
-			dispatcher.forward(request, response);
-		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
-		}
-	}
-
-	/**
-	 * 仕掛処理取得
-	 * 
-	 * @param request
-	 */
-	private void getWorking(HttpServletRequest request) {
-
 		String userName = request.getUserPrincipal().getName();
 		logger.info("ユーザ名:{}", userName);
 
@@ -78,6 +59,14 @@ public class WorkRegister extends HttpServlet {
 
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
+
+		try {
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
+			throw new SystemException("フォワード失敗", e);
+		}
 	}
 
 	/*
@@ -130,7 +119,10 @@ public class WorkRegister extends HttpServlet {
 		}
 
 		// 登録画面の再表示
-		getWorking(request);
+		WorkRegisterViewForm form = logic.getWorkRegisterViewForm(userName);
+
+		request.setAttribute(ConstantDef.ATTR_FORM, form);
+
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 		try {
