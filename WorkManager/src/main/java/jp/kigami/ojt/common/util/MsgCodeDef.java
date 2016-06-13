@@ -9,6 +9,12 @@ package jp.kigami.ojt.common.util;
 public class MsgCodeDef {
 
 	/**
+	 * プライベートコンストラクタ
+	 */
+	private MsgCodeDef() {
+	}
+
+	/**
 	 * 入力チェック（パスワード不一致エラー）
 	 */
 	public static final String CONFIRM_ERROR = "e.validation.001";
@@ -18,8 +24,24 @@ public class MsgCodeDef {
 	 */
 	public static final String SIZE_ERROR = "e.validation.002";
 
-	public static final String MULTI_DATE_EXIT = null;
+	/**
+	 * 入力チェック（未入力エラー）
+	 */
+	public static final String EMPTY_INPUT = "e.validation.003";
 
-	private MsgCodeDef() {
-	}
+	/**
+	 * 入力チェック（フォーマットエラー）
+	 */
+	public static final String INPUT_FORMAT_ERROR = "e.validation.004";
+
+	/**
+	 * 仕掛作業取得時エラー
+	 */
+	public static final String MULTI_DATE_EXIT = "w.db.001";
+
+	/**
+	 * 作業完了時警告
+	 */
+	public static final String ALREADY_FINISHED = "w.db.002";
+
 }

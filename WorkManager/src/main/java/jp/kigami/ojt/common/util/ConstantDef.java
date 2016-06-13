@@ -18,15 +18,4 @@ public class ConstantDef {
 	 * エラーメッセージ（属性）
 	 */
 	public static final String ERROR_MSG = "errorMsg";
-	
-	
-	/**
-	 * フラグ判定(on)
-	 */
-	public static final String FLG_ON = "true";
-
-	/**
-	 * フラグ判定(off)
-	 */
-	public static final String FLG_OFF = "false";
 }
