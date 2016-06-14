@@ -17,23 +17,32 @@ public class MsgCodeDef {
 	/**
 	 * 入力チェック（パスワード不一致エラー）
 	 */
-	public static final String CONFIRM_ERROR = "e.validation.001";
+	public static final String CONFIRM_ERROR = "w.validation.001";
 
 	/**
 	 * 入力チェック（サイズエラー）
 	 */
-	public static final String SIZE_ERROR = "e.validation.002";
+	public static final String SIZE_ERROR = "w.validation.002";
 
 	/**
 	 * 入力チェック（未入力エラー）
 	 */
-	public static final String EMPTY_INPUT = "e.validation.003";
+	public static final String EMPTY_INPUT = "w.validation.003";
 
 	/**
 	 * 入力チェック（フォーマットエラー）
 	 */
-	public static final String INPUT_FORMAT_ERROR = "e.validation.004";
+	public static final String INPUT_FORMAT_ERROR = "w.validation.004";
 
+	/**
+	 * 入力チェック（不正な入力）
+	 */
+	public static final String BAD_INPUT = "e.validation.001";
+
+	/**
+	 * 入力チェック（不正な操作）
+	 */
+	public static final String BAD_OPERATION = "e.validation.002";
 	/**
 	 * 仕掛作業取得時エラー
 	 */
