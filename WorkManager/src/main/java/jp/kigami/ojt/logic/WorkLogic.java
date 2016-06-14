@@ -232,6 +232,8 @@ public class WorkLogic {
 		ValidationResult result = new ValidationResult();
 		result.setCheckResult(true);
 
+		boolean validationChek = false;
+
 		logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", form.getStartTime(),
 				form.getContents(), form.getNote());
 
@@ -244,34 +246,50 @@ public class WorkLogic {
 		// 開始時間チェック
 		String startTime = form.getStartTime();
 		if (startTime == null) {
-			throw new SystemException("不正な入力");
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		}
 		if (!startTime.isEmpty()) {
-			// 入力check
-			result = InputValidation.isTime(startTime);
-		} else {
-			// 未入力の場合、再入力
-			result.setCheckResult(false);
-			result.setErrorMsg("入力してください。");
-
-			if (result.isCheckResult()) {
-				// 作業内容
-				String contents = form.getContents();
-				if (contents == null) {
-					throw new SystemException("不正な入力");
-				} else {
-					result = InputValidation.inputSize(contents, 0, 40);
-				}
+			// フォーマットチェック
+			validationChek = InputValidation.isTime(startTime);
+			if (!validationChek) {
+				result.addErrorMsg(PropertyUtils.getValue(
+						MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
+				result.setCheckResult(validationChek);
 			}
+		} else {
+			// 入力チェック
+			result.setCheckResult(false);
+			result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT,
+					"開始時間"));
+		}
 
-			if (result.isCheckResult()) {
-				// 備考チェック
-				String note = form.getNote();
-				if (note == null) {
-					throw new SystemException("不正な入力");
-				} else {
-					result = InputValidation.inputSize(note, 0, 40);
-				}
+		// 作業内容
+		String contents = form.getContents();
+		if (contents == null) {
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+		} else {
+			// サイズチェック
+			validationChek = InputValidation.inputSize(contents, 0, 40);
+			if (!validationChek) {
+				result.addErrorMsg(PropertyUtils.getValue(
+						MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40"));
+				result.setCheckResult(validationChek);
+			}
+		}
+
+		// 備考チェック
+		String note = form.getNote();
+		if (note == null) {
+			throw new SystemException("不正な入力");
+		} else {
+			// サイズチェック
+			validationChek = InputValidation.inputSize(note, 0, 40);
+			if (!validationChek) {
+				result.addErrorMsg(PropertyUtils.getValue(
+						MsgCodeDef.SIZE_ERROR, "備考", "0", "40"));
+				result.setCheckResult(validationChek);
 			}
 		}
 		return result;
