@@ -7,11 +7,23 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 入力チェック
+ * 
+ * @author kigami
+ *
+ */
 public class InputValidation {
 
+	/**
+	 * ロガー
+	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(InputValidation.class);
 
+	/**
+	 * プライベートコンストラクタ
+	 */
 	private InputValidation() {
 	}
 
@@ -22,25 +34,15 @@ public class InputValidation {
 	 *            check data
 	 * @param min
 	 *            data's minimum size
-	 * @param maxdata's
-	 *            maximum size
+	 * @param maxdata
+	 *            's maximum size
 	 * @return
 	 */
-	public static ValidationResult inputSize(String target, int min, int max) {
-
-		ValidationResult result = new ValidationResult();
+	public static boolean inputSize(String target, int min, int max) {
 
 		logger.info("チェックする文字列：{}", target);
 
-		if ((target.length() <= max) && (target.length() >= min)) {
-
-			result.setCheckResult(true);
-		} else {
-			result.setCheckResult(false);
-			result.setErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR));
-		}
-
-		return result;
+		return (target.length() <= max) && (target.length() >= min);
 	}
 
 	/**
@@ -52,18 +54,9 @@ public class InputValidation {
 	 *            confirmPassword
 	 * @return checkResult
 	 */
-	public static ValidationResult confilm(String target1, String target2) {
+	public static boolean confilm(String target1, String target2) {
 
-		ValidationResult result = new ValidationResult();
-
-		if (target1.equals(target2)) {
-			result.setCheckResult(true);
-		} else {
-			result.setCheckResult(false);
-			result.setErrorMsg(
-					PropertyUtils.getValue(MsgCodeDef.CONFIRM_ERROR));
-		}
-		return result;
+		return target1.equals(target2);
 	}
 
 	/**
@@ -88,15 +81,13 @@ public class InputValidation {
 	 * @param startTime
 	 * @return
 	 */
-	public static ValidationResult isTime(String target) {
+	public static boolean isTime(String target) {
 
-		ValidationResult result = new ValidationResult();
+		boolean result = true;
 		try {
 			DateUtils.getFomatTime(target);
-			result.setCheckResult(true);
 		} catch (DateTimeException e) {
-			result.setCheckResult(false);
-			result.setErrorMsg("フォーマットが違います。");
+			result = false;
 		}
 
 		return result;
