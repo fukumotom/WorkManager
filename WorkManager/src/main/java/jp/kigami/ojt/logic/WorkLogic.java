@@ -11,6 +11,8 @@ import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.DateUtils;
 import jp.kigami.ojt.common.util.InputValidation;
+import jp.kigami.ojt.common.util.MsgCodeDef;
+import jp.kigami.ojt.common.util.PropertyUtils;
 import jp.kigami.ojt.common.util.ValidationResult;
 import jp.kigami.ojt.dao.WorkDao;
 import jp.kigami.ojt.form.WorkRegisterForm;
@@ -255,7 +257,7 @@ public class WorkLogic {
 			if (!validationChek) {
 				result.addErrorMsg(PropertyUtils.getValue(
 						MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
-				result.setCheckResult(validationChek);
+				result.setCheckResult(false);
 			}
 		} else {
 			// 入力チェック
@@ -275,7 +277,7 @@ public class WorkLogic {
 			if (!validationChek) {
 				result.addErrorMsg(PropertyUtils.getValue(
 						MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40"));
-				result.setCheckResult(validationChek);
+				result.setCheckResult(false);
 			}
 		}
 
