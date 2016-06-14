@@ -17,16 +17,11 @@
 	<h1>
 		<label>作業登録フォーム</label>
 	</h1>
+	<h2 align="center">現在の状況:${(form.workingFlg)? "作業中" : "未作業中"}</h2>
+	<h2 id="errMsg">${errorMsg}</h2>
 	<%
 		WorkRegisterViewForm form = (WorkRegisterViewForm) request
 				.getAttribute(ConstantDef.ATTR_FORM);
-		String workState = form.isWorkingFlg() ? "作業中" : "未作業中";
-		out.print("<h2 align='center'>現在の状況:" + workState + "</h2>");
-		String errorMsg = (String) request.getAttribute("errorMsg");
-		String err = errorMsg != null
-				? "<h2 id=\"errMsgs\">" + errorMsg + "</h2>" : "";
-		out.print(err);
-
 		if (form.isWorkingFlg()) {
 	%>
 
