@@ -3,6 +3,12 @@ package jp.kigami.ojt.common.util;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 入力チェック結果格納クラス
+ * 
+ * @author kigami
+ *
+ */
 public class ValidationResult {
 
 	/**
@@ -27,7 +33,7 @@ public class ValidationResult {
 	 * 
 	 * @return the errorMsg
 	 */
-	public String getErrorMsgｓ() {
+	public String getErrorMsgs() {
 
 		StringBuilder sb = new StringBuilder();
 		for (String errorMsg : errorMsgList) {

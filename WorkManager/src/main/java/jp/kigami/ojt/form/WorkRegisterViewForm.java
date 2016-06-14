@@ -63,6 +63,11 @@ public class WorkRegisterViewForm {
 	private Work work;
 
 	/**
+	 * エラーメッセージ
+	 */
+	private String errMsgs;
+
+	/**
 	 * @return the id
 	 */
 	public String getId() {
@@ -210,5 +215,20 @@ public class WorkRegisterViewForm {
 	 */
 	public void setWork(Work work) {
 		this.work = work;
+	}
+
+	/**
+	 * @return the errMsgs
+	 */
+	public String getErrMsgs() {
+		return errMsgs;
+	}
+
+	/**
+	 * @param errMsgs
+	 *            the errMsgs to set
+	 */
+	public void setErrMsgs(String errMsgs) {
+		this.errMsgs = errMsgs;
 	}
 }

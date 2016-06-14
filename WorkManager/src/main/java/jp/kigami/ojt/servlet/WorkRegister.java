@@ -106,13 +106,14 @@ public class WorkRegister extends HttpServlet {
 
 				// 入力チェックエラーの場合、エラーメッセージを表示
 				request.setAttribute(ConstantDef.ERROR_MSG,
-						result.getErrorMsg());
+						result.getErrorMsgs());
 			} else {
 
 				// 入力エラーなしの場合
 				try {
 					logic.register(userName, registerForm);
 				} catch (BusinessException e) {
+					// TODO formに設定する
 					request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
 				}
 			}
