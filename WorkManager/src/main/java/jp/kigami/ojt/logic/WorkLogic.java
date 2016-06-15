@@ -4,9 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.DateUtils;
@@ -20,6 +17,9 @@ import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.model.Work;
 import jp.kigami.ojt.servlet.WorkHelper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class WorkLogic {
 
 	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
@@ -31,9 +31,16 @@ public class WorkLogic {
 
 	}
 
-	public LocalTime getStartTime(Work inputWork) throws BusinessException {
+	/**
+	 * 引数の情報を条件にDBから開始時間を取得
+	 * 
+	 * @param inputWork
+	 * @return
+	 * @throws BusinessException
+	 */
+	public LocalTime getStartTime(Work inputWork) {
 		WorkDao dao = new WorkDao();
-		Work work = dao.getStartTime(inputWork);
+		Work work = dao.findStartTime(inputWork);
 		return work.getStartTime();
 	}
 
@@ -60,10 +67,6 @@ public class WorkLogic {
 		dao.finishWork(inputWork);
 	}
 
-	public void startWork(Work inputWork) throws BusinessException {
-		WorkDao dao = new WorkDao();
-		dao.startWork(inputWork);
-	}
 
 	/**
 	 * 編集作業検索処理
@@ -155,9 +158,10 @@ public class WorkLogic {
 	 * @param finshForm
 	 * 
 	 * @param inputWork
+	 * @return
 	 * @throws BusinessException
 	 */
-	public void finishWork(String userName, String deleteId)
+	public WorkRegisterViewForm finishWork(String userName, String deleteId)
 			throws BusinessException {
 
 		// 入力(id)チェック
@@ -184,42 +188,71 @@ public class WorkLogic {
 
 		WorkDao dao = new WorkDao();
 		dao.finishWork(inputWork);
+
+		return getWorkRegisterViewForm(userName);
 	}
 
 	/**
-	 * 作業開始処理（同期処理） 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * 作業開始処理  仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
 	 * 
 	 * @param registerForm
+	 * @return
 	 * @throws BusinessException
 	 */
-	public synchronized void register(String userName,
+	public WorkRegisterViewForm register(String userName,
 			WorkRegisterForm registerForm) throws BusinessException {
 
-		Work inputWork = new Work();
+		WorkRegisterViewForm form = getWorkRegisterViewForm(userName);
 
-		// 登録情報を設定
-		inputWork.setUserName(userName);
-		if (!registerForm.getId().isEmpty()) {
-			inputWork.setId(Integer.valueOf(registerForm.getId()));
+		// 入力チェック
+		ValidationResult result = inputCheckWhenStart(registerForm);
+		if (!result.isCheckResult()) {
+
+			// 入力チェックエラーの場合、エラーメッセージを設定
+			form.setErrMsgs(result.getErrorMsgs());
+		} else {
+
+			// 入力チェックOKの場合
+			Work inputWork = new Work();
+
+			// 登録情報を設定
+			inputWork.setUserName(userName);
+			if (!registerForm.getId().isEmpty()) {
+				inputWork.setId(Integer.valueOf(registerForm.getId()));
+			}
+			inputWork.setStartTime(DateUtils.getFomatTime(registerForm
+					.getStartTime()));
+			inputWork.setContents(registerForm.getContents());
+			inputWork.setNote(registerForm.getNote());
+
+			//作業開始の 同期処理
+			workRegiste(inputWork);
 		}
-		inputWork.setStartTime(
-				DateUtils.getFomatTime(registerForm.getStartTime()));
-		inputWork.setContents(registerForm.getContents());
-		inputWork.setNote(registerForm.getNote());
 
-		WorkLogic logic = new WorkLogic();
+		return form;
+	}
+
+	/**
+	 * （同期処理）
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	private synchronized void workRegiste(Work inputWork) throws BusinessException {
 
 		// 仕掛処理確認
-		List<Work> workList = logic.findWorking(inputWork);
+		List<Work> workList = findWorking(inputWork);
+
 		if (workList.size() == 1) {
 			// 仕掛処理がある場合、終了
-			logic.finishWork(userName, registerForm.getId());
+			finishWork(inputWork.getUserName(), workList.get(0).getId()
+					.toString());
 		}
 
 		// 作業開始
-		logic.startWork(inputWork);
+		WorkDao dao = new WorkDao();
+		dao.startWork(inputWork);
 	}
 
 	/**
