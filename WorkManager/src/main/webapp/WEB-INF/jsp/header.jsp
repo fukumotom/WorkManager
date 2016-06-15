@@ -8,12 +8,11 @@
 	<tr>
 		<td align="left">
 			<form method="get" action="/WorkManager/Menu">
-				<input type="submit" value="メニュー">
+				<input type="submit" value="メニュー" />
 			</form>
-		</td>
 		<td align="right">
 			<form method="get" action="/WorkManager/Logout">
-				<input type="submit" value="ログアウト">
+				<input type="submit" value="ログアウト" />
 			</form>
 		</td>
 	</tr>

@@ -439,10 +439,18 @@ public class CommonDbUtil {
 
 	}
 
-	public static LocalTime findTime(String sql, Map<Integer, Object> paramMap,
-			String column) throws BusinessException {
+	/**
+	 * 引数で指定したカラム（開始or終了時間）を取得
+	 * 
+	 * @param sql
+	 * @param paramMap
+	 * @param column
+	 * @return
+	 */
+	public static WorkDto findTime(String sql, Map<Integer, Object> paramMap,
+			String column) {
 
-		LocalTime time = null;
+		ArrayList<WorkDto> dtoList = null;
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection();
 				PreparedStatement pstm = con.prepareStatement(sql);) {
@@ -454,18 +462,10 @@ public class CommonDbUtil {
 
 			// DB検索
 			ResultSet result = pstm.executeQuery();
+			dtoList = resultSetToWorkDtoList(result, WorkDto.class);
 
-			int resultcnt = 0;
-			while (result.next()) {
-				resultcnt++;
-				if ("end_time".equals(column)
-						&& result.getTime(column) == null) {
-					throw new BusinessException("作業中の下に追加はできません。");
-				}
-				time = result.getTime(column).toLocalTime();
-			}
-			if (resultcnt != 1) {
-				throw new BusinessException("選択した作業の開始または終了時間を取得できませんでした。");
+			if (dtoList.size() != 1) {
+				throw new SystemException("選択した作業の開始または終了時間を取得できませんでした。");
 			}
 
 		} catch (SQLException e) {
@@ -473,7 +473,7 @@ public class CommonDbUtil {
 			throw new SystemException(e);
 		}
 
-		return time;
+		return dtoList.get(0);
 	}
 
 	public static void deleteWork(String sql, Map<Integer, Object> paramMap)

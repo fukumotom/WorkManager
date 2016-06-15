@@ -1,9 +1,6 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -16,10 +13,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.BusinessException;
-import jp.kigami.ojt.common.util.ConvertToModelUtils;
-import jp.kigami.ojt.common.util.DateUtils;
+import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.ConstantDef;
+import jp.kigami.ojt.common.util.ValidationResult;
+import jp.kigami.ojt.form.WorkFinishForm;
+import jp.kigami.ojt.form.WorkRegisterForm;
+import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.logic.WorkLogic;
-import jp.kigami.ojt.model.Work;
 
 /**
  * 作業登録/完了処理
@@ -28,132 +28,122 @@ import jp.kigami.ojt.model.Work;
 @WebServlet("/WorkRegister")
 public class WorkRegister extends HttpServlet {
 
+	/**
+	 * シリアルバージョン
+	 */
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * ロガー
+	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkRegister.class);
 
+	/*
+	 * 作業登録画面表示用
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
+	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// 仕掛処理取得
 		String userName = request.getUserPrincipal().getName();
-		Work inputWork = new Work();
-		inputWork.setUserName(userName);
-		inputWork.setWorkDate(LocalDate.now());
 		logger.info("ユーザ名:{}", userName);
 
+		// 画面表示データ取得
 		WorkLogic logic = new WorkLogic();
+		WorkRegisterViewForm form = logic.getWorkRegisterViewForm(userName);
 
-		List<Work> workList = logic.findWorking(inputWork);
-		Work work;
-		String state;
-		if (workList.size() == 0) {
-			logger.info("仕掛処理なし");
-			work = null;
-			state = null;
-		} else if (workList.size() == 1) {
-			logger.info("仕掛処理あり");
-			work = workList.get(0);
-			state = "working";
-		} else {
-			logger.warn("仕掛処理が複数あります。");
-			request.setAttribute("errMsg", "仕掛処理が複数あります。");
-			work = workList.get(0);
-			state = "working";
-		}
-		if (state != null) {
-			request.setAttribute("state", state);
-		}
-		request.setAttribute("working", work);
+		request.setAttribute(ConstantDef.ATTR_FORM, form);
+
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
 
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			logger.error("フォワード失敗", e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 
+	/*
+	 * 作業登録画面更新用
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.
+	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		// ログインユーザ名を取得
 		String userName = request.getUserPrincipal().getName();
-		String id = request.getParameter("id");
-		Work inputWork = new Work();
-		inputWork.setUserName(userName);
-		if (id != "") {
-			// ID取得時に型変換
-			inputWork.setId(ConvertToModelUtils.convertInt(id));
-		}
 
-		String action = request.getParameter("action");
+		WorkLogic logic = new WorkLogic();
+
+		// 画面表示用フォーム
+		WorkRegisterViewForm form = new WorkRegisterViewForm();
+
 		// 作業終了処理
-		if ("作業終了".equals(action)) {
+		if (request.getParameter("finishBtn") != null) {
+
+			WorkFinishForm finshForm = setfinishForm(request);
 
 			try {
-
-				workFinish(inputWork);
-
+				form = logic.finishWork(userName, finshForm.getId());
 			} catch (BusinessException e) {
-				request.setAttribute("errMsg", e.getMessage());
-			}
-		} else if ("作業開始".equals(action)) {
-
-			String state = request.getParameter("state");
-			logger.info("作業状況を取得:{}", state);
-
-			String startTime = request.getParameter("startTime");
-			String contents = (String) request.getParameter("contents");
-			String note = (String) request.getParameter("note");
-			logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", startTime, contents,
-					note);
-
-			if ("作業中".equals(state)) {
-
-				try {
-					workFinish(inputWork);
-				} catch (BusinessException e) {
-					request.setAttribute("errMsg", e.getMessage());
-				}
+				form.setErrMsgs(e.getMessage());
 			}
 
-			if (startTime != "") {
-				inputWork.setStartTime(DateUtils.getFomatTime(startTime));
-			} else {
-				// 未入力の場合、現在時間で開始
-				inputWork.setStartTime(DateUtils.getNowTime());
-			}
-			inputWork.setContents(contents);
-			inputWork.setNote(note);
-			WorkLogic logic = new WorkLogic();
+			// 作業開始処理
+		} else if (request.getParameter("startBtn") != null) {
+
+			WorkRegisterForm registerForm = setRegisterForm(request);
 
 			try {
-				logic.startWork(inputWork);
+				form = logic.register(userName, registerForm);
 			} catch (BusinessException e) {
-				request.setAttribute("errMsg", e.getMessage());
+				form.setErrMsgs(e.getMessage());
 			}
 		}
-		doGet(request, response);
+
+		request.setAttribute(ConstantDef.ATTR_FORM, form);
+
+		response.sendRedirect("/WorkManager/WorkRegister");
 	}
 
 	/**
-	 * 作業完了処理
+	 * 作業終了時のリクエスト情報をフォームに設定
 	 * 
-	 * @param inputWork
-	 * @throws BusinessException
+	 * @param request
+	 * @return
 	 */
-	private void workFinish(Work inputWork) throws BusinessException {
-		WorkLogic logic = new WorkLogic();
-		inputWork.setEndTime(DateUtils.getNowTime());
-		LocalTime startTime = logic.getStartTime(inputWork);
-		inputWork.setStartTime(DateUtils.getParseTime(startTime));
+	private WorkFinishForm setfinishForm(HttpServletRequest request) {
 
-		WorkHelper helper = new WorkHelper();
-		helper.calcWorkTime(inputWork);
+		WorkFinishForm form = new WorkFinishForm();
+		form.setId(request.getParameter("id"));
 
-		logic.finishWork(inputWork);
+		return form;
 	}
+
+	/**
+	 * 作業開始時のリクエスト情報をフォームに設定
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private WorkRegisterForm setRegisterForm(HttpServletRequest request) {
+
+		WorkRegisterForm form = new WorkRegisterForm();
+		form.setId(request.getParameter("id"));
+		form.setStartTime(request.getParameter("startTime"));
+		form.setContents(request.getParameter("contents"));
+		form.setNote(request.getParameter("note"));
+
+		return form;
+	}
+
 }
