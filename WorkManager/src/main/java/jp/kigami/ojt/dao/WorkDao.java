@@ -2,21 +2,20 @@ package jp.kigami.ojt.dao;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.dao.dto.WorkDto;
 import jp.kigami.ojt.db.util.CommonDbUtil;
 import jp.kigami.ojt.model.Work;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class WorkDao {
 
@@ -149,7 +148,7 @@ public class WorkDao {
 		}
 	}
 
-	public void startWork(Work work) throws BusinessException {
+	public void startWork(Work work) {
 
 		StringBuilder sql = CommonDbUtil.readSql("startWork.sql");
 
@@ -194,7 +193,7 @@ public class WorkDao {
 		return workList;
 	}
 
-	public Work getStartTime(Work inputWork) throws BusinessException {
+	public Work findStartTime(Work inputWork) {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getStartTime.sql");
@@ -206,11 +205,10 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap,
+		WorkDto resultDto = CommonDbUtil.findTime(sql.toString(), paramMap,
 				"start_time");
 
-		Work resultWork = new Work();
-		resultWork.setStartTime(startTime);
+		Work resultWork = mappingDtoToModel(resultDto);
 
 		return resultWork;
 	}
@@ -227,11 +225,14 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		LocalTime startTime = CommonDbUtil.findTime(sql.toString(), paramMap,
+		WorkDto resultDto = CommonDbUtil.findTime(sql.toString(), paramMap,
 				"end_time");
 
-		Work resultWork = new Work();
-		resultWork.setStartTime(startTime);
+		if (resultDto.getEndTime() == null) {
+			throw new BusinessException("作業中の下に追加はできません。");
+		}
+
+		Work resultWork = mappingDtoToModel(resultDto);
 
 		return resultWork;
 	}
