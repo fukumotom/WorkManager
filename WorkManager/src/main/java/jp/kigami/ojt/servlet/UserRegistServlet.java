@@ -22,12 +22,12 @@ import jp.kigami.ojt.logic.UserRegistLogic;
 import jp.kigami.ojt.model.User;
 
 @WebServlet("/RegisterForm")
-public class UserRegister extends HttpServlet {
+public class UserRegistServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(UserRegister.class);
+			.getLogger(UserRegistServlet.class);
 
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -107,13 +107,10 @@ public class UserRegister extends HttpServlet {
 		String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
 
 		// 入力チェック
-		ArrayList<ValidationResult> checkList = validation(request);
-		for (ValidationResult check : checkList) {
-			if (!check.isCheckResult()) {
-				// 入力チェックがある場合、入力フォームを再表示
-				forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
-				break;
-			}
+		ValidationResult result = validation(request);
+		if (!result.isCheckResult()) {
+			// 入力チェックがある場合、入力フォームを再表示
+			forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
 		}
 
 		// 登録情報設定
@@ -135,41 +132,17 @@ public class UserRegister extends HttpServlet {
 		dispatcher.forward(request, response);
 	}
 
-	private ArrayList<ValidationResult> validation(HttpServletRequest request) {
+	private ValidationResult validation(HttpServletRequest request) {
 
-		ArrayList<ValidationResult> resultList = new ArrayList<>();
+		ValidationResult result = new ValidationResult();
 		String userName = request.getParameter("j_username");
 		String password = request.getParameter("password");
 		String passConfilm = request.getParameter("passwordConfirm");
 
-		ValidationResult result = InputValidation.inputSize(userName, 5, 20);
-		ValidationResult result2 = InputValidation.inputSize(password, 5, 64);
-		ValidationResult result3 = InputValidation.confilm(password,
-				passConfilm);
-		resultList.add(result);
-		resultList.add(result2);
-		resultList.add(result3);
+		InputValidation.inputSize(userName, 5, 20);
+		InputValidation.inputSize(password, 5, 64);
+		InputValidation.confilm(password, passConfilm);
 
-		// 入力情報の長さチェック
-		if (!result.isCheckResult()) {
-			// 画面表示用エラーメッセージ作成
-			logger.info("★★入力エラー:{}", result.getErrorMsg());
-			request.setAttribute("syze_user", result.getErrorMsg());
-		}
-
-		// 入力情報の長さチェック
-		if (!result2.isCheckResult()) {
-			// 画面表示用エラーメッセージ作成
-			logger.info("★★入力エラー:{}", result2.getErrorMsg());
-			request.setAttribute("syze_pass", result2.getErrorMsg());
-		}
-
-		// パスワード同一確認
-		if (!result3.isCheckResult()) {
-			// 画面表示用エラーメッセージ作成
-			logger.info("★★入力エラー:{}", result3.getErrorMsg());
-			request.setAttribute("confirm_pass", result3.getErrorMsg());
-		}
-		return resultList;
+		return result;
 	}
 }
