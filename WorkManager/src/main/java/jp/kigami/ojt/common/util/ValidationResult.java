@@ -22,6 +22,11 @@ public class ValidationResult {
 	private boolean checkResult;
 
 	/**
+	 * エラーメッセージ用連結文字列
+	 */
+	private static final String DELIMITER = "<BR />";
+	
+	/**
 	 * メッセージリストの初期化
 	 */
 	public ValidationResult() {
@@ -35,13 +40,7 @@ public class ValidationResult {
 	 */
 	public String getErrorMsgs() {
 
-		StringBuilder sb = new StringBuilder();
-		for (String errorMsg : errorMsgList) {
-			sb.append(errorMsg);
-			sb.append("<BR />");
-		}
-
-		return sb.toString();
+		return String.join(DELIMITER, errorMsgList);
 	}
 
 	/**
