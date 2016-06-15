@@ -84,15 +84,18 @@ public class WorkRegister extends HttpServlet {
 
 		WorkLogic logic = new WorkLogic();
 
+		// 画面表示用フォーム
+		WorkRegisterViewForm form = new WorkRegisterViewForm();
+
 		// 作業終了処理
 		if (request.getParameter("finishBtn") != null) {
 
 			WorkFinishForm finshForm = setfinishForm(request);
 
 			try {
-				logic.finishWork(userName, finshForm.getId());
+				form = logic.finishWork(userName, finshForm.getId());
 			} catch (BusinessException e) {
-				request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
+				form.setErrMsgs(e.getMessage());
 			}
 
 			// 作業開始処理
@@ -100,37 +103,16 @@ public class WorkRegister extends HttpServlet {
 
 			WorkRegisterForm registerForm = setRegisterForm(request);
 
-			// 入力チェック
-			ValidationResult result = logic.inputCheckWhenStart(registerForm);
-			if (!result.isCheckResult()) {
-
-				// 入力チェックエラーの場合、エラーメッセージを表示
-				request.setAttribute(ConstantDef.ERROR_MSG,
-						result.getErrorMsgs());
-			} else {
-
-				// 入力エラーなしの場合
-				try {
-					logic.register(userName, registerForm);
-				} catch (BusinessException e) {
-					// TODO formに設定する
-					request.setAttribute(ConstantDef.ERROR_MSG, e.getMessage());
-				}
+			try {
+				form = logic.register(userName, registerForm);
+			} catch (BusinessException e) {
+				form.setErrMsgs(e.getMessage());
 			}
 		}
 
-		// 登録画面の再表示
-		WorkRegisterViewForm form = logic.getWorkRegisterViewForm(userName);
-
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
-		RequestDispatcher dispatcher = request
-				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
-		try {
-			dispatcher.forward(request, response);
-		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
-		}
+		response.sendRedirect("/WorkManager/WorkRegister");
 	}
 
 	/**
