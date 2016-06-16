@@ -26,6 +26,6 @@ public class SystemException extends RuntimeException {
 
 	public SystemException(String message, Throwable cause) {
 		super(message, cause);
-		logger.error("システムエラー:{}", cause);
+		logger.error(message + ":{}", cause);
 	}
 }

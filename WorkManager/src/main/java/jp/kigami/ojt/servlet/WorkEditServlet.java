@@ -2,7 +2,6 @@ package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -26,8 +25,8 @@ public class WorkEditServlet extends HttpServlet {
 			.getLogger(WorkEditServlet.class);
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		String userName = request.getUserPrincipal().getName();
 		String id = request.getParameter("id");
@@ -61,7 +60,7 @@ public class WorkEditServlet extends HttpServlet {
 		try {
 			response.sendRedirect("/WorkManager/WorkList");
 		} catch (IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("リダイレクト失敗", e);
 		}
 	}
 }

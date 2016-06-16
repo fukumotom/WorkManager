@@ -75,8 +75,8 @@ public class WorkRegistServlet extends HttpServlet {
 	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		// ログインユーザ名を取得
 		String userName = request.getUserPrincipal().getName();
@@ -111,7 +111,14 @@ public class WorkRegistServlet extends HttpServlet {
 
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
-		response.sendRedirect("/WorkManager/WorkRegister");
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
+
+		try {
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
+			throw new SystemException("フォワード失敗", e);
+		}
 	}
 
 	/**

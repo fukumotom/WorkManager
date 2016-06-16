@@ -1,7 +1,6 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -72,7 +71,7 @@ public class UserRegistServlet extends HttpServlet {
 		try {
 			dispacher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			logger.error("foward失敗：", e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 
@@ -90,7 +89,7 @@ public class UserRegistServlet extends HttpServlet {
 				confilm(request, response);
 			}
 		} catch (IOException | ServletException e) {
-			throw new SystemException(e);
+			throw new SystemException("リダイレクト失敗", e);
 		}
 	}
 
