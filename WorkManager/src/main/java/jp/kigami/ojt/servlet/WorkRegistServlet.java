@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
-import jp.kigami.ojt.common.util.ValidationResult;
 import jp.kigami.ojt.form.WorkFinishForm;
 import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.form.WorkRegisterViewForm;
@@ -26,7 +25,7 @@ import jp.kigami.ojt.logic.WorkLogic;
  *
  */
 @WebServlet("/WorkRegister")
-public class WorkRegister extends HttpServlet {
+public class WorkRegistServlet extends HttpServlet {
 
 	/**
 	 * シリアルバージョン
@@ -37,7 +36,7 @@ public class WorkRegister extends HttpServlet {
 	 * ロガー
 	 */
 	private static final Logger logger = LoggerFactory
-			.getLogger(WorkRegister.class);
+			.getLogger(WorkRegistServlet.class);
 
 	/*
 	 * 作業登録画面表示用

@@ -18,12 +18,12 @@ import jp.kigami.ojt.logic.WorkLogic;
 import jp.kigami.ojt.model.Work;
 
 @WebServlet("/WorkEdit")
-public class WorkEdit extends HttpServlet {
+public class WorkEditServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = LoggerFactory
-			.getLogger(WorkEdit.class);
+			.getLogger(WorkEditServlet.class);
 
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
