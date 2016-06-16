@@ -23,4 +23,9 @@ public class ConstantDef {
 	 * フォーム（属性）
 	 */
 	public static final String ATTR_FORM = "form";
+
+	/**
+	 * 検索条件（属性）
+	 */
+	public static final String CRITERIA = "criteria";
 }
