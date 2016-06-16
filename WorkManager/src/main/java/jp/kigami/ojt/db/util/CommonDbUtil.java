@@ -13,7 +13,6 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -273,7 +272,7 @@ public class CommonDbUtil {
 
 					Object value = null;
 					try {
-						value = method.invoke(dto, null);
+						value = method.invoke(dto);
 					} catch (IllegalAccessException | IllegalArgumentException
 							| InvocationTargetException e) {
 						logger.info("リフレクション失敗", e);
