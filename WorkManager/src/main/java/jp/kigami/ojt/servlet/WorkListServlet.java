@@ -31,8 +31,8 @@ public class WorkListServlet extends HttpServlet {
 			.getLogger(WorkListServlet.class);
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doGet(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		// 作業リスト取得
 		String userName = request.getUserPrincipal().getName();
@@ -53,13 +53,13 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		// 作業リスト表示条件をセッションに保持
 		Work inputWork = (Work) request.getSession().getAttribute("criteria");
@@ -148,7 +148,7 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 }
