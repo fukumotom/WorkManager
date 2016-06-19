@@ -13,6 +13,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,21 +28,34 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import jp.kigami.ojt.common.exception.SystemException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.kigami.ojt.common.exception.BusinessException;
-import jp.kigami.ojt.common.exception.SystemException;
-import jp.kigami.ojt.dao.dto.WorkDto;
-
+/**
+ * DB汎用ユーティリティ
+ * 
+ * @author kigami
+ *
+ */
 public class CommonDbUtil {
 
+	/**
+	 * ロガー
+	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(CommonDbUtil.class);
 
+	/**
+	 * クラスローダー
+	 */
 	private static ClassLoader classLoader = CommonDbUtil.class
 			.getClassLoader();
 
+	/**
+	 * プライベートコンストラクタ
+	 */
 	private CommonDbUtil() {
 	}
 
@@ -82,7 +97,7 @@ public class CommonDbUtil {
 	 * 
 	 * @return
 	 */
-	private static DataSource lookup() {
+	public static DataSource lookup() {
 
 		DataSource ds = null;
 		try {
@@ -135,7 +150,7 @@ public class CommonDbUtil {
 	 *            補完用パラメータ
 	 * @throws SQLException
 	 */
-	private static void bindParam(PreparedStatement pstm,
+	public static void bindParam(PreparedStatement pstm,
 			Map<Integer, Object> paramMap) throws SQLException {
 
 		for (Entry<Integer, Object> entry : paramMap.entrySet()) {
@@ -168,7 +183,7 @@ public class CommonDbUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	private static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
+	public static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
 			Class<T> dtoClass) throws SQLException {
 
 		HashMap<String, String> clmNameMap = new HashMap<String, String>();
@@ -221,6 +236,13 @@ public class CommonDbUtil {
 		return dtoList;
 	}
 
+	/**
+	 * DB結果取得用のsetterをラベル文字列から作成
+	 * 
+	 * @param label
+	 * @param dtoClass
+	 * @return
+	 */
 	private static <T> Method createSetter(String label, Class<T> dtoClass) {
 
 		// ラベルからsetter文字列を作成
@@ -244,41 +266,46 @@ public class CommonDbUtil {
 			}
 		}
 		if (setter == null) {
-			logger.warn("{}のsetterが見つかりませんでした。", setterStr);
+			logger.error("{}内に{}のsetterが見つかりませんでした。", dtoClass.getName(),
+					label);
+			throw new SystemException("バインドに失敗しました。");
 		}
 		return setter;
 	}
 
-	public static <T> HashMap<String, Object> createDtoMap(T dto,
-			Class<T> dtoClass) {
+	/**
+	 * ORマッパー用 ビーンからフィールド名とフィールドの値をmapで取得
+	 * 
+	 * @param dto
+	 * @param dtoClass
+	 * @return
+	 */
+	public static <T> HashMap<String, Object> createBeanValueMap(T dto) {
 
 		// Dtoのフィールド名と値のMapを作成
 		String regex = "get(([A-Z][a-zA-Z\\d]*))";
 		Pattern ptm = Pattern.compile(regex);
 
 		// Dtoのgetterからフィールド名を取得
-		Method[] methods = dtoClass.getDeclaredMethods();
+		Method[] methods = dto.getClass().getDeclaredMethods();
 		HashMap<String, Object> dtoMap = new HashMap<>();
 
 		for (Method method : methods) {
 			// getterを抽出
 			Matcher mat = ptm.matcher(method.getName());
 			if (mat.find()) {
-				String getter = method.getName();
-				if (!getter.contains("Class")) {
-					String fieldName = mat.group(1);
-					fieldName = fieldName.substring(0, 1).toLowerCase()
-							+ fieldName.substring(1);
+				String fieldName = mat.group(1);
+				fieldName = fieldName.substring(0, 1).toLowerCase()
+						+ fieldName.substring(1);
 
-					Object value = null;
-					try {
-						value = method.invoke(dto);
-					} catch (IllegalAccessException | IllegalArgumentException
-							| InvocationTargetException e) {
-						logger.info("リフレクション失敗", e);
-					}
-					dtoMap.put(fieldName, value);
+				Object value = null;
+				try {
+					value = method.invoke(dto);
+				} catch (IllegalAccessException | IllegalArgumentException
+						| InvocationTargetException e) {
+					logger.info("リフレクション失敗", e);
 				}
+				dtoMap.put(fieldName, value);
 			}
 		}
 
@@ -289,36 +316,43 @@ public class CommonDbUtil {
 	}
 
 	/**
-	 * ユーザ登録処理実行
+	 * 件数取得
 	 * 
 	 * @param sql
 	 * @param paramMap
+	 * @return
 	 */
-	public static void insertUsers(String sql, Map<Integer, Object> paramMap) {
+	public static int getDbResultCnt(String sql,
+			Map<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
+		int resultCnt = 0;
 		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
+				PreparedStatement pstm = con.prepareStatement(sql)) {
 
-			logger.info("発行SQL:{}", sql);
-
-			// parameter join
 			bindParam(pstm, paramMap);
-
-			int resultCnt = pstm.executeUpdate();
-			logger.info("{}件登録", resultCnt);
+			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
 			throw new SystemException(e);
 		}
+
+		return resultCnt;
 	}
 
-	// 作業登録処理用
-	public static List<WorkDto> findWorking(String sql,
-			Map<Integer, Object> paramMap) {
+	/**
+	 * 検索結果を取得
+	 * 
+	 * @param sql
+	 * @param paramMap
+	 * @param dtoClass
+	 * @return
+	 */
+	public static <T> List<T> getDtoList(String sql,
+			Map<Integer, Object> paramMap, Class<T> dtoClass) {
 
-		ArrayList<WorkDto> workDtoList = new ArrayList<>();
+		ArrayList<T> dtoList = new ArrayList<>();
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection();
 				PreparedStatement pstm = con.prepareStatement(sql);) {
@@ -330,86 +364,7 @@ public class CommonDbUtil {
 			ResultSet result = pstm.executeQuery();
 
 			// マッピング
-			while (result.next()) {
-				WorkDto workDto = new WorkDto();
-				workDto.setId(result.getInt("id"));
-				workDto.setStartTime(result.getTime("start_time"));
-				workDto.setContents(result.getString("contents"));
-				workDto.setNote(result.getString("note"));
-				workDtoList.add(workDto);
-			}
-
-		} catch (SQLException e) {
-			logger.error("DB接続失敗", e);
-			throw new SystemException(e);
-		}
-
-		return workDtoList;
-	}
-
-	/**
-	 * 作業終了処理
-	 * 
-	 * @param string
-	 * @param paramMap
-	 * @return
-	 * @throws BusinessException
-	 */
-	public static int finishWork(String sql, Map<Integer, Object> paramMap) {
-
-		int resultCnt = 0;
-		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql)) {
-
-			logger.info("発行SQL:{}", sql);
-
-			// parameter join
-			bindParam(pstm, paramMap);
-			resultCnt = pstm.executeUpdate();
-
-		} catch (SQLException e) {
-			logger.error("DB接続失敗");
-			throw new SystemException(e);
-		}
-
-		return resultCnt;
-	}
-
-	public static int startWork(String sql, Map<Integer, Object> paramMap) {
-
-		DataSource ds = lookup();
-		int resultCnt = 0;
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql)) {
-
-			bindParam(pstm, paramMap);
-			resultCnt = pstm.executeUpdate();
-
-		} catch (SQLException e) {
-			logger.error("DB接続失敗", e);
-			throw new SystemException(e);
-		}
-
-		return resultCnt;
-	}
-
-	public static List<WorkDto> findAllWork(String sql,
-			Map<Integer, Object> paramMap) {
-
-		DataSource ds = lookup();
-		ArrayList<WorkDto> dtoList;
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
-
-			logger.info("発行SQL:{}", sql);
-
-			// bindParam
-			bindParam(pstm, paramMap);
-
-			ResultSet result = pstm.executeQuery();
-
-			dtoList = resultSetToWorkDtoList(result, WorkDto.class);
+			dtoList = resultSetToWorkDtoList(result, dtoClass);
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
@@ -419,120 +374,36 @@ public class CommonDbUtil {
 		return dtoList;
 	}
 
-	public static void insertWork(String sql, Map<Integer, Object> paramMap) {
-
-		DataSource ds = lookup();
-
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
-
-			bindParam(pstm, paramMap);
-
-			int resultCnt = pstm.executeUpdate();
-			logger.info("{}件挿入", resultCnt);
-
-		} catch (SQLException e) {
-			logger.error("DB接続失敗", e);
-			throw new SystemException(e);
-		}
-
-	}
-
 	/**
-	 * 引数で指定したカラム（開始or終了時間）を取得
+	 * １件取得
 	 * 
+	 * @param <T>
 	 * @param sql
 	 * @param paramMap
-	 * @param column
 	 * @return
 	 */
-	public static WorkDto findTime(String sql, Map<Integer, Object> paramMap,
-			String column) {
+	public static <T> T findOne(String sql, HashMap<Integer, Object> paramMap,
+			Class<T> dtoClass) {
 
-		ArrayList<WorkDto> dtoList = null;
-		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
-
-			logger.info("発行SQL:{}", sql);
-
-			// bindParam;
-			bindParam(pstm, paramMap);
-
-			// DB検索
-			ResultSet result = pstm.executeQuery();
-			dtoList = resultSetToWorkDtoList(result, WorkDto.class);
-
-			if (dtoList.size() != 1) {
-				throw new SystemException("選択した作業の開始または終了時間を取得できませんでした。");
-			}
-
-		} catch (SQLException e) {
-			logger.error("DB更新失敗", e);
-			throw new SystemException(e);
+		List<T> dtoList = getDtoList(sql, paramMap, dtoClass);
+		if (dtoList.size() != 1) {
+			throw new SystemException("複数件存在します");
 		}
 
 		return dtoList.get(0);
 	}
 
-	public static void deleteWork(String sql, Map<Integer, Object> paramMap)
-			throws BusinessException {
+	/**
+	 * DB更新
+	 * 
+	 * @param sql
+	 * @param paramMap
+	 * @return 更新件数
+	 */
+	public static int updata(String sql, HashMap<Integer, Object> paramMap) {
 
 		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
-
-			logger.info("発行SQL:{}", sql);
-
-			// bindParam;
-			bindParam(pstm, paramMap);
-
-			int resultCnt = pstm.executeUpdate();
-
-			logger.info("{}件削除フラグ更新", resultCnt);
-
-			if (resultCnt == 0) {
-				throw new BusinessException("データは削除されています。");
-			} else if (resultCnt > 1) {
-				throw new SystemException("削除が正常に行われませんでした。");
-			}
-
-		} catch (SQLException e) {
-			logger.error("DB更新失敗", e);
-			throw new SystemException(e);
-		}
-
-	}
-
-	public static WorkDto findEditWork(String sql,
-			HashMap<Integer, Object> paramMap) {
-
-		WorkDto dto = new WorkDto();
-		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql)) {
-
-			logger.info("発行SQL:{}", sql);
-
-			bindParam(pstm, paramMap);
-
-			ResultSet result = pstm.executeQuery();
-			ArrayList<WorkDto> dtolist = resultSetToWorkDtoList(result,
-					WorkDto.class);
-			dto = dtolist.get(0);
-
-		} catch (SQLException e) {
-			logger.error("編集作業取得失敗", e);
-			throw new SystemException(e);
-		}
-
-		return dto;
-	}
-
-	public static void updataWork(String sql,
-			HashMap<Integer, Object> paramMap) {
-
-		DataSource ds = lookup();
+		int resultCnt = 0;
 		try (Connection con = ds.getConnection();
 				PreparedStatement pstm = con.prepareStatement(sql);) {
 
@@ -540,54 +411,83 @@ public class CommonDbUtil {
 
 			bindParam(pstm, paramMap);
 
-			pstm.executeUpdate();
+			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
-			logger.error("編集作業失敗", e);
-			throw new SystemException(e);
+			throw new SystemException("DB更新失敗", e);
 		}
 
-	}
-
-	public static void saveWork(String sql, HashMap<Integer, Object> paramMap) {
-		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
-
-			logger.info("発行SQL:{}", sql);
-
-			bindParam(pstm, paramMap);
-
-			pstm.executeUpdate();
-
-		} catch (SQLException e) {
-			logger.error("編集作業失敗", e);
-			throw new SystemException(e);
-		}
+		return resultCnt;
 	}
 
 	/**
-	 * 未保存作業削除SQL発行
+	 * ビーンマッパー
 	 * 
-	 * @param string
-	 * @param paramMap
+	 * @param before
+	 *            変換前ビーンインスタンス
+	 * @param after
+	 *            変換後ビーンインスタンス
+	 * @return 変換したビーンクラス
 	 */
-	public static void deleteUnSaveWork(String sql,
-			HashMap<Integer, Object> paramMap) {
+	public static <T, U> T beanMaping(U before, T after) {
 
-		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql)) {
+		try {
+			HashMap<String, Object> dtoMap = createBeanValueMap(before);
+			for (Entry<String, Object> entry : dtoMap.entrySet()) {
+				Object value = entry.getValue();
+				// 値があるフィールドを詰め替え
+				if (value != null) {
 
-			logger.info("発行SQL:{}", sql);
+					// 型変換
+					value = convertDate(value);
 
-			bindParam(pstm, paramMap);
+					// 返却するクラスのsetter取得
+					StringBuilder setterStr = new StringBuilder();
+					setterStr.append("set")
+							.append(entry.getKey().substring(0, 1)
+									.toUpperCase())
+							.append(entry.getKey().substring(1));
 
-			pstm.executeUpdate();
+					Method[] methods = after.getClass().getDeclaredMethods();
+					Method setter = null;
+					for (Method tmpSetter : methods) {
+						if (tmpSetter.getName().equals(setterStr.toString())) {
+							setter = tmpSetter;
+							break;
+						}
+					}
+					setter.invoke(after, value);
+				}
 
-		} catch (SQLException e) {
-			logger.error("未保存作業削除失敗", e);
+			}
+
+		} catch (IllegalAccessException | IllegalArgumentException
+				| InvocationTargetException e) {
+			logger.error("DBのバインドに失敗");
 			throw new SystemException(e);
 		}
+
+		return after;
+	}
+
+	/**
+	 * SQL型とjava型の相互変換
+	 * 
+	 * @param value
+	 * @return
+	 */
+	private static Object convertDate(Object value) {
+
+		// sqlとjavaの日付型変換
+		if (value instanceof Date) {
+			value = ((Date) value).toLocalDate();
+		} else if (value instanceof Time) {
+			value = ((Time) value).toLocalTime();
+		} else if (value instanceof LocalDate) {
+			value = Date.valueOf((LocalDate) value);
+		} else if (value instanceof LocalTime) {
+			value = Time.valueOf((LocalTime) value);
+		}
+		return value;
 	}
 }
