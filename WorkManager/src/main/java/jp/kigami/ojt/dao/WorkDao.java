@@ -162,7 +162,7 @@ public class WorkDao {
 
 		// load sqlFile
 		String sqlName;
-		if (work.isDeleteFlg()) {
+		if (work.isDelete()) {
 			sqlName = "getWorkDelList.sql";
 		} else if (work.getWorkDate() != null) {
 			sqlName = "getWorkPastList.sql";

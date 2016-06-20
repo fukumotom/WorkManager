@@ -47,9 +47,9 @@ public class Work implements Serializable {
 	private String note;
 
 	/**
-	 * 削除フラグ
+	 * 削除判定
 	 */
-	private boolean deleteFlg;
+	private boolean delete;
 
 	/**
 	 * 作業日付
@@ -162,18 +162,18 @@ public class Work implements Serializable {
 	}
 
 	/**
-	 * @return the deleteFlg
+	 * @return the delete
 	 */
-	public boolean isDeleteFlg() {
-		return deleteFlg;
+	public boolean isDelete() {
+		return delete;
 	}
 
 	/**
-	 * @param deleteFlg
-	 *            the deleteFlg to set
+	 * @param delete
+	 *            the delete to set
 	 */
-	public void setDeleteFlg(boolean deleteFlg) {
-		this.deleteFlg = deleteFlg;
+	public void setDelete(boolean delete) {
+		this.delete = delete;
 	}
 
 	/**
@@ -190,5 +190,4 @@ public class Work implements Serializable {
 	public void setWorkDate(LocalDate workDate) {
 		this.workDate = workDate;
 	}
-
 }
