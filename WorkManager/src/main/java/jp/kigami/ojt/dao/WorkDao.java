@@ -346,4 +346,21 @@ public class WorkDao {
 		logger.debug("{}件未保存データ削除しました", resultCnt);
 
 	}
+	
+	/**
+	 * 今日の作業を未保存状態で複製するSQL発行
+	 * 
+	 * @param inputWork
+	 */
+	public void copyTodayWork(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("copyTodayWork.sql");
+
+		WorkDto dto = mappingModelToDto(inputWork);
+
+		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+
+		CommonDbUtil.copyWork(sql.toString(), paramMap);
+	}
 }
