@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import jp.kigami.ojt.common.exception.BindFormatException;
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.common.util.ConvertToModelUtils;
 import jp.kigami.ojt.common.util.DateUtils;
 import jp.kigami.ojt.logic.WorkLogic;
@@ -31,8 +32,7 @@ public class WorkListServlet extends HttpServlet {
 			.getLogger(WorkListServlet.class);
 
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doGet(HttpServletRequest request, HttpServletResponse response) {
 
 		// 作業リスト取得
 		String userName = request.getUserPrincipal().getName();
@@ -41,6 +41,10 @@ public class WorkListServlet extends HttpServlet {
 		work.setWorkDate(LocalDate.now());
 
 		WorkLogic logic = new WorkLogic();
+
+		// 編集用テーブルに複製
+		logic.copyTodayWork(work);
+
 		List<Work> workList = logic.findAllWork(work);
 		workList = logic.findAllWork(work);
 		request.setAttribute("workList", workList);
@@ -53,19 +57,19 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
 		// 作業リスト表示条件をセッションに保持
-		Work inputWork = (Work) request.getSession().getAttribute("criteria");
+		Work inputWork = (Work) request.getSession().getAttribute(
+				ConstantDef.CRITERIA);
 		if (inputWork == null) {
 			inputWork = new Work();
-			request.getSession().setAttribute("criteria", inputWork);
+			request.getSession().setAttribute(ConstantDef.CRITERIA, inputWork);
 		}
 
 		String workDate = null;
@@ -79,49 +83,45 @@ public class WorkListServlet extends HttpServlet {
 			// 履歴の日付と削除対象チェック
 			workDate = request.getParameter("workDate");
 
-			inputWork.setWorkDate(
-					ConvertToModelUtils.convertLocalDate(workDate, "workDate"));
+			inputWork.setWorkDate(ConvertToModelUtils.convertLocalDate(
+					workDate, "workDate"));
 
 			String deleteFlg = request.getParameter("deleteFlg");
-			inputWork.setDeleteFlg(
-					ConvertToModelUtils.convertBoolean(deleteFlg));
+			inputWork.setDeleteFlg(ConvertToModelUtils
+					.convertBoolean(deleteFlg));
 		} catch (BindFormatException e) {
 			logger.warn("入力値のバインドに失敗");
 			request.setAttribute("errMsg", e.getErrMsg());
 		}
 
-		// submitボタン判定
-		String actionBtn = request.getParameter("actionBtn");
 		WorkLogic logic = new WorkLogic();
 
-		WorkHelper helper = new WorkHelper();
 		String listDate = DateUtils.getTodayStr();
 
 		String requestPath = "/WEB-INF/jsp/work/workList.jsp";
 
 		try {
 
-			if ("挿入".equals(actionBtn)) {
+			if (request.getParameter("insertBtn") != null) {
 				logger.info("挿入処理開始:");
-				helper.insert(inputWork, "insert");
-			} else if ("追加".equals(actionBtn)) {
+				logic.insertWork(inputWork);
+			} else if (request.getParameter("addBtn") != null) {
 				logger.info("追加処理開始:");
-				helper.insert(inputWork, "add");
-			} else if ("削除".equals(actionBtn)) {
+				logic.addWork(inputWork);
+			} else if (request.getParameter("deleteBtn") != null) {
 				logger.info("削除処理開始:");
-				helper.delete(inputWork);
-			} else if ("履歴".equals(actionBtn)) {
+				logic.delete(inputWork);
+			} else if (request.getParameter("insertBtn") != null) {
 				logger.info("履歴表示処理開始:");
-				helper.dateCheck(inputWork);
-				helper.deleteUnSaveWork(inputWork);
-			} else if ("保存".equals(actionBtn)) {
+				logic.history(inputWork);
+			} else if (request.getParameter("historyBtn") != null) {
 				logger.info("保存処理開始:");
-				helper.save(inputWork);
+				logic.saveWork(inputWork);
 			} else {
 				// 編集
 				logger.info("編集処理開始:");
 				requestPath = "/WEB-INF/jsp/work/workEditForm.jsp";
-				Work editWork = helper.getEditWork(inputWork);
+				Work editWork = logic.getEditWork(inputWork);
 				request.setAttribute("editWork", editWork);
 			}
 
@@ -132,7 +132,7 @@ public class WorkListServlet extends HttpServlet {
 			}
 		}
 
-		if (!"編集".equals(actionBtn)) {
+		if (request.getParameter("editBtn") == null) {
 			// 作業リストの再表示
 			List<Work> workList = logic.findAllWork(inputWork);
 			request.setAttribute("workList", workList);
@@ -148,7 +148,7 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(e);
+			throw new SystemException("フォワード失敗", e);
 		}
 	}
 }
