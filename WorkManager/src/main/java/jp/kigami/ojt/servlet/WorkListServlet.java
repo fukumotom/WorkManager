@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import jp.kigami.ojt.common.exception.BindFormatException;
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.common.util.ConvertToModelUtils;
 import jp.kigami.ojt.common.util.DateUtils;
 import jp.kigami.ojt.logic.WorkLogic;
@@ -62,10 +63,11 @@ public class WorkListServlet extends HttpServlet {
 			HttpServletResponse response) {
 
 		// 作業リスト表示条件をセッションに保持
-		Work inputWork = (Work) request.getSession().getAttribute("criteria");
+		Work inputWork = (Work) request.getSession()
+				.getAttribute(ConstantDef.CRITERIA);
 		if (inputWork == null) {
 			inputWork = new Work();
-			request.getSession().setAttribute("criteria", inputWork);
+			request.getSession().setAttribute(ConstantDef.CRITERIA, inputWork);
 		}
 
 		String workDate = null;

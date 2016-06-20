@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.model.Work;
 
 @WebServlet("/Menu")
@@ -30,7 +31,7 @@ public class MenuServlet extends HttpServlet {
 
 		// 検索条件削除
 		HttpSession session = request.getSession();
-		session.removeAttribute("criteria");
+		session.removeAttribute(ConstantDef.CRITERIA);
 		logger.info("検索条件を削除。");
 
 		// 未保存作業削除
