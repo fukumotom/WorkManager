@@ -44,13 +44,18 @@ public class WorkLogic {
 		return work.getStartTime();
 	}
 
-	public LocalTime getEndTime(Work inputWork) throws BusinessException {
-		WorkDao dao = new WorkDao();
-		Work work = dao.getEndTime(inputWork);
-		return work.getStartTime();
-	}
-
+	/**
+	 * 作業挿入処理
+	 * 
+	 * @param inputWork
+	 */
 	public void insertWork(Work inputWork) {
+
+		LocalTime time = getStartTime(inputWork);
+
+		inputWork.setStartTime(DateUtils.getParseTime(time));
+		inputWork.setEndTime(DateUtils.getParseTime(time));
+
 		WorkDao dao = new WorkDao();
 		dao.insert(inputWork);
 
@@ -67,7 +72,6 @@ public class WorkLogic {
 		dao.finishWork(inputWork);
 	}
 
-
 	/**
 	 * 編集作業検索処理
 	 * 
@@ -76,10 +80,24 @@ public class WorkLogic {
 	 */
 	public Work getEditWork(Work inputWork) {
 
-		WorkDao dao = new WorkDao();
+		// 未保存処理を削除
+		deleteUnSaveWork(inputWork);
 
+		WorkDao dao = new WorkDao();
 		// DBから取得
 		return dao.getEditWork(inputWork);
+	}
+
+	/**
+	 * 編集用作業リスト複製処理
+	 * 
+	 * @param inputWork
+	 */
+	public void copyTodayWork(Work inputWork) {
+
+		WorkDao dao = new WorkDao();
+		dao.copyTodayWork(inputWork);
+
 	}
 
 	/**
@@ -99,6 +117,11 @@ public class WorkLogic {
 		dao.saveWork(inputWork);
 	}
 
+	/**
+	 * 未保存削除処理
+	 * 
+	 * @param inputWork
+	 */
 	public void deleteUnSaveWork(Work inputWork) {
 		WorkDao dao = new WorkDao();
 		dao.deleteUnSaveWork(inputWork);
@@ -193,7 +216,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 作業開始処理  仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * 作業開始処理 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
 	 * 
@@ -227,7 +250,7 @@ public class WorkLogic {
 			inputWork.setContents(registerForm.getContents());
 			inputWork.setNote(registerForm.getNote());
 
-			//作業開始の 同期処理
+			// 作業開始の 同期処理
 			workRegiste(inputWork);
 		}
 
@@ -236,10 +259,12 @@ public class WorkLogic {
 
 	/**
 	 * （同期処理）
+	 * 
 	 * @param inputWork
 	 * @throws BusinessException
 	 */
-	private synchronized void workRegiste(Work inputWork) throws BusinessException {
+	private synchronized void workRegiste(Work inputWork)
+			throws BusinessException {
 
 		// 仕掛処理確認
 		List<Work> workList = findWorking(inputWork);
@@ -329,4 +354,50 @@ public class WorkLogic {
 		}
 		return result;
 	}
+
+	/**
+	 * 履歴表示ロジック
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void history(Work inputWork) throws BusinessException {
+
+		LocalDate workDate = inputWork.getWorkDate();
+		logger.info("入力日付:{}", workDate);
+
+		if (workDate == null) {
+			throw new BusinessException("日付を入力してください。");
+		}
+
+		// 過去日チェック
+		logger.info("今日の日付:{}", LocalDate.now());
+		if (workDate.isAfter(LocalDate.now())) {
+			throw new BusinessException("過去日を選択してください。");
+		}
+
+		// 未保存データ削除
+		deleteUnSaveWork(inputWork);
+
+	}
+
+	/**
+	 * 作業追加処理
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void addWork(Work inputWork) throws BusinessException {
+
+		// 作業中の作業の場合、追加不可。
+		WorkDao dao = new WorkDao();
+		Work work = dao.getEndTime(inputWork);
+		LocalTime time = work.getEndTime();
+
+		inputWork.setStartTime(DateUtils.getParseTime(time));
+		inputWork.setEndTime(DateUtils.getParseTime(time));
+
+		dao.insert(inputWork);
+	}
+
 }
