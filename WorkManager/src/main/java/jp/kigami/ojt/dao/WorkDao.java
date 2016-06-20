@@ -43,33 +43,6 @@ public class WorkDao {
 
 	}
 
-	// private static WorkDto mappingModelToDto(Work work) {
-	//
-	// WorkDto dto = new WorkDto();
-	// dto.setId(work.getId());
-	// dto.setUserName(work.getUserName());
-	// if (work.getStartTime() != null) {
-	// dto.setStartTime(Time.valueOf(work.getStartTime()));
-	// }
-	// if (work.getEndTime() != null) {
-	// dto.setEndTime(Time.valueOf(work.getEndTime()));
-	// }
-	// if (work.getWorkingTime() != null) {
-	// dto.setWorkingTime(Time.valueOf(work.getWorkingTime()));
-	// }
-	// dto.setContents(work.getContents());
-	// dto.setNote(work.getNote());
-	// if (work.getDeleteFlg()) {
-	// dto.setDeleteFlg(1);
-	// } else {
-	// dto.setDeleteFlg(0);
-	// }
-	// if (work.getWorkDate() != null) {
-	// dto.setWorkDate(Date.valueOf(work.getWorkDate()));
-	// }
-	// return dto;
-	// }
-
 	/**
 	 * 編集作業取得SQL発行
 	 * 
