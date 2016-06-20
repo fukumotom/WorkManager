@@ -81,13 +81,20 @@ public class WorkDao {
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getEditWork.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
+
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
 				WorkDto.class);
 
-		return CommonDbUtil.beanMaping(resultDto, new Work());
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
+
+		return outputWork;
 	}
 
 	/**
@@ -101,7 +108,10 @@ public class WorkDao {
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getWorking.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
+
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
@@ -109,7 +119,11 @@ public class WorkDao {
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
-			Work elm = CommonDbUtil.beanMaping(dtoElm, new Work());
+
+			// modelに詰め替え
+			Work elm = new Work();
+			CommonDbUtil.beanMaping(dtoElm, elm);
+
 			workList.add(elm);
 		}
 
@@ -126,7 +140,9 @@ public class WorkDao {
 
 		StringBuilder sql = CommonDbUtil.readSql("finishWork.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
@@ -149,7 +165,9 @@ public class WorkDao {
 
 		StringBuilder sql = CommonDbUtil.readSql("startWork.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
@@ -180,7 +198,9 @@ public class WorkDao {
 		}
 		StringBuilder sql = CommonDbUtil.readSql(sqlName);
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
@@ -189,7 +209,11 @@ public class WorkDao {
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
-			Work elm = CommonDbUtil.beanMaping(dtoElm, new Work());
+
+			// modelに詰め替え
+			Work elm = new Work();
+			CommonDbUtil.beanMaping(dtoElm, elm);
+
 			workList.add(elm);
 		}
 
@@ -208,7 +232,8 @@ public class WorkDao {
 		StringBuilder sql = CommonDbUtil.readSql("getStartTime.sql");
 
 		// DTOに詰め替え
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
@@ -217,7 +242,11 @@ public class WorkDao {
 		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
 				WorkDto.class);
 
-		return CommonDbUtil.beanMaping(resultDto, new Work());
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
+
+		return outputWork;
 	}
 
 	/**
@@ -233,7 +262,8 @@ public class WorkDao {
 		StringBuilder sql = CommonDbUtil.readSql("getEndTime.sql");
 
 		// DTOに詰め替え
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
@@ -246,7 +276,11 @@ public class WorkDao {
 			throw new BusinessException("作業中の下に追加はできません。");
 		}
 
-		return CommonDbUtil.beanMaping(resultDto, new Work());
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
+
+		return outputWork;
 	}
 
 	/**
@@ -260,7 +294,8 @@ public class WorkDao {
 		StringBuilder sql = CommonDbUtil.readSql("insertWork.sql");
 
 		// DTOに詰め替え
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
@@ -281,7 +316,9 @@ public class WorkDao {
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("updateDeleteFlg.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
@@ -304,7 +341,9 @@ public class WorkDao {
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("updataWork.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
@@ -321,7 +360,9 @@ public class WorkDao {
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("saveWork.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
@@ -338,7 +379,9 @@ public class WorkDao {
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("deleteUnSaveWork.sql");
 
-		WorkDto dto = CommonDbUtil.beanMaping(work, new WorkDto());
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 

@@ -427,9 +427,8 @@ public class CommonDbUtil {
 	 *            変換前ビーンインスタンス
 	 * @param after
 	 *            変換後ビーンインスタンス
-	 * @return 変換したビーンクラス
 	 */
-	public static <T, U> T beanMaping(U before, T after) {
+	public static <T, U> void beanMaping(U before, T after) {
 
 		try {
 			HashMap<String, Object> dtoMap = createBeanValueMap(before);
@@ -466,8 +465,6 @@ public class CommonDbUtil {
 			logger.error("DBのバインドに失敗");
 			throw new SystemException(e);
 		}
-
-		return after;
 	}
 
 	/**
