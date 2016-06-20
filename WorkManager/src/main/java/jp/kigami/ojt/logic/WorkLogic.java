@@ -18,10 +18,19 @@ import jp.kigami.ojt.dao.WorkDao;
 import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.model.Work;
-import jp.kigami.ojt.servlet.WorkHelper;
 
+
+/**
+ * 作業管理ロジッククラス
+ * 
+ * @author kigami
+ *
+ */
 public class WorkLogic {
 
+	/**
+	 * ロガー
+	 */
 	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
 
 	public List<Work> findAllWork(Work work) {
@@ -44,13 +53,18 @@ public class WorkLogic {
 		return work.getStartTime();
 	}
 
-	public LocalTime getEndTime(Work inputWork) throws BusinessException {
-		WorkDao dao = new WorkDao();
-		Work work = dao.getEndTime(inputWork);
-		return work.getStartTime();
-	}
-
+	/**
+	 * 作業挿入処理
+	 * 
+	 * @param inputWork
+	 */
 	public void insertWork(Work inputWork) {
+
+		LocalTime time = getStartTime(inputWork);
+
+		inputWork.setStartTime(DateUtils.getParseTime(time));
+		inputWork.setEndTime(DateUtils.getParseTime(time));
+
 		WorkDao dao = new WorkDao();
 		dao.insert(inputWork);
 
@@ -76,7 +90,6 @@ public class WorkLogic {
 	public Work getEditWork(Work inputWork) {
 
 		WorkDao dao = new WorkDao();
-
 		// DBから取得
 		return dao.getEditWork(inputWork);
 	}
@@ -182,8 +195,7 @@ public class WorkLogic {
 		inputWork.setStartTime(DateUtils.getParseTime(startTime));
 
 		// 作業時間を計算
-		WorkHelper helper = new WorkHelper();
-		helper.calcWorkTime(inputWork);
+		calcWorkTime(inputWork);
 
 		WorkDao dao = new WorkDao();
 		dao.finishWork(inputWork);
@@ -192,6 +204,26 @@ public class WorkLogic {
 	}
 
 	/**
+<<<<<<< 0586a435c5935cdd93587548b120d24c230c8829
+=======
+	 * 作業時間の計算処理
+	 * 
+	 * @param inputWork
+	 */
+	public void calcWorkTime(Work inputWork) {
+
+		LocalTime startTime = DateUtils.getParseTime(inputWork.getStartTime());
+		logger.info("開始時間:{}", startTime);
+
+		LocalTime endTime = DateUtils.getParseTime(inputWork.getEndTime());
+		LocalTime calcTime1 = endTime.minusHours(startTime.getHour());
+		LocalTime workingTime = calcTime1.minusMinutes(startTime.getMinute());
+		inputWork.setWorkingTime(DateUtils.getParseTime(workingTime));
+		logger.info("作業時間:{}", inputWork.getWorkingTime());
+	}
+
+	/**
+>>>>>>> modify workhelper #83
 	 * 作業開始処理 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
@@ -329,5 +361,50 @@ public class WorkLogic {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * 履歴表示ロジック
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void history(Work inputWork) throws BusinessException {
+
+		LocalDate workDate = inputWork.getWorkDate();
+		logger.info("入力日付:{}", workDate);
+
+		if (workDate == null) {
+			throw new BusinessException("日付を入力してください。");
+		}
+
+		// 過去日チェック
+		logger.info("今日の日付:{}", LocalDate.now());
+		if (workDate.isAfter(LocalDate.now())) {
+			throw new BusinessException("過去日を選択してください。");
+		}
+
+		// 未保存データ削除
+		deleteUnSaveWork(inputWork);
+
+	}
+
+	/**
+	 * 作業追加処理
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void addWork(Work inputWork) throws BusinessException {
+
+		// 作業中の作業の場合、追加不可。
+		WorkDao dao = new WorkDao();
+		Work work = dao.getEndTime(inputWork);
+		LocalTime time = work.getEndTime();
+
+		inputWork.setStartTime(DateUtils.getParseTime(time));
+		inputWork.setEndTime(DateUtils.getParseTime(time));
+
+		dao.insert(inputWork);
 	}
 }

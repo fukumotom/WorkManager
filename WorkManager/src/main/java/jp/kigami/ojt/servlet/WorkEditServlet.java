@@ -48,8 +48,8 @@ public class WorkEditServlet extends HttpServlet {
 
 		// 作業終了時間が入力された場合、作業時間の再計算
 		if (!endTime.isEmpty()) {
-			WorkHelper helper = new WorkHelper();
-			helper.calcWorkTime(inputWork);
+			WorkLogic logic = new WorkLogic();
+			logic.calcWorkTime(inputWork);
 		}
 
 		WorkLogic logic = new WorkLogic();

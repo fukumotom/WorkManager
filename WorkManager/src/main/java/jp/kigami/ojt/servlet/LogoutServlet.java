@@ -12,7 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.SystemException;
-import jp.kigami.ojt.model.Work;
+import jp.kigami.ojt.logic.CommonLogic;
 
 @WebServlet("/Logout")
 public class LogoutServlet extends HttpServlet {
@@ -27,11 +27,9 @@ public class LogoutServlet extends HttpServlet {
 			HttpServletResponse response) {
 
 		// 未保存作業削除
-		Work work = new Work();
 		String userName = request.getUserPrincipal().getName();
-		work.setUserName(userName);
-		WorkHelper helper = new WorkHelper();
-		helper.deleteUnSaveWork(work);
+		CommonLogic logic = new CommonLogic();
+		logic.deleteUnSaveWork(userName);
 
 		// ログイン情報削除
 		HttpSession session = request.getSession();
