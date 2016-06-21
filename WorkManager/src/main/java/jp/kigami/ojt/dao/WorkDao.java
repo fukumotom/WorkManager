@@ -1,21 +1,19 @@
 package jp.kigami.ojt.dao;
 
-import java.sql.Date;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.dao.dto.WorkDto;
 import jp.kigami.ojt.db.util.CommonDbUtil;
 import jp.kigami.ojt.model.Work;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WorkDao {
 
@@ -24,8 +22,7 @@ public class WorkDao {
 	private HashMap<Integer, Object> createParamMap(StringBuilder sql,
 			WorkDto dto) {
 
-		Map<String, Object> dtoMap = CommonDbUtil.createDtoMap(dto,
-				WorkDto.class);
+		Map<String, Object> dtoMap = CommonDbUtil.createBeanValueMap(dto);
 
 		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
 
@@ -46,53 +43,8 @@ public class WorkDao {
 
 	}
 
-	private static Work mappingDtoToModel(WorkDto dto) {
-
-		Work work = new Work();
-
-		work.setId(dto.getId());
-		work.setUserName(dto.getUserName());
-		work.setStartTime(dto.getStartTime().toLocalTime());
-		if (dto.getEndTime() != null) {
-			work.setEndTime(dto.getEndTime().toLocalTime());
-		}
-		if (dto.getWorkingTime() != null) {
-			work.setWorkingTime(dto.getWorkingTime().toLocalTime());
-		}
-		work.setContents(dto.getContents());
-		work.setNote(dto.getNote());
-		return work;
-	}
-
-	private static WorkDto mappingModelToDto(Work work) {
-
-		WorkDto dto = new WorkDto();
-		dto.setId(work.getId());
-		dto.setUserName(work.getUserName());
-		if (work.getStartTime() != null) {
-			dto.setStartTime(Time.valueOf(work.getStartTime()));
-		}
-		if (work.getEndTime() != null) {
-			dto.setEndTime(Time.valueOf(work.getEndTime()));
-		}
-		if (work.getWorkingTime() != null) {
-			dto.setWorkingTime(Time.valueOf(work.getWorkingTime()));
-		}
-		dto.setContents(work.getContents());
-		dto.setNote(work.getNote());
-		if (work.getDeleteFlg()) {
-			dto.setDeleteFlg(1);
-		} else {
-			dto.setDeleteFlg(0);
-		}
-		if (work.getWorkDate() != null) {
-			dto.setWorkDate(Date.valueOf(work.getWorkDate()));
-		}
-		return dto;
-	}
-
 	/**
-	 * 編集するWork情報を取得
+	 * 編集作業取得SQL発行
 	 * 
 	 * @param inputWork
 	 * @return
@@ -102,43 +54,72 @@ public class WorkDao {
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getEditWork.sql");
 
-		WorkDto dto = mappingModelToDto(work);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
+
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		WorkDto resultDto = CommonDbUtil.findEditWork(sql.toString(), paramMap);
+		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
+				WorkDto.class);
 
-		return mappingDtoToModel(resultDto);
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
+
+		return outputWork;
 	}
 
+	/**
+	 * 作業中の作業取得SQL発行
+	 * 
+	 * @param work
+	 * @return
+	 */
 	public List<Work> findWorking(Work work) {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getWorking.sql");
 
-		WorkDto dto = mappingModelToDto(work);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
+
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		List<WorkDto> dtoList = CommonDbUtil.findWorking(sql.toString(),
-				paramMap);
+		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
+				paramMap, WorkDto.class);
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
-			Work elm = mappingDtoToModel(dtoElm);
+
+			// modelに詰め替え
+			Work elm = new Work();
+			CommonDbUtil.beanMaping(dtoElm, elm);
+
 			workList.add(elm);
 		}
 
 		return workList;
 	}
 
+	/**
+	 * 作業終了SQL発行
+	 * 
+	 * @param work
+	 * @throws BusinessException
+	 */
 	public void finishWork(Work work) throws BusinessException {
 
 		StringBuilder sql = CommonDbUtil.readSql("finishWork.sql");
 
-		WorkDto dto = mappingModelToDto(work);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		int resultCnt = CommonDbUtil.finishWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt == 0) {
 			throw new BusinessException("すでに完了した作業です。");
 		} else if (resultCnt == 1) {
@@ -148,14 +129,21 @@ public class WorkDao {
 		}
 	}
 
+	/**
+	 * 作業開始SQL発行
+	 * 
+	 * @param work
+	 */
 	public void startWork(Work work) {
 
 		StringBuilder sql = CommonDbUtil.readSql("startWork.sql");
 
-		WorkDto dto = mappingModelToDto(work);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
-		int resultCnt = CommonDbUtil.startWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt > 0) {
 			logger.info("正常に作業を開始");
 			logger.info("作業開始件数:{}件", resultCnt);
@@ -164,11 +152,17 @@ public class WorkDao {
 		}
 	}
 
+	/**
+	 * 作業リスト取得SQL発行
+	 * 
+	 * @param work
+	 * @return
+	 */
 	public List<Work> findAllWork(Work work) {
 
 		// load sqlFile
 		String sqlName;
-		if (work.getDeleteFlg()) {
+		if (work.isDelete()) {
 			sqlName = "getWorkDelList.sql";
 		} else if (work.getWorkDate() != null) {
 			sqlName = "getWorkPastList.sql";
@@ -177,127 +171,195 @@ public class WorkDao {
 		}
 		StringBuilder sql = CommonDbUtil.readSql(sqlName);
 
-		WorkDto dto = mappingModelToDto(work);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		List<WorkDto> dtoList = CommonDbUtil.findAllWork(sql.toString(),
-				paramMap);
+		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
+				paramMap, WorkDto.class);
 
 		ArrayList<Work> workList = new ArrayList<>();
 		for (WorkDto dtoElm : dtoList) {
-			Work elm = mappingDtoToModel(dtoElm);
+
+			// modelに詰め替え
+			Work elm = new Work();
+			CommonDbUtil.beanMaping(dtoElm, elm);
+
 			workList.add(elm);
 		}
 
 		return workList;
 	}
 
-	public Work findStartTime(Work inputWork) {
+	/**
+	 * 開始時間取得SQL発行
+	 * 
+	 * @param inputWork
+	 * @return
+	 */
+	public Work findStartTime(Work work) {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getStartTime.sql");
 
 		// DTOに詰め替え
-		WorkDto dto = mappingModelToDto(inputWork);
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		WorkDto resultDto = CommonDbUtil.findTime(sql.toString(), paramMap,
-				"start_time");
+		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
+				WorkDto.class);
 
-		Work resultWork = mappingDtoToModel(resultDto);
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
 
-		return resultWork;
+		return outputWork;
 	}
 
-	public Work getEndTime(Work inputWork) throws BusinessException {
+	/**
+	 * 終了時間取得SQL発行
+	 * 
+	 * @param inputWork
+	 * @return
+	 * @throws BusinessException
+	 */
+	public Work getEndTime(Work work) throws BusinessException {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getEndTime.sql");
 
 		// DTOに詰め替え
-		WorkDto dto = mappingModelToDto(inputWork);
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
 		// 実行
-		WorkDto resultDto = CommonDbUtil.findTime(sql.toString(), paramMap,
-				"end_time");
+		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
+				WorkDto.class);
 
 		if (resultDto.getEndTime() == null) {
 			throw new BusinessException("作業中の下に追加はできません。");
 		}
 
-		Work resultWork = mappingDtoToModel(resultDto);
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
 
-		return resultWork;
+		return outputWork;
 	}
 
-	public void insert(Work inputWork) {
+	/**
+	 * 作業挿入処理SQL発行
+	 * 
+	 * @param inputWork
+	 */
+	public void insert(Work work) {
 
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("insertWork.sql");
 
 		// DTOに詰め替え
-		WorkDto dto = mappingModelToDto(inputWork);
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		CommonDbUtil.insertWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info("{}件挿入しました", resultCnt);
 
 	}
 
-	public void delete(Work inputWork) throws BusinessException {
+	/**
+	 * 作業終了処理SQL発行
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void delete(Work work) throws BusinessException {
 
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("updateDeleteFlg.sql");
 
-		WorkDto dto = mappingModelToDto(inputWork);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		CommonDbUtil.deleteWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 
+		if (resultCnt == 0) {
+			throw new BusinessException("データは削除されています。");
+		} else if (resultCnt > 1) {
+			throw new SystemException("削除が正常に行われませんでした。");
+		}
 	}
 
-	public void updateWork(Work inputWork) {
+	/**
+	 * 作業更新保存SQL発行
+	 * 
+	 * @param inputWork
+	 */
+	public void updateWork(Work work) {
 
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("updataWork.sql");
 
-		WorkDto dto = mappingModelToDto(inputWork);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		CommonDbUtil.updataWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info("{}件更新しました", resultCnt);
 	}
 
-	public void saveWork(Work inputWork) {
+	/**
+	 * 作業保存SQL発行
+	 * 
+	 * @param inputWork
+	 */
+	public void saveWork(Work work) {
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("saveWork.sql");
 
-		WorkDto dto = mappingModelToDto(inputWork);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		CommonDbUtil.saveWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info("{}件保存しました", resultCnt);
 	}
 
-	public void deleteUnSaveWork(Work inputWork) {
+	/**
+	 * 未保存データの削除SQL発行
+	 * 
+	 * @param inputWork
+	 */
+	public void deleteUnSaveWork(Work work) {
 		// SQL読み込み
 		StringBuilder sql = CommonDbUtil.readSql("deleteUnSaveWork.sql");
 
-		WorkDto dto = mappingModelToDto(inputWork);
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
 
 		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
 
-		CommonDbUtil.deleteUnSaveWork(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.debug("{}件未保存データ削除しました", resultCnt);
 
 	}
-
 }

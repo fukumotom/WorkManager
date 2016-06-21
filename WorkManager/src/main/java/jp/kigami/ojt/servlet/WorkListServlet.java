@@ -85,8 +85,7 @@ public class WorkListServlet extends HttpServlet {
 					ConvertToModelUtils.convertLocalDate(workDate, "workDate"));
 
 			String deleteFlg = request.getParameter("deleteFlg");
-			inputWork.setDeleteFlg(
-					ConvertToModelUtils.convertBoolean(deleteFlg));
+			inputWork.setDelete(ConvertToModelUtils.convertBoolean(deleteFlg));
 		} catch (BindFormatException e) {
 			logger.warn("入力値のバインドに失敗");
 			request.setAttribute("errMsg", e.getErrMsg());
