@@ -19,7 +19,6 @@ import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.model.Work;
 
-
 /**
  * 作業管理ロジッククラス
  * 
@@ -215,9 +214,7 @@ public class WorkLogic {
 	}
 
 	/**
-<<<<<<< 0586a435c5935cdd93587548b120d24c230c8829
-=======
-	 * 作業時間の計算処理
+	 * <<<<<<< 0586a435c5935cdd93587548b120d24c230c8829 ======= 作業時間の計算処理
 	 * 
 	 * @param inputWork
 	 */
@@ -234,8 +231,7 @@ public class WorkLogic {
 	}
 
 	/**
->>>>>>> modify workhelper #83
-	 * 作業開始処理 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * >>>>>>> modify workhelper #83 作業開始処理 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
 	 * 
@@ -417,21 +413,5 @@ public class WorkLogic {
 		inputWork.setEndTime(DateUtils.getParseTime(time));
 
 		dao.insert(inputWork);
-	}
-	
-	/**
-	 * 未保存作業削除処理
-	 * 
-	 * @param userName
-	 */
-	public void deleteUnSaveWork(String userName) {
-
-		logger.debug("未保存作業削除処理開始");
-
-		Work work = new Work();
-		work.setUserName(userName);
-
-		WorkLogic logic = new WorkLogic();
-		logic.deleteUnSaveWork(work);
 	}
 }
