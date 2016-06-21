@@ -1,6 +1,5 @@
 <%@page import="jp.kigami.ojt.form.WorkRegisterViewForm"%>
 <%@page import="jp.kigami.ojt.common.util.ConstantDef"%>
-<%@page import="jp.kigami.ojt.form.WorkRegisterForm"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -24,7 +23,7 @@
 				.getAttribute(ConstantDef.ATTR_FORM);
 		if (form.isWorkingFlg()) {
 	%>
-	<jsp:include page="wokingInclude.jsp" />
+	<jsp:include page="unfinishedwokInclude.jsp" />
 	<%
 		}
 	%>

@@ -4,6 +4,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.DateUtils;
@@ -16,9 +19,6 @@ import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.form.WorkRegisterViewForm;
 import jp.kigami.ojt.model.Work;
 import jp.kigami.ojt.servlet.WorkHelper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class WorkLogic {
 
@@ -66,7 +66,6 @@ public class WorkLogic {
 		WorkDao dao = new WorkDao();
 		dao.finishWork(inputWork);
 	}
-
 
 	/**
 	 * 編集作業検索処理
@@ -193,7 +192,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 作業開始処理  仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * 作業開始処理 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
 	 * 
@@ -222,32 +221,34 @@ public class WorkLogic {
 			if (!registerForm.getId().isEmpty()) {
 				inputWork.setId(Integer.valueOf(registerForm.getId()));
 			}
-			inputWork.setStartTime(DateUtils.getFomatTime(registerForm
-					.getStartTime()));
+			inputWork.setStartTime(
+					DateUtils.getFomatTime(registerForm.getStartTime()));
 			inputWork.setContents(registerForm.getContents());
 			inputWork.setNote(registerForm.getNote());
 
-			//作業開始の 同期処理
+			// 作業開始の 同期処理
 			workRegiste(inputWork);
 		}
 
-		return form;
+		return getWorkRegisterViewForm(userName);
 	}
 
 	/**
 	 * （同期処理）
+	 * 
 	 * @param inputWork
 	 * @throws BusinessException
 	 */
-	private synchronized void workRegiste(Work inputWork) throws BusinessException {
+	private synchronized void workRegiste(Work inputWork)
+			throws BusinessException {
 
 		// 仕掛処理確認
 		List<Work> workList = findWorking(inputWork);
 
 		if (workList.size() == 1) {
 			// 仕掛処理がある場合、終了
-			finishWork(inputWork.getUserName(), workList.get(0).getId()
-					.toString());
+			finishWork(inputWork.getUserName(),
+					workList.get(0).getId().toString());
 		}
 
 		// 作業開始
@@ -288,15 +289,15 @@ public class WorkLogic {
 			// フォーマットチェック
 			validationChek = InputValidation.isTime(startTime);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(
-						MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
+				result.addErrorMsg(PropertyUtils
+						.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
 				result.setCheckResult(false);
 			}
 		} else {
 			// 入力チェック
 			result.setCheckResult(false);
-			result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT,
-					"開始時間"));
+			result.addErrorMsg(
+					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
 		}
 
 		// 作業内容
@@ -308,8 +309,8 @@ public class WorkLogic {
 			// サイズチェック
 			validationChek = InputValidation.inputSize(contents, 0, 40);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(
-						MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40"));
+				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
+						"作業内容", "0", "40"));
 				result.setCheckResult(false);
 			}
 		}
@@ -322,8 +323,8 @@ public class WorkLogic {
 			// サイズチェック
 			validationChek = InputValidation.inputSize(note, 0, 40);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(
-						MsgCodeDef.SIZE_ERROR, "備考", "0", "40"));
+				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
+						"備考", "0", "40"));
 				result.setCheckResult(validationChek);
 			}
 		}

@@ -1,6 +1,7 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -15,6 +16,8 @@ import org.slf4j.LoggerFactory;
 import jp.kigami.ojt.common.exception.BusinessException;
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
+import jp.kigami.ojt.common.util.MsgCodeDef;
+import jp.kigami.ojt.common.util.PropertyUtils;
 import jp.kigami.ojt.form.WorkFinishForm;
 import jp.kigami.ojt.form.WorkRegisterForm;
 import jp.kigami.ojt.form.WorkRegisterViewForm;
@@ -107,6 +110,9 @@ public class WorkRegistServlet extends HttpServlet {
 			} catch (BusinessException e) {
 				form.setErrMsgs(e.getMessage());
 			}
+		} else {
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		}
 
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
