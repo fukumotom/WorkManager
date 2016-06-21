@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.SystemException;
 import jp.kigami.ojt.common.util.ConstantDef;
-import jp.kigami.ojt.logic.CommonLogic;
+import jp.kigami.ojt.logic.WorkLogic;
 
 @WebServlet("/Menu")
 public class MenuServlet extends HttpServlet {
@@ -36,7 +36,7 @@ public class MenuServlet extends HttpServlet {
 
 		// 未保存作業削除
 		String userName = request.getUserPrincipal().getName();
-		CommonLogic logic = new CommonLogic();
+		WorkLogic logic = new WorkLogic();
 		logic.deleteUnSaveWork(userName);
 
 		RequestDispatcher dispatcher = request

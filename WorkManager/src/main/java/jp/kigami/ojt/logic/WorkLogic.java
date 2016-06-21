@@ -82,7 +82,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 編集作業検索処理
+	 * 編集作業検索処理 TODO実装途中
 	 * 
 	 * @param inputWork
 	 * @return
@@ -95,7 +95,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 作業更新処理
+	 * 作業更新処理 TODO実装途中
 	 * 
 	 * @param inputWork
 	 */
@@ -111,7 +111,18 @@ public class WorkLogic {
 		dao.saveWork(inputWork);
 	}
 
-	public void deleteUnSaveWork(Work inputWork) {
+	/**
+	 * 未保存作業削除処理
+	 * 
+	 * @param userName
+	 */
+	public void deleteUnSaveWork(String userName) {
+
+		logger.debug("未保存作業削除処理開始");
+
+		Work inputWork = new Work();
+		inputWork.setUserName(userName);
+
 		WorkDao dao = new WorkDao();
 		dao.deleteUnSaveWork(inputWork);
 	}
@@ -165,7 +176,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 作業完了処理
+	 * 作業完了処理 TODO実装途中
 	 * 
 	 * @param finshForm
 	 * 
@@ -364,7 +375,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 履歴表示ロジック
+	 * 履歴表示ロジック TODO実装途中
 	 * 
 	 * @param inputWork
 	 * @throws BusinessException
@@ -385,12 +396,12 @@ public class WorkLogic {
 		}
 
 		// 未保存データ削除
-		deleteUnSaveWork(inputWork);
+		deleteUnSaveWork(inputWork.getUserName());
 
 	}
 
 	/**
-	 * 作業追加処理
+	 * 作業追加処理 TODO実装途中
 	 * 
 	 * @param inputWork
 	 * @throws BusinessException
