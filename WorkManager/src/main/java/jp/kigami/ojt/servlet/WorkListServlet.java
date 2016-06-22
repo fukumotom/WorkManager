@@ -95,34 +95,32 @@ public class WorkListServlet extends HttpServlet {
 		String actionBtn = request.getParameter("actionBtn");
 		WorkLogic logic = new WorkLogic();
 
-		WorkHelper helper = new WorkHelper();
 		String listDate = DateUtils.getTodayStr();
 
 		String requestPath = "/WEB-INF/jsp/work/workList.jsp";
 
 		try {
 
-			if ("挿入".equals(actionBtn)) {
+			if (request.getParameter("insertBtn") != null) {
 				logger.info("挿入処理開始:");
-				helper.insert(inputWork, "insert");
-			} else if ("追加".equals(actionBtn)) {
+				logic.insertWork(inputWork);
+			} else if (request.getParameter("addBtn") != null) {
 				logger.info("追加処理開始:");
-				helper.insert(inputWork, "add");
-			} else if ("削除".equals(actionBtn)) {
+				logic.addWork(inputWork);
+			} else if (request.getParameter("deleteBtn") != null) {
 				logger.info("削除処理開始:");
-				helper.delete(inputWork);
-			} else if ("履歴".equals(actionBtn)) {
+				logic.delete(inputWork);
+			} else if (request.getParameter("insertBtn") != null) {
 				logger.info("履歴表示処理開始:");
-				helper.dateCheck(inputWork);
-				helper.deleteUnSaveWork(inputWork);
-			} else if ("保存".equals(actionBtn)) {
+				logic.history(inputWork);
+			} else if (request.getParameter("historyBtn") != null) {
 				logger.info("保存処理開始:");
-				helper.save(inputWork);
+				logic.saveWork(inputWork);
 			} else {
 				// 編集
 				logger.info("編集処理開始:");
 				requestPath = "/WEB-INF/jsp/work/workEditForm.jsp";
-				Work editWork = helper.getEditWork(inputWork);
+				Work editWork = logic.getEditWork(inputWork);
 				request.setAttribute("editWork", editWork);
 			}
 

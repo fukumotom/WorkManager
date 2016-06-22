@@ -1,7 +1,6 @@
 package jp.kigami.ojt.servlet;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
