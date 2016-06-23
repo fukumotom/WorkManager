@@ -1,4 +1,4 @@
-package jp.kigami.ojt.logic;
+package jp.kigami.ojt.filter;
 
 import java.io.IOException;
 

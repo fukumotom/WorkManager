@@ -1,4 +1,4 @@
-package jp.kigami.ojt.logic;
+package jp.kigami.ojt.listener;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
