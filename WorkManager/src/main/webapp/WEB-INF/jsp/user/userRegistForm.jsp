@@ -22,7 +22,8 @@
 			</tr>
 			<tr>
 				<td><label for="password" class="userForm">パスワード：</label></td>
-				<td><input type="password" name="password" class="userForm" /></td>
+				<td><input type="password" name="password" id="password"
+					class="userForm" /></td>
 			</tr>
 			<tr>
 				<td><label for="passwordConfirm" class="userForm">パスワード確認：</label></td>
