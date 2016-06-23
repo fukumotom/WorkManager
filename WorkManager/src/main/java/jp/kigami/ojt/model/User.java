@@ -2,48 +2,57 @@ package jp.kigami.ojt.model;
 
 import java.io.Serializable;
 
+/**
+ * ユーザ登録処理のmodelクラス
+ * 
+ * @author kigami
+ *
+ */
 public class User implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * シリアルバージョン
+	 */
+	private static final long serialVersionUID = -2761102579685994856L;
 
-	private int userId;
-
+	/**
+	 * ユーザ名
+	 */
 	private String userName;
 
+	/**
+	 * パスワード
+	 */
 	private String password;
 
-	private String confirmPassword;
-
-	public int getUserId() {
-		return userId;
-	}
-
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
-
+	/**
+	 * @return the userName
+	 */
 	public String getUserName() {
 		return userName;
 	}
 
+	/**
+	 * @param userName
+	 *            the userName to set
+	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
 
+	/**
+	 * @return the password
+	 */
 	public String getPassword() {
 		return password;
 	}
 
+	/**
+	 * @param password
+	 *            the password to set
+	 */
 	public void setPassword(String password) {
 		this.password = password;
-	}
-
-	public String getConfirmPassword() {
-		return confirmPassword;
-	}
-
-	public void setConfirmPassword(String confirmPassword) {
-		this.confirmPassword = confirmPassword;
 	}
 
 }

@@ -10,7 +10,7 @@
 </head>
 </head>
 <body>
-	<h1>ユーザ登録が完了しました！</h1>
+	<h3>ユーザ登録が完了しました！</h3>
 	<a href="/WorkManager/Menu">戻る</a>
 </body>
 </html>

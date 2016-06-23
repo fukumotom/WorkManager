@@ -2,9 +2,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<%
-	User user = (User) session.getAttribute("registUser");
-%>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -13,17 +10,17 @@
 	href="${pageContext.request.contextPath}/resources/app/css/styles.css">
 </head>
 <body>
-	<table>
-		<tr>
-			<td>ユーザ名：</td>
-			<td><%=user.getUserName()%></td>
-		</tr>
-		<tr>
-			<td><a href="/WorkManager/RegisterForm"><input type="button"
-					value="戻る" /></a></td>
-			<td><a href="/WorkManager/RegisterForm?action=confirm"><input
-					type="button" value="登録" /></a></td>
-		</tr>
-	</table>
+	<form method="get" action="/WorkManager/RegisterForm?action=confirm">
+		<table>
+			<tr>
+				<td>ユーザ名：</td>
+				<td>${form.userName}</td>
+			</tr>
+			<tr>
+				<td><input type="submit" name="returnBtn" value="戻る" /></td>
+				<td><input type="submit" name="registBtn" value="登録" /></td>
+			</tr>
+		</table>
+	</form>
 </body>
 </html>

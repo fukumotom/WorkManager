@@ -2,40 +2,56 @@ package jp.kigami.ojt.dao.dto;
 
 import java.io.Serializable;
 
-public class UsersDto implements Serializable {
+/**
+ * ユーザ登録処理のDTOクラス
+ * 
+ * @author kigami
+ *
+ */
+public class UserDto implements Serializable {
 
-	private static final long serialVersionUID = 1L;
-	
-	private String userId;
-	
+	/**
+	 * シリアルバージョン
+	 */
+	private static final long serialVersionUID = -1611859676683377943L;
+
+	/**
+	 * ユーザ名
+	 */
 	private String userName;
-	
+
+	/**
+	 * パスワード
+	 */
 	private String password;
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
+	/**
+	 * @return the userName
+	 */
 	public String getUserName() {
 		return userName;
 	}
 
+	/**
+	 * @param userName
+	 *            the userName to set
+	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
 
+	/**
+	 * @return the password
+	 */
 	public String getPassword() {
 		return password;
 	}
 
+	/**
+	 * @param password
+	 *            the password to set
+	 */
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
-
 }

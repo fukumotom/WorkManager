@@ -111,6 +111,36 @@ public class CommonDbUtil {
 	}
 
 	/**
+	 * SQL発行パラメータ作成
+	 * 
+	 * @param <T>
+	 * 
+	 * @param sql
+	 * @param dto
+	 * @return
+	 */
+	public static <T> HashMap<Integer, Object> createParamMap(StringBuilder sql,
+			T dtoClass) {
+
+		HashMap<String, Object> dtoMap = CommonDbUtil
+				.createBeanValueMap(dtoClass);
+
+		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
+
+		HashMap<Integer, Object> paramMap = new HashMap<>();
+
+		for (Entry<String, Object> dtoEntry : dtoMap.entrySet()) {
+
+			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
+				if ((dtoEntry.getKey()).equals(sqlEntry.getValue())) {
+					paramMap.put(sqlEntry.getKey(), dtoEntry.getValue());
+				}
+			}
+		}
+		return paramMap;
+	}
+
+	/**
 	 * sql文からパラメータ用Map作成
 	 * 
 	 * @param sql

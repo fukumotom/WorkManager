@@ -35,6 +35,11 @@ public class MsgCodeDef {
 	public static final String INPUT_FORMAT_ERROR = "w.validation.004";
 
 	/**
+	 * 入力チェック（登録ユーザが存在）
+	 */
+	public static final String EXIT_USER = "w.validation.005";
+
+	/**
 	 * 入力チェック（不正な入力）
 	 */
 	public static final String BAD_INPUT = "e.validation.001";
