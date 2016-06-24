@@ -1,19 +1,19 @@
-package jp.kigami.ojt.model;
+package jp.kigami.ojt.dao.dto;
 
 import java.io.Serializable;
 
 /**
- * ユーザ登録処理のmodelクラス
+ * ユーザ登録処理のDTOクラス
  * 
  * @author kigami
  *
  */
-public class User implements Serializable {
+public class UserDto implements Serializable {
 
 	/**
 	 * シリアルバージョン
 	 */
-	private static final long serialVersionUID = -2761102579685994856L;
+	private static final long serialVersionUID = -1611859676683377943L;
 
 	/**
 	 * ユーザ名
@@ -54,5 +54,4 @@ public class User implements Serializable {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-
 }

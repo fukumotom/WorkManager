@@ -14,54 +14,62 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.ConstantDef;
 import jp.kigami.ojt.common.util.EncryptionUtils;
-import jp.kigami.ojt.common.util.InputValidation;
-import jp.kigami.ojt.common.util.ValidationResult;
+import jp.kigami.ojt.form.UserForm;
 import jp.kigami.ojt.logic.UserRegistLogic;
-import jp.kigami.ojt.model.User;
 
+/**
+ * ユーザ登録処理のServletクラス
+ * 
+ * @author kigami
+ *
+ */
 @WebServlet("/RegisterForm")
 public class UserRegistServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * シリアルバージョン
+	 */
+	private static final long serialVersionUID = 421709107098888902L;
 
+	/**
+	 * ロガー
+	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(UserRegistServlet.class);
 
+	/**
+	 * ユーザ登録フォーム表示、ユーザ登録完了画面表示
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException {
 
 		String forwardPath = null;
 
-		String param = request.getParameter("action");
-
-		if (param == null) {
+		if (request.getParameter("userRegit") != null) {
 			// ユーザ新規登録ボタン押下時
 			forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
 
-		} else if ("confirm".equals(param)) {
-
-			// 更新前入力チェック TODO
-			// ArrayList<ValidationResult> checkList = validation(request);
-			// for (ValidationResult check : checkList) {
-			// if (!check.isCheckResult()) {
-			// throw new BusinessException("");
-			// }
-			// }
+		} else if (request.getParameter("registBtn") != null) {
 
 			// 登録確認画面から登録ボタン押下時
 			HttpSession session = request.getSession();
 
 			// 登録データ取得
-			User user = (User) session.getAttribute("registUser");
+			UserForm userForm = (UserForm) session
+					.getAttribute(ConstantDef.ATTR_FORM);
 
 			// 登録ロジック呼び出し
 			UserRegistLogic logic = new UserRegistLogic();
-			logic.register(user);
+			logic.register(userForm);
 
 			// 不要なスコープ削除
-			session.removeAttribute("registUser");
+			session.removeAttribute(ConstantDef.ATTR_FORM);
 
 			forwardPath = "/WEB-INF/jsp/user/userRegistComplete.jsp";
 
@@ -75,18 +83,56 @@ public class UserRegistServlet extends HttpServlet {
 		}
 	}
 
+	/**
+	 * ユーザ登録処理
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		String actionBtn = request.getParameter("actionBtn");
+		UserForm userForm = getUserForm(request);
 
 		try {
 
-			if ("戻る".equals(actionBtn)) {
+			if (request.getParameter("returnBtn") != null) {
+				// 戻るボタン押下時
 				response.sendRedirect("/WorkManager/Menu");
-			} else if ("確認".equals(actionBtn)) {
-				confilm(request, response);
+
+			} else if (request.getParameter("confilmBtn") != null) {
+
+				// 確認ボタン押下時
+				String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
+
+				UserRegistLogic logic = new UserRegistLogic();
+				// 画面表示情報設定
+				UserForm viewForm = logic.inputvalidation(userForm);
+				viewForm.setUserName(userForm.getUserName());
+				if (!viewForm.getErrMsgs().isEmpty()) {
+					// 入力チェックエラーの場合、ユーザ登録フォームへ遷移
+					forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
+				}
+
+				// セッションにユーザ情報を保存
+				// パスワード暗号化
+				String plainPassword = userForm.getPassword();
+				String encPassword = EncryptionUtils
+						.getEncPassword(plainPassword);
+				userForm.setPassword(encPassword);
+				userForm.setConfirmPassword(encPassword);
+
+				HttpSession session = request.getSession();
+				session.setAttribute(ConstantDef.ATTR_FORM, userForm);
+
+				request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
+
+				// 確認画面へフォワード
+				RequestDispatcher dispatcher = request
+						.getRequestDispatcher(forwardPath);
+				dispatcher.forward(request, response);
+
 			}
 		} catch (IOException | ServletException e) {
 			throw new SystemException("リダイレクト失敗", e);
@@ -94,54 +140,18 @@ public class UserRegistServlet extends HttpServlet {
 	}
 
 	/**
-	 * 確認画面遷移
+	 * 画面情報をユーザフォームに詰める
 	 * 
 	 * @param request
-	 * @param response
-	 * @throws IOException
-	 * @throws ServletException
+	 * @return
 	 */
-	private void confilm(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
-		String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
+	private UserForm getUserForm(HttpServletRequest request) {
 
-		// 入力チェック
-		ValidationResult result = validation(request);
-		if (!result.isCheckResult()) {
-			// 入力チェックがある場合、入力フォームを再表示
-			forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
-		}
+		UserForm form = new UserForm();
+		form.setUserName(request.getParameter("j_username"));
+		form.setPassword(request.getParameter("password"));
+		form.setConfirmPassword(request.getParameter("confirmPassword"));
 
-		// 登録情報設定
-		User user = new User();
-		user.setUserName(request.getParameter("j_username"));
-
-		// 暗号化
-		String plainPassword = request.getParameter("password");
-		String encPassword = EncryptionUtils.getEncPassword(plainPassword);
-		user.setPassword(encPassword);
-
-		// セッションに入力情報を保存
-		HttpSession session = request.getSession();
-		session.setAttribute("registUser", user);
-
-		// 確認画面へフォワード
-		RequestDispatcher dispatcher = request
-				.getRequestDispatcher(forwardPath);
-		dispatcher.forward(request, response);
-	}
-
-	private ValidationResult validation(HttpServletRequest request) {
-
-		ValidationResult result = new ValidationResult();
-		String userName = request.getParameter("j_username");
-		String password = request.getParameter("password");
-		String passConfilm = request.getParameter("passwordConfirm");
-
-		InputValidation.inputSize(userName, 5, 20);
-		InputValidation.inputSize(password, 5, 64);
-		InputValidation.confilm(password, passConfilm);
-
-		return result;
+		return form;
 	}
 }

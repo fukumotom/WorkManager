@@ -111,6 +111,36 @@ public class CommonDbUtil {
 	}
 
 	/**
+	 * SQL発行パラメータ作成
+	 * 
+	 * @param <T>
+	 * 
+	 * @param sql
+	 * @param dto
+	 * @return
+	 */
+	public static <T> HashMap<Integer, Object> createParamMap(StringBuilder sql,
+			T dtoClass) {
+
+		HashMap<String, Object> dtoMap = CommonDbUtil
+				.createBeanValueMap(dtoClass);
+
+		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
+
+		HashMap<Integer, Object> paramMap = new HashMap<>();
+
+		for (Entry<String, Object> dtoEntry : dtoMap.entrySet()) {
+
+			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
+				if ((dtoEntry.getKey()).equals(sqlEntry.getValue())) {
+					paramMap.put(sqlEntry.getKey(), dtoEntry.getValue());
+				}
+			}
+		}
+		return paramMap;
+	}
+
+	/**
 	 * sql文からパラメータ用Map作成
 	 * 
 	 * @param sql
@@ -183,7 +213,7 @@ public class CommonDbUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
+	public static <T> List<T> resultSetToDtoList(ResultSet result,
 			Class<T> dtoClass) throws SQLException {
 
 		HashMap<String, String> clmNameMap = new HashMap<String, String>();
@@ -194,7 +224,7 @@ public class CommonDbUtil {
 			clmNameMap.put(meta.getColumnLabel(i), meta.getColumnClassName(i));
 		}
 
-		ArrayList<T> dtoList = new ArrayList<>();
+		List<T> dtoList = new ArrayList<>();
 
 		while (result.next()) {
 			T dto;
@@ -352,7 +382,7 @@ public class CommonDbUtil {
 	public static <T> List<T> getDtoList(String sql,
 			Map<Integer, Object> paramMap, Class<T> dtoClass) {
 
-		ArrayList<T> dtoList = new ArrayList<>();
+		List<T> dtoList = new ArrayList<>();
 		DataSource ds = lookup();
 		try (Connection con = ds.getConnection();
 				PreparedStatement pstm = con.prepareStatement(sql);) {
@@ -364,7 +394,7 @@ public class CommonDbUtil {
 			ResultSet result = pstm.executeQuery();
 
 			// マッピング
-			dtoList = resultSetToWorkDtoList(result, dtoClass);
+			dtoList = resultSetToDtoList(result, dtoClass);
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);

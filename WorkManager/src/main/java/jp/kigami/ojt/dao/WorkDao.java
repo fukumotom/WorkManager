@@ -3,8 +3,6 @@ package jp.kigami.ojt.dao;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,30 +16,6 @@ import jp.kigami.ojt.model.Work;
 public class WorkDao {
 
 	private static final Logger logger = LoggerFactory.getLogger(Work.class);
-
-	private HashMap<Integer, Object> createParamMap(StringBuilder sql,
-			WorkDto dto) {
-
-		Map<String, Object> dtoMap = CommonDbUtil.createBeanValueMap(dto);
-
-		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
-
-		HashMap<Integer, Object> paramMap = new HashMap<>();
-
-		for (Entry<String, Object> fieldEntry : dtoMap.entrySet()) {
-
-			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
-				if ((fieldEntry.getKey()).equals(sqlEntry.getValue())) {
-
-					paramMap.put(sqlEntry.getKey(), fieldEntry.getValue());
-					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(),
-							fieldEntry.getValue());
-				}
-			}
-		}
-		return paramMap;
-
-	}
 
 	/**
 	 * 編集作業取得SQL発行
@@ -58,7 +32,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
 				WorkDto.class);
@@ -85,7 +59,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
 				paramMap, WorkDto.class);
@@ -117,7 +91,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt == 0) {
@@ -142,7 +116,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt > 0) {
 			logger.info("正常に作業を開始");
@@ -175,7 +149,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
 				paramMap, WorkDto.class);
@@ -209,7 +183,7 @@ public class WorkDao {
 		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		// 実行
 		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
@@ -239,7 +213,7 @@ public class WorkDao {
 		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		// 実行
 		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
@@ -271,7 +245,7 @@ public class WorkDao {
 		CommonDbUtil.beanMaping(work, dto);
 
 		// パラメータ設定
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 		logger.info("{}件挿入しました", resultCnt);
@@ -293,7 +267,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 
@@ -318,7 +292,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 		logger.info("{}件更新しました", resultCnt);
@@ -337,7 +311,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 		logger.info("{}件保存しました", resultCnt);
@@ -356,7 +330,7 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(work, dto);
 
-		HashMap<Integer, Object> paramMap = createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 		logger.debug("{}件未保存データ削除しました", resultCnt);

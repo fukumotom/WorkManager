@@ -1,19 +1,12 @@
 package jp.kigami.ojt.dao;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.sql.DataSource;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jp.kigami.ojt.common.exception.SystemException;
-import jp.kigami.ojt.dao.dto.UsersDto;
+import jp.kigami.ojt.dao.dto.UserDto;
 import jp.kigami.ojt.db.util.CommonDbUtil;
 import jp.kigami.ojt.model.User;
 
@@ -22,81 +15,57 @@ public class UserRegisterDao {
 	private static Logger logger = LoggerFactory
 			.getLogger(UserRegisterDao.class);
 
+	/**
+	 * ユーザ登録SQL発行
+	 * 
+	 * @param user
+	 */
 	public void insertUsers(User user) {
 
 		// load SQLsentence
 		StringBuilder sql1 = CommonDbUtil.readSql("registUser.sql");
 		StringBuilder sql2 = CommonDbUtil.readSql("registRole.sql");
 
-		UsersDto dto = mappingModelToDto(user);
+		// dtoに詰め替え
+		UserDto dto = new UserDto();
+		CommonDbUtil.beanMaping(user, dto);
 
 		// create sql parameter
-		HashMap<Integer, Object> paramMap = createPramMap(sql1, dto);
-		HashMap<Integer, Object> paramMap2 = createPramMap(sql2, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql1,
+				dto);
+		HashMap<Integer, Object> paramMap2 = CommonDbUtil.createParamMap(sql2,
+				dto);
 
 		// DB更新
-		insertUsers(sql1.toString(), paramMap);
-		insertUsers(sql2.toString(), paramMap2);
-
-	}
-
-	private HashMap<Integer, Object> createPramMap(StringBuilder sql,
-			UsersDto dto) {
-
-		HashMap<String, Object> dtoMap = CommonDbUtil.createBeanValueMap(dto);
-
-		Map<Integer, String> sqlParamMap = CommonDbUtil.createSqlMap(sql);
-
-		HashMap<Integer, Object> paramMap = new HashMap<>();
-
-		for (Entry<String, Object> dtoEntry : dtoMap.entrySet()) {
-
-			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
-				if ((dtoEntry.getKey()).equals(sqlEntry.getValue())) {
-					paramMap.put(sqlEntry.getKey(), dtoEntry.getValue());
-				}
-			}
-		}
-
-		return paramMap;
-
-	}
-
-	private UsersDto mappingModelToDto(User user) {
-
-		// 登録情報を設定
-		UsersDto dto = new UsersDto();
-		dto.setUserName(user.getUserName());
-		dto.setPassword(user.getPassword());
-
-		return dto;
-
+		int cnt = CommonDbUtil.updata(sql1.toString(), paramMap);
+		logger.info("{}件登録", cnt);
+		int cnt2 = CommonDbUtil.updata(sql2.toString(), paramMap2);
+		logger.info("{}件登録", cnt2);
 	}
 
 	/**
-	 * ユーザ登録処理実行
+	 * ユーザ検索SQL発行 TODO トランザクション
 	 * 
-	 * @param sql
-	 * @param paramMap
+	 * @param user
+	 * @return
 	 */
-	private void insertUsers(String sql, Map<Integer, Object> paramMap) {
+	public List<UserDto> findUser(User user) {
 
-		DataSource ds = CommonDbUtil.lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
+		// sql読み込み
+		StringBuilder sql = CommonDbUtil.readSql("findUser.sql");
 
-			logger.info("発行SQL:{}", sql);
+		// dtoにmodelを詰め替え
+		UserDto userDto = new UserDto();
+		CommonDbUtil.beanMaping(user, userDto);
 
-			// parameter join
-			CommonDbUtil.bindParam(pstm, paramMap);
+		// SQL発行パラメータ取得
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
+				userDto);
 
-			int resultCnt = pstm.executeUpdate();
-			logger.info("{}件登録", resultCnt);
+		// SQL発行
+		List<UserDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
+				paramMap, UserDto.class);
 
-		} catch (SQLException e) {
-			logger.error("DB接続失敗", e);
-			throw new SystemException(e);
-		}
+		return dtoList;
 	}
-
 }
