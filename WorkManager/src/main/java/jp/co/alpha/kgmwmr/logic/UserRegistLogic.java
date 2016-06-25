@@ -2,9 +2,6 @@ package jp.co.alpha.kgmwmr.logic;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
@@ -13,11 +10,15 @@ import jp.co.alpha.kgmwmr.dao.UserRegisterDao;
 import jp.co.alpha.kgmwmr.dao.dto.UserDto;
 import jp.co.alpha.kgmwmr.form.UserForm;
 import jp.co.alpha.kgmwmr.model.User;
+import jp.kigami.ojt.common.exception.DuplexOperationException;
 
+/**
+ * ユーザ新規登録Logicクラス
+ * 
+ * @author kigami
+ *
+ */
 public class UserRegistLogic {
-
-	private static final Logger logger = LoggerFactory
-			.getLogger(UserRegistLogic.class);
 
 	/**
 	 * ユーザ情報登録
@@ -26,9 +27,13 @@ public class UserRegistLogic {
 	 */
 	public void register(UserForm userForm) {
 
-		// TODO DB更新前のチェック
-		inputvalidation(userForm);
+		// 更新前セッションチェック
+		if (userForm == null) {
+			// セッションから情報が取得できなかった場合、不正操作
+			throw new DuplexOperationException("すでに登録済みです");
+		}
 
+		// formをmodelに詰め替え
 		User user = new User();
 		user.setUserName(userForm.getUserName());
 		user.setPassword(userForm.getPassword());

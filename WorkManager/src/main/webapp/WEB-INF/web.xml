@@ -46,6 +46,10 @@
 		<location>/WEB-INF/jsp/error/systemError.jsp</location>
 	</error-page>
 	<error-page>
+		<exception-type>jp.kigami.ojt.common.exception.DuplexOperationException</exception-type>
+		<location>/WEB-INF/jsp/error/duplexOperationError.jsp</location>
+	</error-page>
+	<error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/jsp/error/404.jsp</location>
 	</error-page>

@@ -27,3 +27,13 @@ h1 label {
 	display: block;
 	width: 100%;
 }
+
+div.center {
+	text-align: center;
+}
+
+p.msg {
+	display: inline-block;
+	text-align: left;
+	font-weight: bold;
+}
