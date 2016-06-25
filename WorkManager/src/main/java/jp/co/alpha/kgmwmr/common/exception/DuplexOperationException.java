@@ -1,4 +1,4 @@
-package jp.kigami.ojt.common.exception;
+package jp.co.alpha.kgmwmr.common.exception;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

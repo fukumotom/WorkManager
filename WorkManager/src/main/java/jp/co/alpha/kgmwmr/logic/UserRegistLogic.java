@@ -2,6 +2,7 @@ package jp.co.alpha.kgmwmr.logic;
 
 import java.util.List;
 
+import jp.co.alpha.kgmwmr.common.exception.DuplexOperationException;
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
@@ -10,7 +11,6 @@ import jp.co.alpha.kgmwmr.dao.UserRegisterDao;
 import jp.co.alpha.kgmwmr.dao.dto.UserDto;
 import jp.co.alpha.kgmwmr.form.UserForm;
 import jp.co.alpha.kgmwmr.model.User;
-import jp.kigami.ojt.common.exception.DuplexOperationException;
 
 /**
  * ユーザ新規登録Logicクラス
