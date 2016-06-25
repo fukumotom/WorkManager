@@ -28,4 +28,9 @@ public class ConstantDef {
 	 * 検索条件（属性）
 	 */
 	public static final String CRITERIA = "criteria";
+
+	/**
+	 * 検索するJNDI名
+	 */
+	public static final String DB_LOOK_UP = "db.look.up.name";
 }

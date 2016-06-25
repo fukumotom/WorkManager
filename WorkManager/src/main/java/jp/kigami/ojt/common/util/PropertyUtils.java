@@ -45,10 +45,24 @@ public class PropertyUtils {
 	/**
 	 * メッセージプロパティファイルをエンコードして読み込む
 	 */
-	private void loadProperty() {
+	private void loadMsgProperty() {
 
 		try (InputStream iStream = PropertyUtils.class.getClassLoader()
 				.getResourceAsStream("messages.properties")) {
+			prop.load(new InputStreamReader(iStream, StandardCharsets.UTF_8));
+
+		} catch (IOException e) {
+			logger.error("プロパティファイル読み込み失敗", e);
+		}
+	}
+
+	/**
+	 * DBプロパティファイルをエンコードして読み込む
+	 */
+	private void loadDbProperty() {
+
+		try (InputStream iStream = PropertyUtils.class.getClassLoader()
+				.getResourceAsStream("db.properties")) {
 			prop.load(new InputStreamReader(iStream, StandardCharsets.UTF_8));
 
 		} catch (IOException e) {
@@ -63,13 +77,14 @@ public class PropertyUtils {
 
 		if (propertyUtils == null) {
 			propertyUtils = new PropertyUtils();
-			propertyUtils.loadProperty();
+			propertyUtils.loadMsgProperty();
+			propertyUtils.loadDbProperty();
 		}
 
 	}
 
 	/**
-	 * message.propertiesから取得したメッセージを取得
+	 * propertiesファイルから値を取得
 	 * 
 	 * @param key
 	 * @param args
