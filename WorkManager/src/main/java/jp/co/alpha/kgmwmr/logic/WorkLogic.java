@@ -15,12 +15,14 @@ import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.common.util.ValidationResult;
 import jp.co.alpha.kgmwmr.dao.WorkDao;
+import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
 import jp.co.alpha.kgmwmr.form.WorkRegisterForm;
 import jp.co.alpha.kgmwmr.form.WorkRegisterViewForm;
 import jp.co.alpha.kgmwmr.model.Work;
 
+
 /**
- * 作業管理ロジッククラス
+ * 作業管理ロジッククラス TODO form対応未
  * 
  * @author kigami
  *
@@ -32,10 +34,26 @@ public class WorkLogic {
 	 */
 	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
 
+	/**
+	 * 作業リスト表示データ取得
+	 * 
+	 * @param work
+	 * @return
+	 */
 	public List<Work> findAllWork(Work work) {
-		WorkDao dao = new WorkDao();
-		List<Work> workList = dao.findAllWork(work);
-		return workList;
+
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			List<Work> workList = dao.findAllWork(work);
+			return workList;
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 
 	}
 
@@ -47,9 +65,21 @@ public class WorkLogic {
 	 * @throws BusinessException
 	 */
 	public LocalTime getStartTime(Work inputWork) {
-		WorkDao dao = new WorkDao();
-		Work work = dao.findStartTime(inputWork);
-		return work.getStartTime();
+
+		Work output;
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			output = dao.findStartTime(inputWork);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
+		return output.getStartTime();
 	}
 
 	/**
@@ -64,50 +94,123 @@ public class WorkLogic {
 		inputWork.setStartTime(DateUtils.getParseTime(time));
 		inputWork.setEndTime(DateUtils.getParseTime(time));
 
-		WorkDao dao = new WorkDao();
-		dao.insert(inputWork);
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
 
-	}
+			// 挿入処理実行
+			WorkDao dao = new WorkDao();
+			dao.insert(inputWork);
 
-	public void delete(Work inputWork) throws BusinessException {
-		WorkDao dao = new WorkDao();
-		dao.delete(inputWork);
-	}
+			// コミット
+			CommonDbUtil.commit();
 
-	public void finishWork(Work inputWork) throws BusinessException {
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 
-		WorkDao dao = new WorkDao();
-		dao.finishWork(inputWork);
 	}
 
 	/**
-	 * 編集作業検索処理 TODO実装途中
+	 * 作業論理削除処理
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void delete(Work inputWork) throws BusinessException {
+
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
+
+			WorkDao dao = new WorkDao();
+			dao.delete(inputWork);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+	}
+
+	/**
+	 * 編集作業検索処理
 	 * 
 	 * @param inputWork
 	 * @return
 	 */
 	public Work getEditWork(Work inputWork) {
 
-		WorkDao dao = new WorkDao();
+		Work output;
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			output = dao.getEditWork(inputWork);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
 		// DBから取得
-		return dao.getEditWork(inputWork);
+		return output;
 	}
 
 	/**
-	 * 作業更新処理 TODO実装途中
+	 * 作業更新処理
 	 * 
 	 * @param inputWork
 	 */
 	public void updateWork(Work inputWork) {
 
-		WorkDao dao = new WorkDao();
-		dao.updateWork(inputWork);
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
 
+			// 更新処理実行
+			WorkDao dao = new WorkDao();
+			dao.updateWork(inputWork);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 	}
 
+	/**
+	 * 作業保存処理 TODO実装途中
+	 * 
+	 * @param inputWork
+	 */
 	public void saveWork(Work inputWork) {
-		WorkDao dao = new WorkDao();
-		dao.saveWork(inputWork);
+
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
+
+			// 保存処理実行
+			WorkDao dao = new WorkDao();
+			dao.saveWork(inputWork);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 	}
 
 	/**
@@ -122,8 +225,21 @@ public class WorkLogic {
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
 
-		WorkDao dao = new WorkDao();
-		dao.deleteUnSaveWork(inputWork);
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
+
+			WorkDao dao = new WorkDao();
+			dao.deleteUnSaveWork(inputWork);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 	}
 
 	/**
@@ -142,8 +258,18 @@ public class WorkLogic {
 		// 現在時間を設定
 		inputWork.setWorkDate(LocalDate.now());
 
-		// 仕掛作業取得
-		List<Work> workList = findWorking(inputWork);
+		List<Work> workList;
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
+
+			// 仕掛作業取得
+			workList = findWorking(inputWork);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 
 		// formに仕掛作業と作業状態フラグを設定
 		if (workList.size() == 0) {
@@ -163,19 +289,23 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 仕掛作業取得
+	 * 仕掛作業取得（コネクションは呼び元でオープン）
 	 * 
 	 * @param inputWork
 	 * @return
 	 */
 	public List<Work> findWorking(Work inputWork) {
+
+		List<Work> workList;
+
 		WorkDao dao = new WorkDao();
-		List<Work> workList = dao.findWorking(inputWork);
+		workList = dao.findWorking(inputWork);
+
 		return workList;
 	}
 
 	/**
-	 * 作業完了処理 TODO実装途中
+	 * 作業完了処理
 	 * 
 	 * @param finshForm
 	 * 
@@ -207,14 +337,26 @@ public class WorkLogic {
 		// 作業時間を計算
 		calcWorkTime(inputWork);
 
-		WorkDao dao = new WorkDao();
-		dao.finishWork(inputWork);
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
+
+			WorkDao dao = new WorkDao();
+			dao.finishWork(inputWork);
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 
 		return getWorkRegisterViewForm(userName);
 	}
 
 	/**
-	 * <<<<<<< 0586a435c5935cdd93587548b120d24c230c8829 ======= 作業時間の計算処理
+	 * 作業時間の計算処理
 	 * 
 	 * @param inputWork
 	 */
@@ -281,18 +423,31 @@ public class WorkLogic {
 	private synchronized void workRegiste(Work inputWork)
 			throws BusinessException {
 
-		// 仕掛処理確認
-		List<Work> workList = findWorking(inputWork);
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
 
-		if (workList.size() == 1) {
-			// 仕掛処理がある場合、終了
-			finishWork(inputWork.getUserName(),
-					workList.get(0).getId().toString());
+			// 仕掛処理確認
+			List<Work> workList = findWorking(inputWork);
+
+			if (workList.size() == 1) {
+				// 仕掛処理がある場合、終了
+				finishWork(inputWork.getUserName(),
+						workList.get(0).getId().toString());
+			}
+
+			// 作業開始
+			WorkDao dao = new WorkDao();
+			dao.startWork(inputWork);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
 		}
-
-		// 作業開始
-		WorkDao dao = new WorkDao();
-		dao.startWork(inputWork);
 	}
 
 	/**
@@ -397,21 +552,35 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 作業追加処理 TODO実装途中
+	 * 作業追加処理
 	 * 
 	 * @param inputWork
 	 * @throws BusinessException
 	 */
 	public void addWork(Work inputWork) throws BusinessException {
 
-		// 作業中の作業の場合、追加不可。
-		WorkDao dao = new WorkDao();
-		Work work = dao.getEndTime(inputWork);
-		LocalTime time = work.getEndTime();
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
 
-		inputWork.setStartTime(DateUtils.getParseTime(time));
-		inputWork.setEndTime(DateUtils.getParseTime(time));
+			// 作業中の作業の場合、追加不可。
+			WorkDao dao = new WorkDao();
 
-		dao.insert(inputWork);
+			Work work = dao.getEndTime(inputWork);
+			LocalTime time = work.getEndTime();
+
+			inputWork.setStartTime(DateUtils.getParseTime(time));
+			inputWork.setEndTime(DateUtils.getParseTime(time));
+
+			dao.insert(inputWork);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 	}
 }

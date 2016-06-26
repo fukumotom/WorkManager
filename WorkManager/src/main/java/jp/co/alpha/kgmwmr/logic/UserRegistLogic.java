@@ -2,13 +2,16 @@ package jp.co.alpha.kgmwmr.logic;
 
 import java.util.List;
 
-import jp.co.alpha.kgmwmr.common.exception.IllegalOperationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.common.util.ValidationResult;
 import jp.co.alpha.kgmwmr.dao.UserRegisterDao;
 import jp.co.alpha.kgmwmr.dao.dto.UserDto;
+import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
 import jp.co.alpha.kgmwmr.form.UserForm;
 import jp.co.alpha.kgmwmr.model.User;
 
@@ -19,6 +22,12 @@ import jp.co.alpha.kgmwmr.model.User;
  *
  */
 public class UserRegistLogic {
+
+	/**
+	 * ロガー
+	 */
+	private static final Logger logger = LoggerFactory
+			.getLogger(UserRegistLogic.class);
 
 	/**
 	 * ユーザ情報登録
@@ -38,9 +47,22 @@ public class UserRegistLogic {
 		user.setUserName(userForm.getUserName());
 		user.setPassword(userForm.getPassword());
 
-		// DB更新
-		UserRegisterDao dao = new UserRegisterDao();
-		dao.insertUsers(user);
+		// トランザクション境界
+		try {
+			// トランザクション管理設定
+			boolean isAutoCommit = false;
+			CommonDbUtil.openConnection(isAutoCommit);
+			// DB更新
+			UserRegisterDao dao = new UserRegisterDao();
+			dao.insertUsers(user);
+
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 	}
 
 	/**
@@ -108,11 +130,23 @@ public class UserRegistLogic {
 
 		User user = new User();
 		user.setUserName(userName);
+		boolean result = false;
 
-		UserRegisterDao dao = new UserRegisterDao();
-		// 入力ユーザの存在チェック
-		List<UserDto> userDtoList = dao.findUser(user);
+		// トランザクション境界
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
 
-		return userDtoList.size() == 0;
+			UserRegisterDao dao = new UserRegisterDao();
+			// 入力ユーザの存在チェック
+			List<UserDto> userDtoList = dao.findUser(user);
+			result = (userDtoList.size() == 0);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
+		return result;
 	}
 }
