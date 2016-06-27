@@ -2,7 +2,7 @@ package jp.co.alpha.kgmwmr.logic;
 
 import java.util.List;
 
-import jp.co.alpha.kgmwmr.common.exception.DuplexOperationException;
+import jp.co.alpha.kgmwmr.common.exception.IllegalOperationException;
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
@@ -30,7 +30,7 @@ public class UserRegistLogic {
 		// 更新前セッションチェック
 		if (userForm == null) {
 			// セッションから情報が取得できなかった場合、不正操作
-			throw new DuplexOperationException("すでに登録済みです");
+			throw new IllegalOperationException("不正操作がなされました");
 		}
 
 		// formをmodelに詰め替え

@@ -46,7 +46,7 @@
 		<location>/WEB-INF/jsp/error/systemError.jsp</location>
 	</error-page>
 	<error-page>
-		<exception-type>jp.kigami.ojt.common.exception.DuplexOperationException</exception-type>
+		<exception-type>jp.kigami.ojt.common.exception.IllegalOperationException</exception-type>
 		<location>/WEB-INF/jsp/error/duplexOperationError.jsp</location>
 	</error-page>
 	<error-page>
