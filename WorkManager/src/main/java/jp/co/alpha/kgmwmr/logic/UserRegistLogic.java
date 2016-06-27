@@ -50,8 +50,7 @@ public class UserRegistLogic {
 		// トランザクション境界
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 			// DB更新
 			UserRegisterDao dao = new UserRegisterDao();
 			dao.insertUsers(user);

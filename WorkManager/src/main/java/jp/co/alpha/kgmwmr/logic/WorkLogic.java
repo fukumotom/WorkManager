@@ -96,8 +96,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			// 挿入処理実行
 			WorkDao dao = new WorkDao();
@@ -123,8 +122,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			WorkDao dao = new WorkDao();
 			dao.delete(inputWork);
@@ -172,8 +170,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			// 更新処理実行
 			WorkDao dao = new WorkDao();
@@ -197,8 +194,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			// 保存処理実行
 			WorkDao dao = new WorkDao();
@@ -227,8 +223,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			WorkDao dao = new WorkDao();
 			dao.deleteUnSaveWork(inputWork);
@@ -339,8 +334,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			WorkDao dao = new WorkDao();
 			dao.finishWork(inputWork);
@@ -425,8 +419,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			// 仕掛処理確認
 			List<Work> workList = findWorking(inputWork);
@@ -561,8 +554,7 @@ public class WorkLogic {
 
 		try {
 			// トランザクション管理設定
-			boolean isAutoCommit = false;
-			CommonDbUtil.openConnection(isAutoCommit);
+			CommonDbUtil.openConnection(false);
 
 			// 作業中の作業の場合、追加不可。
 			WorkDao dao = new WorkDao();
