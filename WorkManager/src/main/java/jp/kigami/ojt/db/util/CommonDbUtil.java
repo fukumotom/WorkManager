@@ -29,6 +29,8 @@ import javax.naming.NamingException;
 import javax.sql.DataSource;
 
 import jp.kigami.ojt.common.exception.SystemException;
+import jp.kigami.ojt.common.util.ConstantDef;
+import jp.kigami.ojt.common.util.PropertyUtils;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +104,8 @@ public class CommonDbUtil {
 		DataSource ds = null;
 		try {
 			Context context = new InitialContext();
-			ds = (DataSource) context.lookup("java:comp/env/jdbc/postgres");
+			ds = (DataSource) context
+					.lookup(PropertyUtils.getValue(ConstantDef.DB_LOOK_UP));
 		} catch (NamingException e) {
 			logger.error("JNDI接続エラー:{}", e);
 			throw new SystemException(e);
