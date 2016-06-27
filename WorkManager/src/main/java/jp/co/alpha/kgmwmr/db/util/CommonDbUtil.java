@@ -170,8 +170,7 @@ public class CommonDbUtil {
 	}
 
 	/**
-<<<<<<< badd70301fc9e3116021ba20376462bd2e16d92b
-	 * JNDIによりデータソースを取得
+	 * <<<<<<< badd70301fc9e3116021ba20376462bd2e16d92b JNDIによりデータソースを取得
 	 * 
 	 * @return
 	 */
@@ -190,9 +189,7 @@ public class CommonDbUtil {
 	}
 
 	/**
-=======
->>>>>>> addtion transaction manage #107
-	 * SQL発行パラメータ作成
+	 * ======= >>>>>>> addtion transaction manage #107 SQL発行パラメータ作成
 	 * 
 	 * @param <T>
 	 * 
@@ -294,7 +291,7 @@ public class CommonDbUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static <T> ArrayList<T> resultSetToWorkDtoList(ResultSet result,
+	public static <T> List<T> resultSetToWorkDtoList(ResultSet result,
 			Class<T> dtoClass) throws SQLException {
 
 		HashMap<String, String> clmNameMap = new HashMap<String, String>();
@@ -462,7 +459,7 @@ public class CommonDbUtil {
 	public static <T> List<T> getDtoList(String sql,
 			Map<Integer, Object> paramMap, Class<T> dtoClass) {
 
-		ArrayList<T> dtoList = new ArrayList<>();
+		List<T> dtoList = new ArrayList<>();
 		try (Connection con = connectionMap.get(getConnectionId());
 				PreparedStatement pstm = con.prepareStatement(sql);) {
 
