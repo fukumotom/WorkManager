@@ -1,5 +1,5 @@
-<%@page import="jp.kigami.ojt.form.WorkRegisterViewForm"%>
-<%@page import="jp.kigami.ojt.common.util.ConstantDef"%>
+<%@page import="jp.co.alpha.kgmwmr.form.WorkRegisterViewForm"%>
+<%@page import="jp.co.alpha.kgmwmr.common.util.ConstantDef"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <!DOCTYPE html>
