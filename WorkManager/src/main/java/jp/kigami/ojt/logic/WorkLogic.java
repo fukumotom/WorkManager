@@ -350,27 +350,35 @@ public class WorkLogic {
 
 			if (inputWork.getId() == 0) {
 				// 別の操作で作業が追加されていた場合
-				throw new BusinessException("仕掛処理があります");
+				throw new BusinessException("作業が開始されています");
 			}
 
-			// 表示されている仕掛処理を終了、終了
-			Work finishWork = workList.get(0);
+			// DBに登録されている仕掛処理を取得
+			Work dbWorking = workList.get(0);
 
 			// 画面表示の仕掛作業を取得
 			Work viewWorking = getFinishWork(inputWork.getUserName(),
 					inputWork.getId());
 
-			// 終了時間を設定
-			finishWork.setEndTime(DateUtils.getNowTime());
-			// 作業時間計算
-			calcWorkTime(finishWork);
+			if (dbWorking.getId() == viewWorking.getId()) {
+				// 画面情報とDB情報が一致。処理を終了する
 
-			// 作業終了処理
-			dao.finishWork(finishWork);
+				// 終了時間を設定
+				viewWorking.setEndTime(DateUtils.getNowTime());
+				// 作業時間計算
+				calcWorkTime(viewWorking);
+				dao.finishWork(viewWorking);
+				// 作業開始
+				dao.startWork(inputWork);
+
+			} else {
+				throw new BusinessException("別の作業が開始されています");
+			}
+		} else {
+			// 仕掛り処理なしの場合
+			// 作業開始
+			dao.startWork(inputWork);
 		}
-
-		// 作業開始
-		dao.startWork(inputWork);
 	}
 
 	/**
