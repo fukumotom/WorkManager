@@ -363,4 +363,31 @@ public class WorkDao {
 
 		CommonDbUtil.copyWork(sql.toString(), paramMap);
 	}
+	
+	/**
+	 * 画面から指定した作業を取得するSQL発行
+	 * 
+	 * @param inputWork
+	 * @return
+	 */
+	public Work getSelectWork(Work work) {
+
+		// load SQLfile
+		StringBuilder sql = CommonDbUtil.readSql("getSelectWork.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(work, dto);
+
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
+
+		WorkDto resultDto = CommonDbUtil.findOne(sql.toString(), paramMap,
+				WorkDto.class);
+
+		// modelに詰め替え
+		Work outputWork = new Work();
+		CommonDbUtil.beanMaping(resultDto, outputWork);
+
+		return outputWork;
+	}
 }
