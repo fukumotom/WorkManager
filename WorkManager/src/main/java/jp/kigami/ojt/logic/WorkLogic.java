@@ -164,7 +164,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 仕掛作業取得
+	 * 仕掛作業取得（コネクションは呼び元でオープン）
 	 * 
 	 * @param inputWork
 	 * @return
@@ -192,34 +192,87 @@ public class WorkLogic {
 			throw new SystemException("不正な入力");
 		}
 
-		Work inputWork = new Work();
-		// ユーザ名を設定
-		inputWork.setUserName(userName);
-		// IDを設定
-		inputWork.setId(Integer.valueOf(deleteId));
+		// 画面表示用情報
+		WorkRegisterViewForm viewForm;
 
-		// 終了時間を設定
-		inputWork.setEndTime(DateUtils.getNowTime());
+		try {
+			// トランザクション管理設定
+			CommonDbUtil.openConnection(false);
 
-		// 開始時間を設定
-		LocalTime startTime = getStartTime(inputWork);
-		inputWork.setStartTime(DateUtils.getParseTime(startTime));
+			Work finishWork = getFinishWork(userName, Integer.valueOf(deleteId));
 
-		// 作業時間を計算
-		WorkHelper helper = new WorkHelper();
-		helper.calcWorkTime(inputWork);
+			// 作業終了処理
+			WorkDao dao = new WorkDao();
+			dao.finishWork(finishWork);
 
-		WorkDao dao = new WorkDao();
-		dao.finishWork(inputWork);
+			viewForm = getWorkRegisterViewForm(userName);
 
-		return getWorkRegisterViewForm(userName);
+			// コミット
+			CommonDbUtil.commit();
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
+		return viewForm;
 	}
 
 	/**
-	 * 作業開始処理 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
+	 * 完了する作業情報を取得
+	 *
+	 * @param userName
+	 * @param deleteId
+	 * @return
+	 * @throws BusinessException
+	 */
+	private Work getFinishWork(String userName, Integer deleteId)
+			throws BusinessException {
+
+		Work inputWork = new Work();
+		inputWork.setId(deleteId);
+		inputWork.setUserName(userName);
+
+		WorkDao dao = new WorkDao();
+		Work finishWork = dao.getSelectWork(inputWork);
+		// 取得した作業チェック
+		if (finishWork.isDelete()) {
+			throw new BusinessException("すでに削除されています");
+		} else if (finishWork.getEndTime() != null) {
+			throw new BusinessException("すでに終了しています");
+		}
+
+		// 終了時間を設定
+		finishWork.setEndTime(DateUtils.getNowTime());
+		// 作業時間計算
+		calcWorkTime(finishWork);
+
+		return finishWork;
+	}
+
+	/**
+	 * 作業時間の計算処理
+	 * 
+	 * @param work
+	 */
+	public void calcWorkTime(Work work) {
+
+		LocalTime startTime = DateUtils.getParseTime(work.getStartTime());
+		logger.info("開始時間:{}", startTime);
+
+		LocalTime endTime = DateUtils.getParseTime(work.getEndTime());
+		LocalTime calcTime = endTime.minusHours(startTime.getHour());
+		LocalTime workingTime = calcTime.minusMinutes(startTime.getMinute());
+		work.setWorkingTime(DateUtils.getParseTime(workingTime));
+		logger.info("作業時間:{}", work.getWorkingTime());
+	}
+
+
+	/**
+	 * 作業開始処理<br>
+	 * 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
-	 * 
 	 * @param registerForm
 	 * @return
 	 * @throws BusinessException
@@ -227,31 +280,54 @@ public class WorkLogic {
 	public WorkRegisterViewForm register(String userName,
 			WorkRegisterForm registerForm) throws BusinessException {
 
-		WorkRegisterViewForm form = getWorkRegisterViewForm(userName);
+		WorkRegisterViewForm form;
 
-		// 入力チェック
-		ValidationResult result = inputCheckWhenStart(registerForm);
-		if (!result.isCheckResult()) {
+		try {
 
-			// 入力チェックエラーの場合、エラーメッセージを設定
-			form.setErrMsgs(result.getErrorMsgs());
-		} else {
+			// 入力チェック
+			ValidationResult result = inputCheckWhenStart(registerForm);
+			if (!result.isCheckResult()) {
 
-			// 入力チェックOKの場合
-			Work inputWork = new Work();
+				CommonDbUtil.openConnection();
 
-			// 登録情報を設定
-			inputWork.setUserName(userName);
-			if (!registerForm.getId().isEmpty()) {
-				inputWork.setId(Integer.valueOf(registerForm.getId()));
+				// 画面表示用情報
+				form = getWorkRegisterViewForm(userName);
+				// 入力チェックエラーの場合、エラーメッセージを設定
+				form.setErrMsgs(result.getErrorMsgs());
+
+			} else {
+
+				// 入力チェックOKの場合
+				Work inputWork = new Work();
+
+				// 登録情報を設定
+				inputWork.setUserName(userName);
+				if (!registerForm.getId().isEmpty()) {
+					// 仕掛り作業のIDを設定
+					inputWork.setId(Integer.valueOf(registerForm.getId()));
+				}
+				inputWork.setStartTime(DateUtils.getFomatTime(registerForm
+						.getStartTime()));
+				inputWork.setContents(registerForm.getContents());
+				inputWork.setNote(registerForm.getNote());
+
+				// トランザクション管理設定
+				CommonDbUtil.openConnection(false);
+
+				// 作業開始の 同期処理
+				workRegiste(inputWork);
+
+				// 画面表示用情報
+				form = getWorkRegisterViewForm(userName);
+
+				// コミット
+				CommonDbUtil.commit();
+
 			}
-			inputWork.setStartTime(DateUtils.getFomatTime(registerForm
-					.getStartTime()));
-			inputWork.setContents(registerForm.getContents());
-			inputWork.setNote(registerForm.getNote());
 
-			// 作業開始の 同期処理
-			workRegiste(inputWork);
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
 		}
 
 		return form;
@@ -268,15 +344,32 @@ public class WorkLogic {
 
 		// 仕掛処理確認
 		List<Work> workList = findWorking(inputWork);
+		WorkDao dao = new WorkDao();
 
 		if (workList.size() == 1) {
-			// 仕掛処理がある場合、終了
-			finishWork(inputWork.getUserName(), workList.get(0).getId()
-					.toString());
+
+			if (inputWork.getId() == 0) {
+				// 別の操作で作業が追加されていた場合
+				throw new BusinessException("仕掛処理があります");
+			}
+
+			// 表示されている仕掛処理を終了、終了
+			Work finishWork = workList.get(0);
+
+			// 画面表示の仕掛作業を取得
+			Work viewWorking = getFinishWork(inputWork.getUserName(),
+					inputWork.getId());
+
+			// 終了時間を設定
+			finishWork.setEndTime(DateUtils.getNowTime());
+			// 作業時間計算
+			calcWorkTime(finishWork);
+
+			// 作業終了処理
+			dao.finishWork(finishWork);
 		}
 
 		// 作業開始
-		WorkDao dao = new WorkDao();
 		dao.startWork(inputWork);
 	}
 
