@@ -40,11 +40,11 @@ public class WorkRegistServlet extends HttpServlet {
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkRegistServlet.class);
 
-	/*
+	/**
 	 * 作業登録画面表示用
 	 * 
 	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.
-	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
+	 *      HttpServletRequest , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -56,7 +56,7 @@ public class WorkRegistServlet extends HttpServlet {
 
 		// 画面表示データ取得
 		WorkLogic logic = new WorkLogic();
-		WorkRegisterViewForm form = logic.getWorkRegisterViewForm(userName);
+		WorkRegisterViewForm form = logic.getViewdata(userName);
 
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
@@ -70,11 +70,11 @@ public class WorkRegistServlet extends HttpServlet {
 		}
 	}
 
-	/*
+	/**
 	 * 作業登録画面更新用
 	 * 
 	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.
-	 * HttpServletRequest , javax.servlet.http.HttpServletResponse)
+	 *      HttpServletRequest , javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
 	public void doPost(HttpServletRequest request,

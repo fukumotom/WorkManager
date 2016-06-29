@@ -170,7 +170,7 @@ public class CommonDbUtil {
 	}
 
 	/**
-	 * <<<<<<< badd70301fc9e3116021ba20376462bd2e16d92b JNDIによりデータソースを取得
+	 * JNDIによりデータソースを取得
 	 * 
 	 * @return
 	 */
@@ -189,7 +189,7 @@ public class CommonDbUtil {
 	}
 
 	/**
-	 * ======= >>>>>>> addtion transaction manage #107 SQL発行パラメータ作成
+	 * SQL発行パラメータ作成
 	 * 
 	 * @param <T>
 	 * 
@@ -434,8 +434,8 @@ public class CommonDbUtil {
 			Map<Integer, Object> paramMap) {
 
 		int resultCnt = 0;
-		try (Connection con = connectionMap.get(getConnectionId());
-				PreparedStatement pstm = con.prepareStatement(sql)) {
+		Connection con = connectionMap.get(getConnectionId());
+		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			bindParam(pstm, paramMap);
 			resultCnt = pstm.executeUpdate();
@@ -460,8 +460,8 @@ public class CommonDbUtil {
 			Map<Integer, Object> paramMap, Class<T> dtoClass) {
 
 		List<T> dtoList = new ArrayList<>();
-		try (Connection con = connectionMap.get(getConnectionId());
-				PreparedStatement pstm = con.prepareStatement(sql);) {
+		Connection con = connectionMap.get(getConnectionId());
+		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
