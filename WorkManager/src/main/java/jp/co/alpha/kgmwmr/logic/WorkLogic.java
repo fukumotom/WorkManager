@@ -414,4 +414,25 @@ public class WorkLogic {
 
 		dao.insert(inputWork);
 	}
+	
+	/**
+	 * CSVエクスポート処理 TODO form対応未 出力情報を画面に返して再表示
+	 * 
+	 * @param inputWork
+	 */
+	public void csvExport(Work inputWork) {
+
+		// エクスポートするデータを取得
+		WorkDao dao = new WorkDao();
+
+		// 検索条件から出力する条件（作業日付、削除含む） TODO SQL修正必要
+		List<Work> exportWorkList = dao.findAllWork(inputWork);
+
+		String fileName = DateUtils.formatCsvDate(inputWork.getWorkDate())
+				+ "_workList.csv";
+		File csvFile = new File(fileName);
+		// タイトルを追記
+		// 内容追記
+
+	}
 }
