@@ -56,9 +56,84 @@ public class CommonDbUtil {
 			.getClassLoader();
 
 	/**
+	 * コネクションマップ
+	 */
+	private static Map<String, Connection> connectionMap = new HashMap<>();
+
+	/**
 	 * プライベートコンストラクタ
 	 */
 	private CommonDbUtil() {
+	}
+
+	/**
+	 * JNDIからコネクションを取得し、コネクションmapにスレッドと紐づけて格納する<br>
+	 * オートコミット：OFF
+	 * 
+	 * @param isAutoCommit
+	 */
+	public static void openConnection(boolean isAutoCommit) {
+
+		String connectionId = getConnectionId();
+
+		DataSource ds = null;
+		Connection con = null;
+		try {
+			Context context = new InitialContext();
+
+			// JNDI経由でコネクションを取得
+			ds = (DataSource) context.lookup("db.look.up.name");
+			con = ds.getConnection();
+			con.setAutoCommit(isAutoCommit);
+			connectionMap.put(connectionId, con);
+		} catch (NamingException | SQLException e) {
+			logger.error("JNDI接続エラー:{}", e);
+			throw new SystemException(e);
+		}
+	}
+
+	/**
+	 * JNDIからコネクションを取得し、コネクションmapにスレッドと紐づけて格納する<br>
+	 * オートコミット：ON
+	 * 
+	 */
+	public static void openConnection() {
+		openConnection(true);
+	}
+
+	/**
+	 * コネクションに紐づくスレッドIDを生成
+	 * 
+	 * @return
+	 */
+	private static String getConnectionId() {
+		return Thread.currentThread().getId() + ":"
+				+ Thread.currentThread().getName();
+	}
+
+	/**
+	 * コミット
+	 */
+	public static void commit() {
+		try {
+			connectionMap.get(getConnectionId()).commit();
+		} catch (SQLException e) {
+			throw new SystemException(e);
+		}
+	}
+
+	/**
+	 * コネクションをコネクションMapから削除してクローズする
+	 */
+	public static void closeConnection() {
+		Connection con = connectionMap.remove(getConnectionId());
+		if (con != null) {
+			try {
+				con.close();
+			} catch (SQLException e) {
+				logger.warn("DBコネクションクローズ時に失敗:{}", e);
+			}
+		}
 	}
 
 	/**
@@ -216,7 +291,7 @@ public class CommonDbUtil {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static <T> List<T> resultSetToDtoList(ResultSet result,
+	public static <T> List<T> resultSetToWorkDtoList(ResultSet result,
 			Class<T> dtoClass) throws SQLException {
 
 		HashMap<String, String> clmNameMap = new HashMap<String, String>();
@@ -227,7 +302,7 @@ public class CommonDbUtil {
 			clmNameMap.put(meta.getColumnLabel(i), meta.getColumnClassName(i));
 		}
 
-		List<T> dtoList = new ArrayList<>();
+		ArrayList<T> dtoList = new ArrayList<>();
 
 		while (result.next()) {
 			T dto;
@@ -358,10 +433,9 @@ public class CommonDbUtil {
 	public static int getDbResultCnt(String sql,
 			Map<Integer, Object> paramMap) {
 
-		DataSource ds = lookup();
 		int resultCnt = 0;
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql)) {
+		Connection con = connectionMap.get(getConnectionId());
+		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			bindParam(pstm, paramMap);
 			resultCnt = pstm.executeUpdate();
@@ -386,9 +460,8 @@ public class CommonDbUtil {
 			Map<Integer, Object> paramMap, Class<T> dtoClass) {
 
 		List<T> dtoList = new ArrayList<>();
-		DataSource ds = lookup();
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
+		Connection con = connectionMap.get(getConnectionId());
+		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
@@ -397,7 +470,7 @@ public class CommonDbUtil {
 			ResultSet result = pstm.executeQuery();
 
 			// マッピング
-			dtoList = resultSetToDtoList(result, dtoClass);
+			dtoList = resultSetToWorkDtoList(result, dtoClass);
 
 		} catch (SQLException e) {
 			logger.error("DB接続失敗", e);
@@ -435,10 +508,9 @@ public class CommonDbUtil {
 	 */
 	public static int updata(String sql, HashMap<Integer, Object> paramMap) {
 
-		DataSource ds = lookup();
 		int resultCnt = 0;
-		try (Connection con = ds.getConnection();
-				PreparedStatement pstm = con.prepareStatement(sql);) {
+		Connection con = connectionMap.get(getConnectionId());
+		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
 
