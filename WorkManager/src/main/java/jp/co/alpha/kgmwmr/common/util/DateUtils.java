@@ -6,11 +6,16 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 /**
+<<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911
  * DateUtils
  * @author kigami
  *
  */
 /**
+ * ======= 日時操作ユーティリティ
+ * 
+ * >>>>>>> add javadoc and format method in dateutils #103
+ * 
  * @author kigami
  *
  */
@@ -29,24 +34,32 @@ public class DateUtils {
 			.ofPattern("HH:mm");
 
 	/**
+	 * CSVファイル名用日付フォーマット
+	 */
+	private static final DateTimeFormatter csvFileNameFormatter = DateTimeFormatter
+			.ofPattern("yyyyMMdd");
+
+	/**
 	 * プライベートコンストラクタ
 	 */
 	private DateUtils() {
 	}
 
 	/**
-	 * 今日の日付取得
+	 * 現在日付を取得
 	 * 
-	 * @return 今日の日付文字列
+	 * @return 現在の日付文字列
 	 */
 	public static String getTodayStr() {
 		return LocalDate.now().format(DATEFORMATTER);
 	}
 
 	/**
-	 * 現在時間（文字列）取得
+	 * <<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911 現在時間（文字列）取得
 	 * 
-	 * @return 現在時間
+	 * @return 現在時間 ======= 現在時間を文字列で取得
+	 * 
+	 * @return >>>>>>> add javadoc and format method in dateutils #103
 	 */
 	public static String getNowTimeStr() {
 		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS)
@@ -54,9 +67,11 @@ public class DateUtils {
 	}
 
 	/**
-	 * 現在時間取得
+	 * <<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911 現在時間取得
 	 * 
-	 * @return 現在時間
+	 * @return 現在時間 ======= 現在時間を秒切り捨てで取得
+	 * 
+	 * @return >>>>>>> add javadoc and format method in dateutils #103
 	 */
 	public static LocalTime getNowTime() {
 		String now = LocalTime.now().format(TIMEFORMATTER);
@@ -64,7 +79,7 @@ public class DateUtils {
 	}
 
 	/**
-	 * 秒切り捨て時間の取得
+	 * 時間を秒切り捨てで取得
 	 * 
 	 * @param time
 	 *            時間
@@ -92,8 +107,9 @@ public class DateUtils {
 	 * 日付フォーマット
 	 * 
 	 * @param localDate
-	 *            フォーマット対象
-	 * @return yyyy/M/d形式の日付
+	 *            <<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911 フォーマット対象
+	 * @return yyyy/M/d形式の日付 =======
+	 * @return >>>>>>> add javadoc and format method in dateutils #103
 	 */
 	public static String formatDate(LocalDate localDate) {
 
@@ -121,6 +137,17 @@ public class DateUtils {
 	 */
 	public static LocalDate getParseDate(String date) {
 		return LocalDate.parse(date, DATEFORMATTER);
+	}
+
+	/**
+	 * csvファイル名用時間フォーマット
+	 * 
+	 * @param time
+	 * @return
+	 */
+	public static String csvFormatTime(LocalTime time) {
+
+		return time.format(csvFileNameFormatter);
 	}
 
 }
