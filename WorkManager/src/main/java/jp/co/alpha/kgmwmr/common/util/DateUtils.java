@@ -6,15 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
 /**
-<<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911
- * DateUtils
- * @author kigami
- *
- */
-/**
- * ======= 日時操作ユーティリティ
- * 
- * >>>>>>> add javadoc and format method in dateutils #103
+ * 日時操作ユーティリティ
  * 
  * @author kigami
  *
@@ -55,11 +47,9 @@ public class DateUtils {
 	}
 
 	/**
-	 * <<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911 現在時間（文字列）取得
+	 * 現在時間（文字列）取得
 	 * 
-	 * @return 現在時間 ======= 現在時間を文字列で取得
-	 * 
-	 * @return >>>>>>> add javadoc and format method in dateutils #103
+	 * @return 現在時間（文字列）
 	 */
 	public static String getNowTimeStr() {
 		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS)
@@ -67,23 +57,18 @@ public class DateUtils {
 	}
 
 	/**
-	 * <<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911 現在時間取得
+	 * 現在時間(秒切り捨て)取得
 	 * 
-	 * @return 現在時間 ======= 現在時間を秒切り捨てで取得
-	 * 
-	 * @return >>>>>>> add javadoc and format method in dateutils #103
+	 * @return 現在時間(秒切り捨て)
 	 */
 	public static LocalTime getNowTime() {
-		String now = LocalTime.now().format(TIMEFORMATTER);
-		return LocalTime.parse(now).truncatedTo(ChronoUnit.SECONDS);
+		return truncatedTime(LocalTime.now());
 	}
 
 	/**
-	 * 時間を秒切り捨てで取得
+	 * 時間(秒切り捨て)取得
 	 * 
-	 * @param time
-	 *            時間
-	 * @return HH:ｍｍ形式の時間
+	 * @return HH:mm形式の時間
 	 */
 	public static LocalTime truncatedTime(LocalTime time) {
 
@@ -94,9 +79,7 @@ public class DateUtils {
 	/**
 	 * 文字列をLocalTime型に変換
 	 * 
-	 * @param time
-	 *            時間文字列
-	 * @return HH:mm 時間
+	 * @return HH:mm形式の時間
 	 */
 	public static LocalTime getParseTime(String time) {
 
@@ -107,9 +90,8 @@ public class DateUtils {
 	 * 日付フォーマット
 	 * 
 	 * @param localDate
-	 *            <<<<<<< 4d34a3ce0c44d12073067ca79ff47abda3ebb911 フォーマット対象
-	 * @return yyyy/M/d形式の日付 =======
-	 * @return >>>>>>> add javadoc and format method in dateutils #103
+	 *            フォーマット対象
+	 * @return yyyy/M/d形式の日付
 	 */
 	public static String formatDate(LocalDate localDate) {
 
@@ -143,10 +125,11 @@ public class DateUtils {
 	 * csvファイル名用時間フォーマット
 	 * 
 	 * @param time
-	 * @return
+	 *            出力する作業リストの表示時間
+	 * @return CSVファイル名
 	 */
-	public static String csvFormatDate(LocalDate date) {
+	public static String csvFormatTime(LocalTime time) {
 
-		return date.format(csvFileNameFormatter);
+		return time.format(csvFileNameFormatter);
 	}
 }
