@@ -60,6 +60,8 @@ public class CommonDbUtil {
 	 */
 	private static Map<String, Connection> connectionMap = new HashMap<>();
 
+	private static final String LOOK_UP_DB = "db.look.up.name";
+
 	/**
 	 * プライベートコンストラクタ
 	 */
@@ -82,7 +84,8 @@ public class CommonDbUtil {
 			Context context = new InitialContext();
 
 			// JNDI経由でコネクションを取得
-			ds = (DataSource) context.lookup("db.look.up.name");
+			ds = (DataSource) context
+					.lookup(PropertyUtils.getValue(LOOK_UP_DB));
 			con = ds.getConnection();
 			con.setAutoCommit(isAutoCommit);
 			connectionMap.put(connectionId, con);
