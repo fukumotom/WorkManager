@@ -85,7 +85,7 @@ public class InputValidation {
 
 		boolean result = true;
 		try {
-			DateUtils.getFomatTime(target);
+			DateUtils.formatLocalTime(target);
 		} catch (DateTimeException e) {
 			result = false;
 		}

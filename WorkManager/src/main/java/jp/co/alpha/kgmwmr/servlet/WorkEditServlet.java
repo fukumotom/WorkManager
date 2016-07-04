@@ -41,8 +41,8 @@ public class WorkEditServlet extends HttpServlet {
 		logger.info("入力値：開始時間[{}] 終了時間[{}] 作業内容[{}] 備考[{}]", startTime, endTime,
 				contents, note);
 
-		inputWork.setStartTime(DateUtils.getFomatTime(startTime));
-		inputWork.setEndTime(DateUtils.getFomatTime(endTime));
+		inputWork.setStartTime(DateUtils.formatLocalTime(startTime));
+		inputWork.setEndTime(DateUtils.formatLocalTime(endTime));
 		inputWork.setContents(contents);
 		inputWork.setNote(note);
 
