@@ -1,5 +1,10 @@
 package jp.co.alpha.kgmwmr.logic;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -38,6 +43,50 @@ public class WorkLogic {
 	 * ロガー
 	 */
 	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
+
+	/**
+	 * CSV出力タイトル
+	 */
+	private static final String[] csvTitles = {"開始時間", "終了時間", "作業時間", "作業内容",
+			"備考"};
+
+	/**
+	 * CSV区切り文字
+	 */
+	private static final String CSV_DELIMITER = ",";
+
+	/**
+	 * CSV出力文字コード
+	 */
+	private static final String CSV_CHARSET = "Shift_JIS";
+
+	/**
+	 * CSV改行
+	 */
+	private static final String NEW_LINE = "\n";
+
+	/**
+	 * 作業リスト表示データ取得
+	 * 
+	 * @param work
+	 * @return
+	 */
+	public List<Work> findAllWork(Work work) {
+
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			List<Work> workList = dao.findAllWork(work);
+			return workList;
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
+	}
 
 	/**
 	 * 作業挿入処理
@@ -554,6 +603,7 @@ public class WorkLogic {
 				}
 				inputWork.setStartTime(
 						DateUtils.getParseTime(registerForm.getStartTime()));
+
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
 
@@ -901,5 +951,80 @@ public class WorkLogic {
 			targetList = dao.findAllNote(inputWork);
 		}
 		return targetList;
+	}
+
+	/**
+	 * CSVエクスポート処理
+	 * 
+	 * @param inputWork
+	 * @throws BusinessException
+	 */
+	public void csvExport(Work inputWork) throws BusinessException {
+
+		// 検索条件から日付を取得
+		String fileName = DateUtils.csvFormatDate(inputWork.getWorkDate())
+				+ "_workList.csv";
+		File csvFile = new File(fileName);
+
+		List<Work> dataList;
+		try {
+			// トランザクション管理設定
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			dataList = dao.findAllWork(inputWork);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
+		try (FileOutputStream fw = new FileOutputStream(csvFile);
+				OutputStreamWriter outsw = new OutputStreamWriter(fw,
+						Charset.forName(CSV_CHARSET));) {
+
+			logger.debug("作成ファイルのパス:{}", csvFile.getAbsolutePath());
+
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < csvTitles.length; i++) {
+				sb.append("\"" + csvTitles[i] + "\"");
+				// 行の最後はカンマを付けない
+				if (i != csvTitles.length - 1) {
+					sb.append(CSV_DELIMITER);
+				}
+			}
+			sb.append(NEW_LINE);
+
+			// 内容を出力
+			for (Work data : dataList) {
+				String startTime = DateUtils.formatTime(data.getStartTime())
+						.replaceAll("\"", "\"\"");
+				sb.append("\"" + startTime + "\"").append(CSV_DELIMITER);
+
+				String endTime = DateUtils.formatTime(data.getEndTime())
+						.replaceAll("\"", "\"\"");
+				sb.append("\"" + endTime + "\"").append(CSV_DELIMITER);
+
+				String WorkingTime = DateUtils.formatTime(data.getWorkingTime())
+						.replaceAll("\"", "\"\"");
+				sb.append("\"" + WorkingTime + "\"").append(CSV_DELIMITER);
+
+				// ""（引用符）がある場合、CSV出力用にエスケープする。
+				String Contents = data.getContents().replaceAll("\"", "\"\"");
+				sb.append("\"" + Contents + "\"").append(CSV_DELIMITER);
+
+				// ""（引用符）がある場合、CSV出力用にエスケープする。
+				String note = data.getNote().replaceAll("\"", "\"\"");
+				sb.append("\"" + note + "\"").append(CSV_DELIMITER);
+				// 行の改行を追加
+				sb.append(NEW_LINE);
+			}
+
+			outsw.write(sb.toString());
+			outsw.flush();
+
+		} catch (IOException e) {
+			throw new BusinessException(e, "CSV作成に失敗");
+		}
 	}
 }
