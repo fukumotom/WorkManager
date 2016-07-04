@@ -128,8 +128,8 @@ public class DateUtils {
 	 *            出力する作業リストの表示時間
 	 * @return CSVファイル名
 	 */
-	public static String csvFormatTime(LocalTime time) {
+	public static String csvFormatDate(LocalDate date) {
 
-		return time.format(csvFileNameFormatter);
+		return date.format(csvFileNameFormatter);
 	}
 }
