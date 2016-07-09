@@ -1001,13 +1001,24 @@ public class WorkLogic {
 						.replaceAll("\"", "\"\"");
 				sb.append("\"" + startTime + "\"").append(CSV_DELIMITER);
 
-				String endTime = DateUtils.formatTime(data.getEndTime())
-						.replaceAll("\"", "\"\"");
-				sb.append("\"" + endTime + "\"").append(CSV_DELIMITER);
+				// 終了時間は値があるときのみ出力
+				if (data.getEndTime() != null) {
+					String endTime = DateUtils.formatTime(data.getEndTime())
+							.replaceAll("\"", "\"\"");
+					sb.append("\"" + endTime + "\"").append(CSV_DELIMITER);
+				} else {
+					sb.append(CSV_DELIMITER);
+				}
 
-				String WorkingTime = DateUtils.formatTime(data.getWorkingTime())
-						.replaceAll("\"", "\"\"");
-				sb.append("\"" + WorkingTime + "\"").append(CSV_DELIMITER);
+				// 作業時間は値があるときのみ出力
+				if (data.getWorkingTime() != null) {
+					String WorkingTime = DateUtils
+							.formatTime(data.getWorkingTime())
+							.replaceAll("\"", "\"\"");
+					sb.append("\"" + WorkingTime + "\"").append(CSV_DELIMITER);
+				} else {
+					sb.append(CSV_DELIMITER);
+				}
 
 				// ""（引用符）がある場合、CSV出力用にエスケープする。
 				String Contents = data.getContents().replaceAll("\"", "\"\"");
