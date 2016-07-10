@@ -419,7 +419,8 @@ public class WorkDao {
 		WorkDto dto = new WorkDto();
 		CommonDbUtil.beanMaping(inputWork, dto);
 
-		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
+				dto);
 
 		CommonDbUtil.updata(sql.toString(), paramMap);
 

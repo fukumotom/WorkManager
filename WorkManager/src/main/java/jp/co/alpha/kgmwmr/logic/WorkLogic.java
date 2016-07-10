@@ -98,7 +98,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ再取得(削除済みリストに追加はなし)
-		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
+				inputWork.getWorkDate(), false);
 		return viewForm;
 	}
 
@@ -109,7 +110,8 @@ public class WorkLogic {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public WorkListViewForm delete(WorkListForm inputForm) throws BusinessException {
+	public WorkListViewForm delete(WorkListForm inputForm)
+			throws BusinessException {
 
 		// 作業削除データ設定
 		Work inputWork = new Work();
@@ -134,7 +136,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ再取得(削除済みリストはもう削除しない)
-		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
+				inputWork.getWorkDate(), false);
 		return viewForm;
 	}
 
@@ -243,7 +246,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ取得(保存後は当日のデータを表示)
-		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
+				inputWork.getWorkDate(), false);
 		return viewForm;
 	}
 
@@ -363,7 +367,8 @@ public class WorkLogic {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public WorkRegisterViewForm finishWork(String userName, String deleteId) throws BusinessException {
+	public WorkRegisterViewForm finishWork(String userName, String deleteId)
+			throws BusinessException {
 
 		// 入力(id)チェック
 		if (!InputValidation.idCheck(deleteId)) {
@@ -405,7 +410,8 @@ public class WorkLogic {
 	 * @return
 	 * @throws BusinessException
 	 */
-	private Work getFinishWork(String userName, Integer deleteId) throws BusinessException {
+	private Work getFinishWork(String userName, Integer deleteId)
+			throws BusinessException {
 
 		// 取得する作業条件を設定
 		Work inputWork = new Work();
@@ -456,7 +462,8 @@ public class WorkLogic {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public WorkRegisterViewForm register(String userName, WorkRegisterForm registerForm) throws BusinessException {
+	public WorkRegisterViewForm register(String userName,
+			WorkRegisterForm registerForm) throws BusinessException {
 
 		WorkRegisterViewForm form;
 
@@ -517,7 +524,8 @@ public class WorkLogic {
 	 * @param inputWork
 	 * @throws BusinessException
 	 */
-	private synchronized void workRegiste(Work inputWork) throws BusinessException {
+	private synchronized void workRegiste(Work inputWork)
+			throws BusinessException {
 
 		// 仕掛処理確認
 		List<Work> workList = findWorking(inputWork);
@@ -533,7 +541,8 @@ public class WorkLogic {
 			Work dbWorking = workList.get(0);
 
 			// 画面表示の仕掛作業を取得
-			Work viewWorking = getFinishWork(inputWork.getUserName(), inputWork.getId());
+			Work viewWorking = getFinishWork(inputWork.getUserName(),
+					inputWork.getId());
 
 			if (dbWorking.getId().equals(viewWorking.getId())) {
 				// 画面情報とDB情報が一致。処理を終了する
@@ -567,7 +576,8 @@ public class WorkLogic {
 
 		boolean validationChek = false;
 
-		logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", form.getStartTime(), form.getContents(), form.getNote());
+		logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", form.getStartTime(),
+				form.getContents(), form.getNote());
 
 		// idチェック
 		String id = form.getId();
@@ -578,7 +588,8 @@ public class WorkLogic {
 		// 開始時間チェック
 		String startTime = form.getStartTime();
 		if (startTime == null) {
-			throw new SystemException(PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		}
 		if (!startTime.isEmpty()) {
 			// フォーマットチェック
@@ -598,7 +609,8 @@ public class WorkLogic {
 		// 作業内容
 		String contents = form.getContents();
 		if (contents == null) {
-			throw new SystemException(PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		} else {
 			// サイズチェック
 			validationChek = InputValidation.inputSize(contents, 0, 40);
@@ -632,7 +644,8 @@ public class WorkLogic {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public WorkListViewForm history(WorkListForm inputForm) throws BusinessException {
+	public WorkListViewForm history(WorkListForm inputForm)
+			throws BusinessException {
 
 		String workDateStr = inputForm.getWorkDate();
 		logger.info("入力日付:{}", workDateStr);
@@ -653,10 +666,12 @@ public class WorkLogic {
 		deleteUnSaveWork(userName);
 
 		// 削除反映
-		boolean delete = ConstantDef.DELETE_CHECK_ON.equals(inputForm.getDeleteCechk());
+		boolean delete = ConstantDef.DELETE_CHECK_ON
+				.equals(inputForm.getDeleteCechk());
 
 		// 画面表示データ再取得
-		WorkListViewForm viewForm = getWorkListViewForm(userName, workDate, delete);
+		WorkListViewForm viewForm = getWorkListViewForm(userName, workDate,
+				delete);
 		return viewForm;
 	}
 
@@ -667,7 +682,8 @@ public class WorkLogic {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public WorkListViewForm addWork(WorkListForm inputForm) throws BusinessException {
+	public WorkListViewForm addWork(WorkListForm inputForm)
+			throws BusinessException {
 
 		// form情報を処理用モデルに設定
 		Work inputWork = new Work();
@@ -699,7 +715,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ再取得(削除済みリストに追加はなし)
-		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
+				inputWork.getWorkDate(), false);
 		return viewForm;
 	}
 
@@ -775,5 +792,17 @@ public class WorkLogic {
 		editForm.setNote(work.getNote());
 
 		return editForm;
+	}
+
+	/**
+	 * 編集用作業リスト複製処理
+	 * 
+	 * @param inputWork
+	 */
+	public void copyTodayWork(Work inputWork) {
+
+		WorkDao dao = new WorkDao();
+		dao.copyTodayWork(inputWork);
+
 	}
 }
