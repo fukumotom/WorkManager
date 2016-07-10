@@ -627,4 +627,16 @@ public class WorkLogic {
 			CommonDbUtil.closeConnection();
 		}
 	}
+	
+ 	/**
+	 * 編集用作業リスト複製処理
+	 * 
+	 * @param inputWork
+	 */
+	public void copyTodayWork(Work inputWork) {
+
+		WorkDao dao = new WorkDao();
+		dao.copyTodayWork(inputWork);
+
+ 	}
 }

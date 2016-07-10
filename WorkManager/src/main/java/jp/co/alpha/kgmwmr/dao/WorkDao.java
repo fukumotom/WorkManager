@@ -289,7 +289,7 @@ public class WorkDao {
 	}
 
 	/**
-	 * 作業終了処理SQL発行
+	 * 作業削除処理SQL発行
 	 * 
 	 * @param inputWork
 	 * @throws BusinessException
@@ -375,5 +375,25 @@ public class WorkDao {
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 		logger.debug("{}件未保存データ削除しました", resultCnt);
 
+	}
+
+	/**
+	 * 今日の作業を未保存状態で複製するSQL発行
+	 * 
+	 * @param inputWork
+	 */
+	public void copyTodayWork(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("copyTodayWork.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(inputWork, dto);
+
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
+				dto);
+
+		CommonDbUtil.copyWork(sql.toString(), paramMap);
 	}
 }

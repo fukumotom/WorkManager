@@ -592,4 +592,28 @@ public class CommonDbUtil {
 		}
 		return value;
 	}
+
+	/**
+	 * 編集時の今日のデータを未保存状態で複製
+	 * 
+	 * @param sql
+	 * @param paramMap
+	 */
+	public static void copyWork(String sql, HashMap<Integer, Object> paramMap) {
+
+		DataSource ds = lookup();
+		try (Connection con = ds.getConnection();
+				PreparedStatement pstm = con.prepareStatement(sql)) {
+
+			logger.info("発行SQL：{}", sql);
+
+			bindParam(pstm, paramMap);
+
+			pstm.execute();
+
+		} catch (SQLException e) {
+			logger.error("複製処理失敗", e);
+			throw new SystemException(e);
+		}
+	}
 }
