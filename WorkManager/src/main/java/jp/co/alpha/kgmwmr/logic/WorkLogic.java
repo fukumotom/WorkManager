@@ -36,17 +36,17 @@ public class WorkLogic {
 	/**
 	 * 作業リスト表示データ取得
 	 * 
-	 * @param work
+	 * @param inputWork
 	 * @return
 	 */
-	public List<Work> findAllWork(Work work) {
+	public List<Work> findAllWork(Work inputWork) {
 
 		try {
 			// 接続開始
 			CommonDbUtil.openConnection();
 
 			WorkDao dao = new WorkDao();
-			List<Work> workList = dao.findAllWork(work);
+			List<Work> workList = dao.findAllWork(inputWork);
 			return workList;
 
 		} finally {
@@ -315,7 +315,8 @@ public class WorkLogic {
 			// トランザクション管理設定
 			CommonDbUtil.openConnection(false);
 
-			Work finishWork = getFinishWork(userName, Integer.valueOf(deleteId));
+			Work finishWork = getFinishWork(userName,
+					Integer.valueOf(deleteId));
 
 			// 作業終了処理
 			WorkDao dao = new WorkDao();
@@ -423,8 +424,8 @@ public class WorkLogic {
 					// 仕掛り作業がある場合、作業IDを設定
 					inputWork.setId(Integer.valueOf(registerForm.getId()));
 				}
-				inputWork.setStartTime(DateUtils.getFomatTime(registerForm
-						.getStartTime()));
+				inputWork.setStartTime(
+						DateUtils.getFomatTime(registerForm.getStartTime()));
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
 
@@ -527,15 +528,15 @@ public class WorkLogic {
 			// フォーマットチェック
 			validationChek = InputValidation.isTime(startTime);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(
-						MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
+				result.addErrorMsg(PropertyUtils
+						.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
 				result.setCheckResult(false);
 			}
 		} else {
 			// 入力チェック
 			result.setCheckResult(false);
-			result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT,
-					"開始時間"));
+			result.addErrorMsg(
+					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
 		}
 
 		// 作業内容
@@ -547,8 +548,8 @@ public class WorkLogic {
 			// サイズチェック
 			validationChek = InputValidation.inputSize(contents, 0, 40);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(
-						MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40"));
+				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
+						"作業内容", "0", "40"));
 				result.setCheckResult(false);
 			}
 		}
@@ -561,8 +562,8 @@ public class WorkLogic {
 			// サイズチェック
 			validationChek = InputValidation.inputSize(note, 0, 40);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(
-						MsgCodeDef.SIZE_ERROR, "備考", "0", "40"));
+				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
+						"備考", "0", "40"));
 				result.setCheckResult(validationChek);
 			}
 		}
