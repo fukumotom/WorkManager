@@ -957,9 +957,10 @@ public class WorkLogic {
 	 * CSVエクスポート処理
 	 * 
 	 * @param inputWork
+	 * @return
 	 * @throws BusinessException
 	 */
-	public void csvExport(Work inputWork) throws BusinessException {
+	public File csvExport(Work inputWork) throws BusinessException {
 
 		// 検索条件から日付を取得
 		String fileName = DateUtils.csvFormatDate(inputWork.getWorkDate())
@@ -997,26 +998,29 @@ public class WorkLogic {
 
 			// 内容を出力
 			for (Work data : dataList) {
+				// 時間は""で囲む
 				String startTime = DateUtils.formatTime(data.getStartTime())
 						.replaceAll("\"", "\"\"");
 				sb.append("\"" + startTime + "\"").append(CSV_DELIMITER);
 
-				// 終了時間は値があるときのみ出力
 				if (data.getEndTime() != null) {
+					// 時間は""で囲む
 					String endTime = DateUtils.formatTime(data.getEndTime())
 							.replaceAll("\"", "\"\"");
 					sb.append("\"" + endTime + "\"").append(CSV_DELIMITER);
 				} else {
+					// 未終了作業の終了時間は空白
 					sb.append(CSV_DELIMITER);
 				}
 
-				// 作業時間は値があるときのみ出力
 				if (data.getWorkingTime() != null) {
+					// 時間は""で囲む
 					String WorkingTime = DateUtils
 							.formatTime(data.getWorkingTime())
 							.replaceAll("\"", "\"\"");
 					sb.append("\"" + WorkingTime + "\"").append(CSV_DELIMITER);
 				} else {
+					// 未終了の作業時間は空白
 					sb.append(CSV_DELIMITER);
 				}
 
@@ -1037,5 +1041,7 @@ public class WorkLogic {
 		} catch (IOException e) {
 			throw new BusinessException(e, "CSV作成に失敗");
 		}
+
+		return csvFile;
 	}
 }

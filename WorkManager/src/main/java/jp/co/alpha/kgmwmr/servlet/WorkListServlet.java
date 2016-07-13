@@ -1,5 +1,9 @@
 package jp.co.alpha.kgmwmr.servlet;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 
@@ -137,7 +141,8 @@ public class WorkListServlet extends HttpServlet {
 				viewForm = logic.saveWork(inputForm);
 			} else if (request.getParameter("csvExportBtn") != null) {
 				logger.info("CSVエクスポート処理開始:");
-				logic.csvExport(inputWork);
+				File csvFile = logic.csvExport(inputWork);
+				download(response, csvFile);
 			} else {
 				// 編集
 				logger.info("編集処理開始:");
@@ -204,5 +209,48 @@ public class WorkListServlet extends HttpServlet {
 			form.setDeleteCechk(ConstantDef.DELETE_CHECK_OFF);
 		}
 		return form;
+	}
+
+	/**
+	 * CSVファイルダウンロード処理
+	 * 
+	 * @param response
+	 *            レスポンス情報
+	 * 
+	 * @param csvFile
+	 *            CSVファイル
+	 */
+	private void download(HttpServletResponse response, File csvFile) {
+
+		response.setContentType("application/octet-stream");
+		response.setContentLength((int) csvFile.length());
+		response.setHeader("Content-disposition",
+				"attachment; filename=\"" + csvFile.getName() + "\"");
+
+		// キャッシュの無効化
+		response.setHeader("Cache-Control",
+				"must-revalidate, post-check=0,pre-check=0");
+		// プロキシサーバーでのキャッシュ無効化
+		response.setHeader("Pragma", "private");
+
+		try (BufferedInputStream bufIn = new BufferedInputStream(
+				new FileInputStream(csvFile));
+				BufferedOutputStream bufOut = new BufferedOutputStream(
+						response.getOutputStream())) {
+
+			byte[] buf = new byte[1024];
+			int len;
+			// 1Kbyteずつファイルを読み込み
+			while ((len = bufIn.read(buf)) != -1) {
+				bufOut.write(buf, 0, len);
+			}
+			// 出力
+			bufOut.flush();
+
+		} catch (IOException e) {
+			// ヘッダーのリセット
+			response.reset();
+			throw new SystemException(e);
+		}
 	}
 }

@@ -63,12 +63,15 @@
 					style=${(empty form.workList)?'display:none':''} /></td>
 				<td><input type="submit" value="CSVエクスポート" name="csvExportBtn"
 					style=${(empty form.workList)?'display:none':''} /></td>
+				<td><input type="submit" value="CSVエクスポート" name="csvExportBtn"
+					style=${(empty form.workList)?'display:none':''} /></td>
 				<td><input type="checkbox" name="deleteFlg" /> 削除を含む <input
 					type="text" name="workDate" /> (yyyy/MM/dd) <input type="submit"
 					value="履歴" name="historyBtn" /></td>
+
+
 			</tr>
 		</table>
-
 	</form>
 </body>
 </html>
