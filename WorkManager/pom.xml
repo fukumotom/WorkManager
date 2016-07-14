@@ -12,6 +12,24 @@
 		<java.version>1.8</java.version>
 	</properties>
 
+	<profiles>
+		<profile>
+			<id>local</id>
+			<properties>
+				<tomcat.deploy.url>http://localhost:8080/manager/text</tomcat.deploy.url>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>inCompany</id>
+			<properties>
+				<tomcat.deploy.url>http://localhost:8088/manager/text</tomcat.deploy.url>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
 		<finalName>WorkManager</finalName>
 		<plugins>
@@ -31,7 +49,7 @@
 				<version>2.2</version>
 				<configuration>
 					<path>/${project.build.finalName}</path>
-					<url>http://localhost:8080/manager/text</url>
+					<url>${tomcat.deploy.url}</url>
 					<username>tomcat</username>
 					<password>tomcat</password>
 				</configuration>
@@ -64,21 +82,5 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-
-	<repositories>
-		<repository>
-			<id>tomcat</id>
-			<name>Maven2 Repository</name>
-			<url>http://repo2.maven.org/maven2</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>tomcat</id>
-			<name>Maven2 Repository</name>
-			<url>http://repo2.maven.org/maven2</url>
-		</pluginRepository>
-	</pluginRepositories>
-
 
 </project>
