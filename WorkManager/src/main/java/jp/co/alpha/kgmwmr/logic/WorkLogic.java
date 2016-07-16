@@ -721,6 +721,7 @@ public class WorkLogic {
 	}
 
 	/**
+<<<<<<< b1c437059d406978f6dceed564cf70a6a5c74dbb
 	 * 編集用作業リスト複製処理
 	 * 
 	 * @param inputWork
@@ -806,3 +807,4 @@ public class WorkLogic {
 
 	}
 }
+
