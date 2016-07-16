@@ -1,5 +1,6 @@
 package jp.co.alpha.kgmwmr.dao;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -215,7 +216,7 @@ public class WorkDao {
 	 * @param inputWork
 	 * @return
 	 */
-	public LocalTime  findStartTime(Work inputWork) {
+	public LocalTime findStartTime(Work inputWork) {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getStartTime.sql");
@@ -236,7 +237,7 @@ public class WorkDao {
 		Work outputWork = new Work();
 		CommonDbUtil.beanMaping(resultDto, outputWork);
 
-		return outputWork;
+		return outputWork.getStartTime();
 	}
 
 	/**
@@ -246,7 +247,7 @@ public class WorkDao {
 	 * @return
 	 * @throws BusinessException
 	 */
-	public Work getEndTime(Work inputWork) throws BusinessException {
+	public LocalTime findEndTime(Work inputWork) throws BusinessException {
 
 		// load SQLfile
 		StringBuilder sql = CommonDbUtil.readSql("getEndTime.sql");
@@ -271,11 +272,11 @@ public class WorkDao {
 		Work outputWork = new Work();
 		CommonDbUtil.beanMaping(resultDto, outputWork);
 
-		return outputWork;
+		return outputWork.getEndTime();
 	}
 
 	/**
-	 * 作業挿入処理SQL発行
+	 * 作業挿入SQL発行
 	 * 
 	 * @param inputWork
 	 */
@@ -298,7 +299,7 @@ public class WorkDao {
 	}
 
 	/**
-	 * 作業削除処理SQL発行
+	 * 作業削除SQL発行
 	 * 
 	 * @param inputWork
 	 * @throws BusinessException
@@ -325,7 +326,7 @@ public class WorkDao {
 	}
 
 	/**
-	 * 作業更新保存SQL発行
+	 * 作業更新SQL発行
 	 * 
 	 * @param inputWork
 	 */
