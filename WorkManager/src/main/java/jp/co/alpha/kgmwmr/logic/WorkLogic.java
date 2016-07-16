@@ -70,7 +70,7 @@ public class WorkLogic {
 			WorkDao dao = new WorkDao();
 
 			// 挿入する作業の開始、終了時間を取得
-			LocalTime time = dao.findStartTime(inputWork).getStartTime();
+			LocalTime time = dao.findStartTime(inputWork);
 			inputWork.setStartTime(DateUtils.getParseTime(time));
 			inputWork.setEndTime(DateUtils.getParseTime(time));
 
@@ -611,9 +611,8 @@ public class WorkLogic {
 			// 作業中の作業の場合、追加不可。
 			WorkDao dao = new WorkDao();
 
-			Work work = dao.getEndTime(inputWork);
 			// 追加する作業の開始、終了時間を取得
-			LocalTime time = work.getEndTime();
+			LocalTime time = dao.findEndTime(inputWork);
 			inputWork.setStartTime(DateUtils.getParseTime(time));
 			inputWork.setEndTime(DateUtils.getParseTime(time));
 
@@ -627,8 +626,8 @@ public class WorkLogic {
 			CommonDbUtil.closeConnection();
 		}
 	}
-	
- 	/**
+
+	/**
 	 * 編集用作業リスト複製処理
 	 * 
 	 * @param inputWork
@@ -638,5 +637,5 @@ public class WorkLogic {
 		WorkDao dao = new WorkDao();
 		dao.copyTodayWork(inputWork);
 
- 	}
+	}
 }
