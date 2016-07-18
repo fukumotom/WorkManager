@@ -7,9 +7,11 @@ import java.time.temporal.ChronoUnit;
 
 public class DateUtils {
 
-	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+	public static final DateTimeFormatter dateFormatter = DateTimeFormatter
+			.ofPattern("yyyy/M/d");
 
-	public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+	public static final DateTimeFormatter timeFormatter = DateTimeFormatter
+			.ofPattern("HH:mm");
 
 	private DateUtils() {
 	}
@@ -19,7 +21,8 @@ public class DateUtils {
 	}
 
 	public static String getNowTimeStr() {
-		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS).format(timeFormatter);
+		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS)
+				.format(timeFormatter);
 	}
 
 	public static LocalTime getNowTime() {

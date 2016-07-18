@@ -211,7 +211,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 作業保存処理 TODO実装途中
+	 * 作業保存処理
 	 * 
 	 * @param inputForm
 	 * @return
@@ -721,7 +721,6 @@ public class WorkLogic {
 	}
 
 	/**
-<<<<<<< b1c437059d406978f6dceed564cf70a6a5c74dbb
 	 * 編集用作業リスト複製処理
 	 * 
 	 * @param inputWork
@@ -793,18 +792,6 @@ public class WorkLogic {
 		editForm.setNote(work.getNote());
 
 		return editForm;
-	}
-
-	/**
-	 * 編集用作業リスト複製処理
-	 * 
-	 * @param inputWork
-	 */
-	public void copyTodayWork(Work inputWork) {
-
-		WorkDao dao = new WorkDao();
-		dao.copyTodayWork(inputWork);
 
 	}
 }
-
