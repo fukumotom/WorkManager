@@ -82,7 +82,7 @@ public class CommonDbUtil {
 			Context context = new InitialContext();
 
 			// JNDI経由でコネクションを取得
-			ds = (DataSource) context.lookup("db.look.up.name");
+			ds = (DataSource) context.lookup(PropertyUtils.getValue("db.look.up.name"));
 			con = ds.getConnection();
 			con.setAutoCommit(isAutoCommit);
 			connectionMap.put(connectionId, con);

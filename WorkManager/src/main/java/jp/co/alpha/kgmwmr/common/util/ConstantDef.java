@@ -33,4 +33,15 @@ public class ConstantDef {
 	 * 検索するJNDI名
 	 */
 	public static final String DB_LOOK_UP = "db.look.up.name";
+
+	/**
+	 * 検索条件の削除checkbox(ON)
+	 */
+	public static final String DELETE_CHECK_ON = "on";
+	
+
+	/**
+	 * 検索条件の削除checkbox(OFF)
+	 */
+	public static final String DELETE_CHECK_OFF = "off";
 }

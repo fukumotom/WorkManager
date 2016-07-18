@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
+import jp.co.alpha.kgmwmr.common.util.ConstantDef;
+import jp.co.alpha.kgmwmr.common.util.ConvertToModelUtils;
 import jp.co.alpha.kgmwmr.common.util.DateUtils;
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
@@ -16,6 +18,8 @@ import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.common.util.ValidationResult;
 import jp.co.alpha.kgmwmr.dao.WorkDao;
 import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
+import jp.co.alpha.kgmwmr.form.WorkListForm;
+import jp.co.alpha.kgmwmr.form.WorkListViewForm;
 import jp.co.alpha.kgmwmr.form.WorkRegisterForm;
 import jp.co.alpha.kgmwmr.form.WorkRegisterViewForm;
 import jp.co.alpha.kgmwmr.model.Work;
@@ -61,7 +65,13 @@ public class WorkLogic {
 	 * 
 	 * @param inputWork
 	 */
-	public void insertWork(Work inputWork) {
+	public WorkListViewForm insertWork(WorkListForm inputForm) {
+
+		// formから処理に必要な情報を取得
+		Work inputWork = new Work();
+		String userName = inputForm.getUserName();
+		inputWork.setUserName(userName);
+		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
 
 		try {
 			// トランザクション管理設定
@@ -85,15 +95,25 @@ public class WorkLogic {
 			CommonDbUtil.closeConnection();
 		}
 
+		// 画面表示データ再取得(削除済みリストに追加はなし)
+		return getWorkListViewForm(userName, LocalDate.now(), false);
 	}
 
 	/**
 	 * 作業論理削除処理
 	 * 
-	 * @param inputWork
+	 * @param inputForm
+	 * @return
 	 * @throws BusinessException
 	 */
-	public void delete(Work inputWork) throws BusinessException {
+	public WorkListViewForm delete(WorkListForm inputForm)
+			throws BusinessException {
+
+		// 作業削除データ設定
+		Work inputWork = new Work();
+		String userName = inputForm.getUserName();
+		inputWork.setUserName(userName);
+		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
 
 		try {
 			// トランザクション管理設定
@@ -109,6 +129,9 @@ public class WorkLogic {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
+
+		// 画面表示データ再取得(削除済みリストはもう削除しない)
+		return getWorkListViewForm(userName, LocalDate.now(), false);
 	}
 
 	/**
@@ -163,9 +186,13 @@ public class WorkLogic {
 	/**
 	 * 作業保存処理 TODO実装途中
 	 * 
-	 * @param inputWork
+	 * @param inputForm
 	 */
-	public void saveWork(Work inputWork) {
+	public void saveWork(WorkListForm inputForm) {
+
+		Work inputWork = new Work();
+		inputWork.setUserName(inputForm.getUserName());
+		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
 
 		try {
 			// トランザクション管理設定
@@ -281,7 +308,7 @@ public class WorkLogic {
 	 * @param inputWork
 	 * @return
 	 */
-	public List<Work> findWorking(Work inputWork) {
+	private List<Work> findWorking(Work inputWork) {
 
 		List<Work> workList;
 
@@ -573,17 +600,21 @@ public class WorkLogic {
 	/**
 	 * 履歴表示ロジック TODO実装途中
 	 * 
-	 * @param inputWork
+	 * @param inputForm
+	 * @return
 	 * @throws BusinessException
 	 */
-	public void history(Work inputWork) throws BusinessException {
+	public WorkListViewForm history(WorkListForm inputForm)
+			throws BusinessException {
 
-		LocalDate workDate = inputWork.getWorkDate();
-		logger.info("入力日付:{}", workDate);
+		String workDateStr = inputForm.getWorkDate();
+		logger.info("入力日付:{}", workDateStr);
+		String userName = inputForm.getUserName();
 
-		if (workDate == null) {
+		if (workDateStr == null) {
 			throw new BusinessException("日付を入力してください。");
 		}
+		LocalDate workDate = DateUtils.getParseDate(workDateStr);
 
 		// 過去日チェック
 		logger.info("今日の日付:{}", LocalDate.now());
@@ -592,17 +623,31 @@ public class WorkLogic {
 		}
 
 		// 未保存データ削除
-		deleteUnSaveWork(inputWork.getUserName());
+		deleteUnSaveWork(userName);
 
+		// 削除反映
+		boolean delete = ConstantDef.DELETE_CHECK_ON
+				.equals(inputForm.getDeleteCechk());
+
+		// 画面表示データ再取得
+		return getWorkListViewForm(userName, workDate, delete);
 	}
 
 	/**
 	 * 作業追加処理
 	 * 
-	 * @param inputWork
+	 * @param inputForm
+	 * @return
 	 * @throws BusinessException
 	 */
-	public void addWork(Work inputWork) throws BusinessException {
+	public WorkListViewForm addWork(WorkListForm inputForm)
+			throws BusinessException {
+
+		// form情報を処理用モデルに設定
+		Work inputWork = new Work();
+		String userName = inputForm.getUserName();
+		inputWork.setUserName(userName);
+		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
 
 		try {
 			// トランザクション管理設定
@@ -625,6 +670,9 @@ public class WorkLogic {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
+
+		// 画面表示データ再取得(削除済みリストに追加はなし)
+		return getWorkListViewForm(userName, LocalDate.now(), false);
 	}
 
 	/**
@@ -632,10 +680,42 @@ public class WorkLogic {
 	 * 
 	 * @param inputWork
 	 */
-	public void copyTodayWork(Work inputWork) {
+	public void copyTodayWork(String userName) {
+
+		Work inputWork = new Work();
+		inputWork.setUserName(userName);
 
 		WorkDao dao = new WorkDao();
 		dao.copyTodayWork(inputWork);
 
+	}
+
+	/**
+	 * 作業リスト表示用フォームを取得
+	 * 
+	 * @param userName
+	 * @param listDate
+	 * @param delete
+	 * @return
+	 */
+	public WorkListViewForm getWorkListViewForm(String userName,
+			LocalDate listDate, boolean delete) {
+
+		WorkListViewForm form = new WorkListViewForm();
+
+		Work work = new Work();
+		work.setUserName(userName);
+		work.setWorkDate(listDate);
+		work.setDelete(delete);
+
+		List<Work> workList = findAllWork(work);
+
+		form.setWorkList(workList);
+
+		// 表示用日付
+		form.setListDate(DateUtils.formatDate(listDate));
+		logger.info("作業リストの日付:{}", DateUtils.getTodayStr());
+
+		return form;
 	}
 }

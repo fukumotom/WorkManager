@@ -46,4 +46,14 @@ public class DateUtils {
 		return localDate.format(dateFormatter);
 	}
 
+	/**
+	 * 文字列をLocalDate型に変換
+	 * 
+	 * @param date
+	 * @return
+	 */
+	public static LocalDate getParseDate(String date) {
+		return LocalDate.parse(date, dateFormatter);
+	}
+
 }
