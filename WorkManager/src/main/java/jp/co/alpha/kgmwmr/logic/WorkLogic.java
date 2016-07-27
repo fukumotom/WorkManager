@@ -170,6 +170,7 @@ public class WorkLogic {
 		// 編集するデータ（画面初期表示用）取得
 		WorkEditForm editForm = setWorkEditForm(output);
 		return editForm;
+
 	}
 
 	/**
@@ -792,6 +793,5 @@ public class WorkLogic {
 		editForm.setNote(work.getNote());
 
 		return editForm;
-
 	}
 }
