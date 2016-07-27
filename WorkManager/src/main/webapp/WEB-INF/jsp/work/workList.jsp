@@ -37,7 +37,7 @@
 			<tr>
 				<td><input type="radio" name="id"
 					value="${form.workList[index].id}"
-					checked="${(index ==0)?'checked':''}" /></td>
+					<%= index == 0?"checked=checked":"" %> /></td>
 				<td>${form.workList[index].startTime}</td>
 				<td>${form.workList[index].endTime}</td>
 				<td>${form.workList[index].workingTime}</td>

@@ -6,3 +6,4 @@ SET
 WHERE
 	id = ${id}
 	AND user_name = ${userName}
+	AND status_flg = 1

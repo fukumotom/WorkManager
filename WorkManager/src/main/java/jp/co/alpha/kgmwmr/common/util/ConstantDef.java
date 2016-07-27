@@ -25,6 +25,11 @@ public class ConstantDef {
 	public static final String ATTR_FORM = "form";
 
 	/**
+	 * フォーム（属性）
+	 */
+	public static final String ATTR_EDIT_FORM = "editForm";
+
+	/**
 	 * 検索条件（属性）
 	 */
 	public static final String CRITERIA = "criteria";

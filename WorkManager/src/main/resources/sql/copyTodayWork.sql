@@ -17,6 +17,6 @@ INSERT INTO
 		FROM
 			workmanage
 		WHERE
-			user_name = $ { userName }
+			user_name = ${userName}
 			AND work_date = DATE 'now'
 	);

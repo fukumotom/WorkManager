@@ -9,3 +9,4 @@ FROM
 WHERE
     w.user_name = ${userName}
     AND w.id = ${id}
+	AND w.status_flg = 1

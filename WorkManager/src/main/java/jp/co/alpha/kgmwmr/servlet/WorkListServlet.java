@@ -17,6 +17,7 @@ import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.common.util.DateUtils;
+import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
@@ -120,8 +121,9 @@ public class WorkListServlet extends HttpServlet {
 				// 編集
 				logger.info("編集処理開始:");
 				requestPath = "/WEB-INF/jsp/work/workEditForm.jsp";
-				// Work editWork = logic.getEditWork(inputWork);
-				// request.setAttribute("editWork", editWork);
+				WorkEditForm editForm = new WorkEditForm();
+				editForm = logic.getEditWork(inputForm);
+				 request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
 
 		} catch (BusinessException e) {

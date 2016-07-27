@@ -180,8 +180,6 @@ public class WorkDao {
 		String sqlName;
 		if (inputWork.isDelete()) {
 			sqlName = "getWorkDelList.sql";
-		} else if (inputWork.getWorkDate() != null) {
-			sqlName = "getWorkPastList.sql";
 		} else {
 			sqlName = "getWorkList.sql";
 		}
