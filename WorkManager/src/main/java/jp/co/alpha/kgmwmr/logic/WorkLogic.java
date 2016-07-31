@@ -44,7 +44,7 @@ public class WorkLogic {
 	 * @param inputWork
 	 * @return
 	 */
-	public List<Work> findAllWork(Work inputWork) {
+	private List<Work> findAllWork(Work inputWork) {
 
 		try {
 			// 接続開始
@@ -170,7 +170,6 @@ public class WorkLogic {
 		// 編集するデータ（画面初期表示用）取得
 		WorkEditForm editForm = setWorkEditForm(output);
 		return editForm;
-
 	}
 
 	/**
@@ -241,6 +240,9 @@ public class WorkLogic {
 			// コミット
 			CommonDbUtil.commit();
 
+			// 画面表示用にデータを複製
+			dao.copyTodayWork(inputWork);
+
 		} finally {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
@@ -248,7 +250,7 @@ public class WorkLogic {
 
 		// 画面表示データ取得(保存後は当日のデータを表示)
 		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
-				inputWork.getWorkDate(), false);
+				LocalDate.now(), false);
 		return viewForm;
 	}
 
@@ -732,7 +734,6 @@ public class WorkLogic {
 		inputWork.setUserName(userName);
 
 		try {
-
 			// コネクション開始
 			CommonDbUtil.openConnection();
 
