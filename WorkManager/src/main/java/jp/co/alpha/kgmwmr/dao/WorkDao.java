@@ -402,6 +402,26 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
 				dto);
 
-		CommonDbUtil.copyWork(sql.toString(), paramMap);
+		CommonDbUtil.updata(sql.toString(), paramMap);
+	}
+
+	/**
+	 * 保存処理時に複製した元のデータを削除
+	 * 
+	 * @param inputWork
+	 */
+	public void deleteCopyBase(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("deleteCopyBase.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(inputWork, dto);
+
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql, dto);
+
+		CommonDbUtil.updata(sql.toString(), paramMap);
+
 	}
 }

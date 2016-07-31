@@ -26,7 +26,7 @@ import jp.co.alpha.kgmwmr.form.WorkRegisterViewForm;
 import jp.co.alpha.kgmwmr.model.Work;
 
 /**
- * 作業管理ロジッククラス TODO form対応未
+ * 作業管理ロジッククラス
  * 
  * @author kigami
  *
@@ -44,7 +44,7 @@ public class WorkLogic {
 	 * @param inputWork
 	 * @return
 	 */
-	public List<Work> findAllWork(Work inputWork) {
+	private List<Work> findAllWork(Work inputWork) {
 
 		try {
 			// 接続開始
@@ -97,7 +97,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ再取得(削除済みリストに追加はなし)
-		return getWorkListViewForm(userName, LocalDate.now(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		return viewForm;
 	}
 
 	/**
@@ -131,7 +132,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ再取得(削除済みリストはもう削除しない)
-		return getWorkListViewForm(userName, LocalDate.now(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		return viewForm;
 	}
 
 	/**
@@ -161,7 +163,8 @@ public class WorkLogic {
 		}
 
 		// 編集するデータ（画面初期表示用）取得
-		return setWorkEditForm(output);
+		WorkEditForm editForm = setWorkEditForm(output);
+		return editForm;
 	}
 
 	/**
@@ -206,12 +209,14 @@ public class WorkLogic {
 	 * 作業保存処理 TODO実装途中
 	 * 
 	 * @param inputForm
+	 * @return
 	 */
-	public void saveWork(WorkListForm inputForm) {
+	public WorkListViewForm saveWork(WorkListForm inputForm) {
 
 		Work inputWork = new Work();
 		inputWork.setUserName(inputForm.getUserName());
 		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
+		inputWork.setWorkDate(DateUtils.getParseDate(inputForm.getWorkDate()));
 
 		try {
 			// トランザクション管理設定
@@ -219,15 +224,24 @@ public class WorkLogic {
 
 			// 保存処理実行
 			WorkDao dao = new WorkDao();
+			// 編集用複製データ削除
+			dao.deleteCopyBase(inputWork);
 			dao.saveWork(inputWork);
 
 			// コミット
 			CommonDbUtil.commit();
 
+			// 画面表示用にデータを複製
+			dao.copyTodayWork(inputWork);
+
 		} finally {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
+
+		// 画面表示データ取得(削除済みデータは編集,保存はしない)
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		return viewForm;
 	}
 
 	/**
@@ -380,7 +394,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 完了する作業情報を取得
+	 * 完了する作業情報を取得 TODO notForm
 	 *
 	 * @param userName
 	 * @param deleteId
@@ -417,7 +431,7 @@ public class WorkLogic {
 	 * 
 	 * @param inputWork
 	 */
-	public void calcWorkTime(Work inputWork) {
+	private void calcWorkTime(Work inputWork) {
 
 		LocalTime startTime = DateUtils.getParseTime(inputWork.getStartTime());
 		logger.info("開始時間:{}", startTime);
@@ -633,7 +647,8 @@ public class WorkLogic {
 		boolean delete = ConstantDef.DELETE_CHECK_ON.equals(inputForm.getDeleteCechk());
 
 		// 画面表示データ再取得
-		return getWorkListViewForm(userName, workDate, delete);
+		WorkListViewForm viewForm = getWorkListViewForm(userName, workDate, delete);
+		return viewForm;
 	}
 
 	/**
@@ -674,7 +689,8 @@ public class WorkLogic {
 		}
 
 		// 画面表示データ再取得(削除済みリストに追加はなし)
-		return getWorkListViewForm(userName, LocalDate.now(), false);
+		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
+		return viewForm;
 	}
 
 	/**
@@ -687,9 +703,19 @@ public class WorkLogic {
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
 
-		WorkDao dao = new WorkDao();
-		dao.copyTodayWork(inputWork);
+		try {
 
+			// コネクション開始
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			dao.copyTodayWork(inputWork);
+
+		} finally {
+
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 	}
 
 	/**
@@ -731,7 +757,9 @@ public class WorkLogic {
 		WorkEditForm editForm = new WorkEditForm();
 		editForm.setId(String.valueOf(work.getId()));
 		editForm.setStartTime(DateUtils.formatTime(work.getStartTime()));
-		editForm.setEndTime(DateUtils.formatTime(work.getEndTime()));
+		if (work.getEndTime() != null) {
+			editForm.setEndTime(DateUtils.formatTime(work.getEndTime()));
+		}
 		editForm.setContents(work.getContents());
 		editForm.setNote(work.getNote());
 
