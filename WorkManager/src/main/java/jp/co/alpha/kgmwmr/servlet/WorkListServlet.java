@@ -39,7 +39,8 @@ public class WorkListServlet extends HttpServlet {
 	/**
 	 * ロガー
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(WorkListServlet.class);
+	private static final Logger logger = LoggerFactory
+			.getLogger(WorkListServlet.class);
 
 	/**
 	 * 作業リスト画面への遷移パス
@@ -53,18 +54,21 @@ public class WorkListServlet extends HttpServlet {
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	public void doGet(HttpServletRequest request, HttpServletResponse response) {
+	public void doGet(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		// ログインユーザ取得
 		String userName = request.getUserPrincipal().getName();
 
 		WorkLogic logic = new WorkLogic();
 		logic.copyTodayWork(userName);
-		WorkListViewForm form = logic.getWorkListViewForm(userName, LocalDate.now(), false);
+		WorkListViewForm form = logic.getWorkListViewForm(userName,
+				LocalDate.now(), false);
 
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher(WORKLIST_JSP_PATH);
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher(WORKLIST_JSP_PATH);
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
@@ -79,13 +83,15 @@ public class WorkListServlet extends HttpServlet {
 	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	public void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		// // 画面情報をFormに詰める
 		WorkListForm inputForm = setForm(request);
 
 		// 作業リスト表示条件をセッションに保持
-		WorkListForm creteriaForm = (WorkListForm) request.getSession().getAttribute(ConstantDef.CRITERIA);
+		WorkListForm creteriaForm = (WorkListForm) request.getSession()
+				.getAttribute(ConstantDef.CRITERIA);
 		if (creteriaForm == null) {
 			// 検索条件を設定
 			request.getSession().setAttribute(ConstantDef.CRITERIA, inputForm);
@@ -123,8 +129,10 @@ public class WorkListServlet extends HttpServlet {
 			logger.warn("入力チェックエラー");
 			// 作業リストの再表示
 			LocalDate date = DateUtils.getParseDate(inputForm.getWorkDate());
-			boolean delete = inputForm.getDeleteCechk().equals(ConstantDef.DELETE_CHECK_ON);
-			viewForm = logic.getWorkListViewForm(inputForm.getUserName(), date, delete);
+			boolean delete = inputForm.getDeleteCechk()
+					.equals(ConstantDef.DELETE_CHECK_ON);
+			viewForm = logic.getWorkListViewForm(inputForm.getUserName(), date,
+					delete);
 
 			// エラーメッセージ設定
 			viewForm.setErrMsgs(e.getMessage());
@@ -132,7 +140,8 @@ public class WorkListServlet extends HttpServlet {
 
 		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher(requestPath);
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher(requestPath);
 
 		try {
 			dispatcher.forward(request, response);

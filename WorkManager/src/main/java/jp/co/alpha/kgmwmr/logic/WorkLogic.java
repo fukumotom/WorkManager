@@ -242,6 +242,8 @@ public class WorkLogic {
 
 			// 画面表示用にデータを複製
 			dao.copyTodayWork(inputWork);
+			// コミット
+			CommonDbUtil.commit();
 
 		} finally {
 			// 処理完了後、コネクションMapからコネクションを削除
