@@ -73,6 +73,7 @@ public class WorkLogic {
 		String userName = inputForm.getUserName();
 		inputWork.setUserName(userName);
 		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
+		inputWork.setWorkDate(DateUtils.getParseDate(inputForm.getWorkDate()));
 
 		try {
 			// トランザクション管理設定
@@ -115,6 +116,7 @@ public class WorkLogic {
 		String userName = inputForm.getUserName();
 		inputWork.setUserName(userName);
 		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
+		inputWork.setWorkDate(DateUtils.getParseDate(inputForm.getWorkDate()));
 
 		try {
 			// トランザクション管理設定
@@ -227,19 +229,20 @@ public class WorkLogic {
 			// 編集用複製データ削除
 			dao.deleteCopyBase(inputWork);
 			dao.saveWork(inputWork);
-
 			// コミット
 			CommonDbUtil.commit();
 
 			// 画面表示用にデータを複製
 			dao.copyTodayWork(inputWork);
+			// コミット
+			CommonDbUtil.commit();
 
 		} finally {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
 
-		// 画面表示データ取得(削除済みデータは編集,保存はしない)
+		// 画面表示データ取得(保存後は当日のデータを表示)
 		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(), inputWork.getWorkDate(), false);
 		return viewForm;
 	}
@@ -665,6 +668,7 @@ public class WorkLogic {
 		String userName = inputForm.getUserName();
 		inputWork.setUserName(userName);
 		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
+		inputWork.setWorkDate(DateUtils.getParseDate(inputForm.getWorkDate()));
 
 		try {
 			// トランザクション管理設定
