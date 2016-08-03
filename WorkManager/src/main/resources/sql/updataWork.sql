@@ -7,8 +7,8 @@ SET
 	,contents = ${contents}
 	,note = ${note}
 	,update_flg = 1
-	,status_flg = 1
 	,uptime = Timestamp 'now'
 WHERE
 	id = ${id}
 	AND user_name = ${userName}
+	AND status_flg = 1

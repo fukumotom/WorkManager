@@ -5,6 +5,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.alpha.kgmwmr.common.exception.IllegalOperationException;
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;

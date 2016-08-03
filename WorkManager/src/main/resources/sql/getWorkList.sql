@@ -10,7 +10,8 @@ FROM
 	WorkManage w
 WHERE
 	w.user_name = ${userName}
-	And w.work_date = Date 'now'
+	And w.work_date = ${workDate}
 	AND w.delete_flg = 0
+	AND w.status_flg = 1
 ORDER BY
 	w.start_time, w.end_time

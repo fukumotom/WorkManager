@@ -25,6 +25,11 @@ public class ConstantDef {
 	public static final String ATTR_FORM = "form";
 
 	/**
+	 * フォーム（属性）
+	 */
+	public static final String ATTR_EDIT_FORM = "editForm";
+
+	/**
 	 * 検索条件（属性）
 	 */
 	public static final String CRITERIA = "criteria";
@@ -33,4 +38,15 @@ public class ConstantDef {
 	 * 検索するJNDI名
 	 */
 	public static final String DB_LOOK_UP = "db.look.up.name";
+
+	/**
+	 * 検索条件の削除checkbox(ON)
+	 */
+	public static final String DELETE_CHECK_ON = "on";
+	
+
+	/**
+	 * 検索条件の削除checkbox(OFF)
+	 */
+	public static final String DELETE_CHECK_OFF = "off";
 }

@@ -1,66 +1,80 @@
 package jp.co.alpha.kgmwmr.servlet;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
-import jp.co.alpha.kgmwmr.common.util.ConvertToModelUtils;
-import jp.co.alpha.kgmwmr.common.util.DateUtils;
+import jp.co.alpha.kgmwmr.common.util.ConstantDef;
+import jp.co.alpha.kgmwmr.form.WorkEditForm;
+import jp.co.alpha.kgmwmr.form.WorkListViewForm;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
-import jp.co.alpha.kgmwmr.model.Work;
 
 @WebServlet("/WorkEdit")
 public class WorkEditServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * シリアルバージョン
+	 */
+	private static final long serialVersionUID = 1013971984714290550L;
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(WorkEditServlet.class);
+	/**
+	 * 作業リスト画面への遷移パス
+	 */
+	private static final String WORKLIST_JSP_PATH = "/WEB-INF/jsp/work/workList.jsp";
 
 	@Override
-	public void doPost(HttpServletRequest request,
-			HttpServletResponse response) {
+	public void doPost(HttpServletRequest request, HttpServletResponse response) {
 
-		String userName = request.getUserPrincipal().getName();
-		String id = request.getParameter("id");
-		Work inputWork = new Work();
-		inputWork.setUserName(userName);
-		inputWork.setId(ConvertToModelUtils.convertInt(id));
-
-		String startTime = request.getParameter("startTime");
-		String endTime = request.getParameter("endTime");
-		String contents = (String) request.getParameter("contents");
-		String note = (String) request.getParameter("note");
-		logger.info("入力値：開始時間[{}] 終了時間[{}] 作業内容[{}] 備考[{}]", startTime, endTime,
-				contents, note);
-
-		inputWork.setStartTime(DateUtils.getFomatTime(startTime));
-		inputWork.setEndTime(DateUtils.getFomatTime(endTime));
-		inputWork.setContents(contents);
-		inputWork.setNote(note);
-
-		// 作業終了時間が入力された場合、作業時間の再計算
-		if (!endTime.isEmpty()) {
-			WorkLogic logic = new WorkLogic();
-			logic.calcWorkTime(inputWork);
-		}
+		WorkEditForm editForm = setForm(request);
 
 		WorkLogic logic = new WorkLogic();
 
-		logic.updateWork(inputWork);
+		logic.updateWork(editForm);
 
 		// 作業リストへ戻る
+		WorkListViewForm viewForm = logic.getWorkListViewForm(editForm.getUserName(), LocalDate.now(), false);
+		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
+		RequestDispatcher dispatcher = request.getRequestDispatcher(WORKLIST_JSP_PATH);
 		try {
-			response.sendRedirect("/WorkManager/WorkList");
-		} catch (IOException e) {
-			throw new SystemException("リダイレクト失敗", e);
+			dispatcher.forward(request, response);
+		} catch (ServletException | IOException e) {
+			throw new SystemException("フォワード失敗", e);
 		}
+	}
+
+	/**
+	 * リクエスト情報をformに詰め替え<br>
+	 * 入力チェック
+	 * 
+	 * @param request
+	 * @return
+	 */
+	private WorkEditForm setForm(HttpServletRequest request) {
+
+		WorkEditForm editForm = new WorkEditForm();
+
+		String id = request.getParameter("id");
+		editForm.setId(id);
+		String userName = request.getUserPrincipal().getName();
+		editForm.setUserName(userName);
+
+		String startTime = request.getParameter("startTime");
+		editForm.setStartTime(startTime);
+		String endTime = request.getParameter("endTime");
+		editForm.setEndTime(endTime);
+
+		String contents = (String) request.getParameter("contents");
+		editForm.setContents(contents);
+		String note = (String) request.getParameter("note");
+		editForm.setNote(note);
+
+		return editForm;
 	}
 }

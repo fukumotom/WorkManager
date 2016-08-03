@@ -12,14 +12,6 @@
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
-	<%
-		Object obj = request.getAttribute("editWork");
-		Work editWork;
-		if (obj instanceof Work) {
-			editWork = (Work) obj;
-			request.setAttribute("editWork", editWork);
-		}
-	%>
 	<form method="post" action="/WorkManager/WorkEdit">
 		<table>
 			<tr>
@@ -27,30 +19,30 @@
 			</tr>
 			<tr>
 				<td><input type="text" name="startTime"
-					value="${editWork.startTime}" /></td>
+					value="${editForm.startTime}" /></td>
 			</tr>
 			<tr>
 				<th>終了時間</th>
 			</tr>
 			<tr>
 				<td><input type="text" name="endTime"
-					value="${editWork.endTime}" /></td>
+					value="${editForm.endTime}" /></td>
 			</tr>
 			<tr>
 				<th>作業内容</th>
 			</tr>
 			<tr>
 				<td><input type="text" name="contents"
-					value="${editWork.contents}" /></td>
+					value="${editForm.contents}" /></td>
 			</tr>
 			<tr>
 				<th>備考</th>
 			</tr>
 			<tr>
-				<td><input type="text" name="note" value="${editWork.note}" /></td>
+				<td><input type="text" name="note" value="${editForm.note}" /></td>
 			</tr>
 		</table>
-		<input type="hidden" name="id" value="${editWork.id}" /><input
+		<input type="hidden" name="id" value="${editForm.id}" /><input
 			type="submit" value="更新" />
 	</form>
 </body>
