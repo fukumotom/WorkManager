@@ -298,8 +298,6 @@ public class WorkLogic {
 	 */
 	public void deleteUnSaveWork(String userName) {
 
-		logger.debug("未保存作業削除処理開始");
-
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
 
@@ -367,11 +365,11 @@ public class WorkLogic {
 
 		// formに仕掛作業と作業状態フラグを設定
 		if (workList.size() == 0) {
-			logger.info("仕掛処理なし");
+			logger.info(PropertyUtils.getValue(MsgCodeDef.WORKING));
 			form.setWork(null);
 			form.setWorkingFlg(false);
 		} else {
-			logger.info("仕掛処理あり");
+			logger.info(PropertyUtils.getValue(MsgCodeDef.NOT_WORKING));
 			form.setWork(workList.get(0));
 			form.setWorkingFlg(true);
 		}
@@ -412,7 +410,8 @@ public class WorkLogic {
 
 		// 入力(id)チェック
 		if (!InputValidation.idCheck(deleteId)) {
-			throw new SystemException("不正な入力");
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		}
 
 		// 画面表示用情報
@@ -463,9 +462,11 @@ public class WorkLogic {
 		Work finishWork = dao.getSelectWork(inputWork);
 		// 取得した作業チェック
 		if (finishWork.isDelete()) {
-			throw new BusinessException("すでに削除されています");
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.ALREADY_FINISHED));
 		} else if (finishWork.getEndTime() != null) {
-			throw new BusinessException("すでに終了しています");
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.ALREADY_DELETE));
 		}
 
 		// 終了時間を設定
@@ -488,12 +489,13 @@ public class WorkLogic {
 		logger.info("開始時間:{}", startTime);
 
 		LocalTime endTime = DateUtils.truncatedTime(inputWork.getEndTime());
-		
+
 		// 開始時間<終了時間チェック
-		if(endTime.isBefore(startTime)){
-			throw new BusinessException(PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
+		if (endTime.isBefore(startTime)) {
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
 		}
-		
+
 		LocalTime calcTime = endTime.minusHours(startTime.getHour());
 		LocalTime workingTime = calcTime.minusMinutes(startTime.getMinute());
 		inputWork.setWorkingTime(DateUtils.truncatedTime(workingTime));
@@ -581,7 +583,8 @@ public class WorkLogic {
 		if (workList.size() == 1) {
 			if (inputWork.getId() == 0) {
 				// 別の操作で作業が追加されていた場合
-				throw new BusinessException("作業が開始されています");
+				throw new BusinessException(
+						PropertyUtils.getValue(MsgCodeDef.ALREADY_START, "作業"));
 			}
 
 			// DBに登録されている仕掛処理を取得
@@ -600,7 +603,8 @@ public class WorkLogic {
 				dao.startWork(inputWork);
 
 			} else {
-				throw new BusinessException("別の作業が開始されています");
+				throw new BusinessException(PropertyUtils
+						.getValue(MsgCodeDef.ALREADY_START, "別の作業"));
 			}
 		} else {
 			// 仕掛り処理なしの場合
@@ -623,13 +627,14 @@ public class WorkLogic {
 
 		boolean validationChek = false;
 
-		logger.info("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", form.getStartTime(),
+		logger.debug("入力値：開始時間[{}] 作業内容[{}] 備考[{}]", form.getStartTime(),
 				form.getContents(), form.getNote());
 
 		// idチェック
 		String id = form.getId();
 		if (!InputValidation.idCheck(id)) {
-			throw new SystemException("不正な入力");
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		}
 
 		// 開始時間チェック
@@ -717,9 +722,10 @@ public class WorkLogic {
 		LocalDate workDate = DateUtils.getParseDate(workDateStr);
 
 		// 過去日チェック
-		logger.info("今日の日付:{}", LocalDate.now());
+		logger.debug("今日の日付:{}", LocalDate.now());
 		if (workDate.isAfter(LocalDate.now())) {
-			throw new BusinessException("過去日を選択してください。");
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "過去日"));
 		}
 
 		// 未保存データ削除
@@ -840,7 +846,7 @@ public class WorkLogic {
 
 		// 表示用日付
 		form.setListDate(DateUtils.formatDate(listDate));
-		logger.info("作業リストの日付:{}", DateUtils.getTodayStr());
+		logger.debug("作業リストの日付:{}", DateUtils.getTodayStr());
 
 		return form;
 	}

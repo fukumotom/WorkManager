@@ -4,9 +4,6 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 
 /**
@@ -17,11 +14,6 @@ import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
  */
 @WebListener
 public class InitialListener implements ServletContextListener {
-
-	/**
-	 * ロガー
-	 */
-	private Logger logger = LoggerFactory.getLogger(InitialListener.class);
 
 	/**
 	 * 起動時にプロパティファイルをロード

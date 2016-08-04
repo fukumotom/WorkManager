@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.dao.dto.UserDto;
 import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
 import jp.co.alpha.kgmwmr.model.User;
@@ -48,9 +50,9 @@ public class UserRegisterDao {
 
 		// DB更新
 		int cnt = CommonDbUtil.updata(sql1.toString(), paramMap);
-		logger.info("{}件登録", cnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_REGISTER), cnt);
 		int cnt2 = CommonDbUtil.updata(sql2.toString(), paramMap2);
-		logger.info("{}件登録", cnt2);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_REGISTER), cnt2);
 	}
 
 	/**

@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.common.util.ThreadIdentifier;
 
@@ -62,6 +63,36 @@ public class CommonDbUtil {
 	private static Map<String, Connection> connectionMap = new HashMap<>();
 
 	/**
+	 * データソース名
+	 */
+	private static final String DS_NAME = "db.look.up.name";
+
+	/**
+	 * バインドに失敗しました
+	 */
+	private static final String ERR_BUSINESS_001 = "e.business.001";
+
+	/**
+	 * リフレクション失敗
+	 */
+	private static final String ERR_BUSINESS_002 = "e.business.002";
+
+	/**
+	 * JNDI接続エラー
+	 */
+	private static final String ERR_BUSINESS_003 = "e.business.003";
+
+	/**
+	 * SQLファイル読み込み失敗
+	 */
+	private static final String ERR_BUSINESS_004 = "e.business.004";
+
+	/**
+	 * 複数件存在
+	 */
+	private static final String ERR_BUSINESS_005 = "e.business.005";
+
+	/**
 	 * プライベートコンストラクタ
 	 */
 	private CommonDbUtil() {
@@ -84,14 +115,12 @@ public class CommonDbUtil {
 			Context context = new InitialContext();
 
 			// JNDI経由でコネクションを取得
-			ds = (DataSource) context
-					.lookup(PropertyUtils.getValue("db.look.up.name"));
+			ds = (DataSource) context.lookup(PropertyUtils.getValue(DS_NAME));
 			con = ds.getConnection();
 			con.setAutoCommit(isAutoCommit);
 			connectionMap.put(connectionId, con);
 		} catch (NamingException | SQLException e) {
-			logger.error("JNDI接続エラー:{}", e);
-			throw new SystemException(e);
+			throw new SystemException(ERR_BUSINESS_003, e);
 		}
 	}
 
@@ -172,9 +201,9 @@ public class CommonDbUtil {
 			}
 
 		} catch (IOException e) {
-			logger.error("SQLファイル読み込み失敗", e);
+			throw new SystemException(ERR_BUSINESS_004, e);
 		}
-		logger.info("読み込みSQL：{}", builder.toString());
+		logger.debug("読み込みSQL：{}", builder.toString());
 		return builder;
 	}
 
@@ -191,8 +220,7 @@ public class CommonDbUtil {
 			ds = (DataSource) context
 					.lookup(PropertyUtils.getValue(ConstantDef.DB_LOOK_UP));
 		} catch (NamingException e) {
-			logger.error("JNDI接続エラー:{}", e);
-			throw new SystemException(e);
+			throw new SystemException(ERR_BUSINESS_003, e);
 		}
 		return ds;
 	}
@@ -221,6 +249,8 @@ public class CommonDbUtil {
 			for (Entry<Integer, String> sqlEntry : sqlParamMap.entrySet()) {
 				if ((dtoEntry.getKey()).equals(sqlEntry.getValue())) {
 					paramMap.put(sqlEntry.getKey(), dtoEntry.getValue());
+					logger.info("paramMap内容[{}]:{}", sqlEntry.getKey(),
+							dtoEntry.getValue());
 				}
 			}
 		}
@@ -323,14 +353,13 @@ public class CommonDbUtil {
 			T dto;
 			try {
 				dto = dtoClass.newInstance();
-			} catch (InstantiationException | IllegalAccessException e1) {
-				logger.error("DTOのリフレクションに失敗");
-				throw new SystemException(e1);
+			} catch (InstantiationException | IllegalAccessException e) {
+				throw new SystemException(ERR_BUSINESS_002, e);
 			}
 			for (Entry<String, String> entry : clmNameMap.entrySet()) {
 				String label = entry.getKey();
 				String typeStr = entry.getValue();
-				logger.info("clmNameMap内容[ラベル]:型     [{}]:{}", label, typeStr);
+				logger.debug("clmNameMap内容[ラベル]:型     [{}]:{}", label, typeStr);
 
 				// ラベルからDB結果を取得
 				Object obj;
@@ -350,8 +379,7 @@ public class CommonDbUtil {
 
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
-					logger.error("DBのバインドに失敗");
-					throw new SystemException(e);
+					throw new SystemException(ERR_BUSINESS_001, e);
 				}
 			}
 			dtoList.add(dto);
@@ -393,7 +421,7 @@ public class CommonDbUtil {
 		if (setter == null) {
 			logger.error("{}内に{}のsetterが見つかりませんでした。", dtoClass.getName(),
 					label);
-			throw new SystemException("バインドに失敗しました。");
+			throw new SystemException(PropertyUtils.getValue(ERR_BUSINESS_001));
 		}
 		return setter;
 	}
@@ -429,14 +457,14 @@ public class CommonDbUtil {
 					value = method.invoke(dto);
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
-					logger.info("リフレクション失敗", e);
+					throw new SystemException(ERR_BUSINESS_002, e);
 				}
 				dtoMap.put(fieldName, value);
 			}
 		}
 
 		for (Entry<String, Object> entry : dtoMap.entrySet()) {
-			logger.info("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
+			logger.debug("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
 		}
 		return dtoMap;
 	}
@@ -461,8 +489,8 @@ public class CommonDbUtil {
 			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
-			logger.error("DB接続失敗", e);
-			throw new SystemException(e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.MISS_DB_FIND), e);
 		}
 
 		return resultCnt;
@@ -496,8 +524,8 @@ public class CommonDbUtil {
 			dtoList = resultSetToWorkDtoList(result, dtoClass);
 
 		} catch (SQLException e) {
-			logger.error("DB接続失敗", e);
-			throw new SystemException(e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.MISS_DB_FIND), e);
 		}
 
 		return dtoList;
@@ -519,7 +547,7 @@ public class CommonDbUtil {
 
 		List<T> dtoList = getDtoList(sql, paramMap, dtoClass);
 		if (dtoList.size() != 1) {
-			throw new SystemException("複数件存在します");
+			throw new SystemException(ERR_BUSINESS_005);
 		}
 
 		return dtoList.get(0);
@@ -547,7 +575,8 @@ public class CommonDbUtil {
 			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new SystemException("DB更新失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.MISS_DB_INSERT), e);
 		}
 
 		return resultCnt;
@@ -595,8 +624,7 @@ public class CommonDbUtil {
 
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			logger.error("DBのバインドに失敗");
-			throw new SystemException(e);
+			throw new SystemException(ERR_BUSINESS_001, e);
 		}
 	}
 
@@ -643,8 +671,8 @@ public class CommonDbUtil {
 			pstm.execute();
 
 		} catch (SQLException e) {
-			logger.error("複製処理失敗", e);
-			throw new SystemException(e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.MISS_DB_COPY), e);
 		}
 	}
 }

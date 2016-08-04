@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.dao.dto.WorkDto;
 import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
 import jp.co.alpha.kgmwmr.model.Work;
@@ -303,7 +305,7 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info("{}件挿入しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT), resultCnt);
 
 	}
 
@@ -330,9 +332,14 @@ public class WorkDao {
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 
 		if (resultCnt == 0) {
-			throw new BusinessException("データは削除されています。");
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.ALREADY_DELETE));
 		} else if (resultCnt > 1) {
-			throw new SystemException("削除が正常に行われませんでした。");
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.MISS_DB_DELETE));
+		} else {
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE),
+					resultCnt);
 		}
 	}
 
@@ -355,7 +362,7 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info("{}件更新しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE), resultCnt);
 	}
 
 	/**
@@ -376,7 +383,7 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info("{}件保存しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE), resultCnt);
 	}
 
 	/**
@@ -397,7 +404,7 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.debug("{}件未保存データ削除しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE), resultCnt);
 
 	}
 
@@ -419,7 +426,8 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
 				dto);
 
-		CommonDbUtil.updata(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE), resultCnt);
 	}
 
 	/**
@@ -440,7 +448,8 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
 				dto);
 
-		CommonDbUtil.updata(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE), resultCnt);
 
 	}
 }
