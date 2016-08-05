@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
 
 /**
@@ -26,10 +28,21 @@ import jp.co.alpha.kgmwmr.logic.WorkLogic;
 @WebServlet("/Menu")
 public class MenuServlet extends HttpServlet {
 
-	private static final long serialVersionUID = 1L;
+	/**
+	 * シリアルバージョン
+	 */
+	private static final long serialVersionUID = -3523357132124156646L;
 
+	/**
+	 * ロガー
+	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(MenuServlet.class);
+
+	/**
+	 * メニュー画面への遷移パス
+	 */
+	private static final String MENU_JSP_PATH = "/WEB-INF/jsp/menu.jsp";
 
 	/**
 	 * メニュー画面表示<br>
@@ -45,7 +58,7 @@ public class MenuServlet extends HttpServlet {
 		// 検索条件削除
 		HttpSession session = request.getSession();
 		session.removeAttribute(ConstantDef.CRITERIA);
-		logger.info("検索条件を削除。");
+		logger.debug("検索条件を削除。");
 
 		// 未保存作業削除
 		String userName = request.getUserPrincipal().getName();
@@ -53,11 +66,12 @@ public class MenuServlet extends HttpServlet {
 		logic.deleteUnSaveWork(userName);
 
 		RequestDispatcher dispatcher = request
-				.getRequestDispatcher("/WEB-INF/jsp/menu.jsp");
+				.getRequestDispatcher(MENU_JSP_PATH);
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
 		}
 	}
 }

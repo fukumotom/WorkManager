@@ -305,7 +305,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT), resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT,
+				String.valueOf(resultCnt)));
 
 	}
 
@@ -338,8 +339,8 @@ public class WorkDao {
 			throw new SystemException(
 					PropertyUtils.getValue(MsgCodeDef.MISS_DB_DELETE));
 		} else {
-			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE),
-					resultCnt);
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
+					String.valueOf(resultCnt)));
 		}
 	}
 
@@ -362,7 +363,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE), resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+				String.valueOf(resultCnt)));
 	}
 
 	/**
@@ -383,7 +385,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE), resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+				String.valueOf(resultCnt)));
 	}
 
 	/**
@@ -404,7 +407,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE), resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
+				String.valueOf(resultCnt)));
 
 	}
 
@@ -427,7 +431,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE), resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+				String.valueOf(resultCnt)));
 	}
 
 	/**
@@ -449,7 +454,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE), resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
+				String.valueOf(resultCnt)));
 
 	}
 }

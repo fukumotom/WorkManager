@@ -17,6 +17,8 @@ import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.common.util.DateUtils;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
@@ -46,6 +48,11 @@ public class WorkListServlet extends HttpServlet {
 	 * 作業リスト画面への遷移パス
 	 */
 	private static final String WORKLIST_JSP_PATH = "/WEB-INF/jsp/work/workList.jsp";
+
+	/**
+	 * 作業編集フォームへの遷移パス
+	 */
+	private static final String WORKEDITFORM_JSP_PATH = "/WEB-INF/jsp/work/workEditForm.jsp";
 
 	/**
 	 * 作業リスト表示
@@ -81,7 +88,8 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
 		}
 	}
 
@@ -104,24 +112,24 @@ public class WorkListServlet extends HttpServlet {
 		try {
 
 			if (request.getParameter("insertBtn") != null) {
-				logger.info("挿入処理開始:");
+				logger.debug("挿入処理開始:");
 				viewForm = logic.insertWork(inputForm);
 			} else if (request.getParameter("addBtn") != null) {
-				logger.info("追加処理開始:");
+				logger.debug("追加処理開始:");
 				viewForm = logic.addWork(inputForm);
 			} else if (request.getParameter("deleteBtn") != null) {
-				logger.info("削除処理開始:");
+				logger.debug("削除処理開始:");
 				viewForm = logic.delete(inputForm);
 			} else if (request.getParameter("historyBtn") != null) {
-				logger.info("履歴表示処理開始:");
+				logger.debug("履歴表示処理開始:");
 				viewForm = logic.history(inputForm);
 			} else if (request.getParameter("saveBtn") != null) {
-				logger.info("保存処理開始:");
+				logger.debug("保存処理開始:");
 				viewForm = logic.saveWork(inputForm);
 			} else {
 				// 編集
 				logger.info("編集処理開始:");
-				requestPath = "/WEB-INF/jsp/work/workEditForm.jsp";
+				requestPath = WORKEDITFORM_JSP_PATH;
 				WorkEditForm editForm = logic.getEditWork(inputForm);
 				request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
@@ -150,7 +158,8 @@ public class WorkListServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
 		}
 	}
 

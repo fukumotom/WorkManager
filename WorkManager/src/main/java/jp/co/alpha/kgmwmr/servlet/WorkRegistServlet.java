@@ -32,13 +32,18 @@ public class WorkRegistServlet extends HttpServlet {
 	/**
 	 * シリアルバージョン
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -6184493566508372094L;
 
 	/**
 	 * ロガー
 	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(WorkRegistServlet.class);
+
+	/**
+	 * 作業登録フォームへの遷移パス
+	 */
+	private static final String WORKREGISTFORM_JSP_PATH = "/WEB-INF/jsp/work/workRegistForm.jsp";
 
 	/**
 	 * 作業登録画面表示用
@@ -52,7 +57,7 @@ public class WorkRegistServlet extends HttpServlet {
 
 		// 仕掛処理取得
 		String userName = request.getUserPrincipal().getName();
-		logger.info("ユーザ名:{}", userName);
+		logger.debug("ユーザ名:{}", userName);
 
 		// 画面表示データ取得
 		WorkLogic logic = new WorkLogic();
@@ -61,12 +66,13 @@ public class WorkRegistServlet extends HttpServlet {
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
 		RequestDispatcher dispatcher = request
-				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
+				.getRequestDispatcher(WORKREGISTFORM_JSP_PATH);
 
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
 		}
 	}
 
@@ -117,12 +123,13 @@ public class WorkRegistServlet extends HttpServlet {
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
 		RequestDispatcher dispatcher = request
-				.getRequestDispatcher("/WEB-INF/jsp/work/workRegistForm.jsp");
+				.getRequestDispatcher(WORKREGISTFORM_JSP_PATH);
 
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
 		}
 	}
 

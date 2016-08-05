@@ -10,12 +10,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.common.util.EncryptionUtils;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.form.UserForm;
 import jp.co.alpha.kgmwmr.logic.UserRegistLogic;
 
@@ -34,10 +33,14 @@ public class UserRegistServlet extends HttpServlet {
 	private static final long serialVersionUID = 421709107098888902L;
 
 	/**
-	 * ロガー
+	 * ユーザ登録フォームへの遷移パス
 	 */
-	private static final Logger logger = LoggerFactory
-			.getLogger(UserRegistServlet.class);
+	private static final String USERREGISTFORM_JSP_PATH = "/WEB-INF/jsp/user/userRegistForm.jsp";
+
+	/**
+	 * ユーザ登録確認画面への遷移パス
+	 */
+	private static final String USERREGISTCONFIRM_JSP_PATH = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
 
 	/**
 	 * ユーザ登録フォーム表示、ユーザ登録完了画面表示
@@ -53,7 +56,7 @@ public class UserRegistServlet extends HttpServlet {
 
 		if (request.getParameter("userRegit") != null) {
 			// ユーザ新規登録ボタン押下時
-			forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
+			forwardPath = USERREGISTFORM_JSP_PATH;
 
 		} else if (request.getParameter("registBtn") != null) {
 
@@ -71,7 +74,7 @@ public class UserRegistServlet extends HttpServlet {
 			// 不要なスコープ削除
 			session.removeAttribute(ConstantDef.ATTR_FORM);
 
-			forwardPath = "/WEB-INF/jsp/user/userRegistComplete.jsp";
+			forwardPath = USERREGISTCONFIRM_JSP_PATH;
 
 		}
 
@@ -79,7 +82,8 @@ public class UserRegistServlet extends HttpServlet {
 		try {
 			dispacher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
 		}
 	}
 
@@ -104,7 +108,7 @@ public class UserRegistServlet extends HttpServlet {
 			} else if (request.getParameter("confilmBtn") != null) {
 
 				// 確認ボタン押下時
-				String forwardPath = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
+				String forwardPath = USERREGISTCONFIRM_JSP_PATH;
 
 				UserRegistLogic logic = new UserRegistLogic();
 				// 画面表示情報設定
@@ -112,7 +116,7 @@ public class UserRegistServlet extends HttpServlet {
 				viewForm.setUserName(userForm.getUserName());
 				if (!viewForm.getErrMsgs().isEmpty()) {
 					// 入力チェックエラーの場合、ユーザ登録フォームへ遷移
-					forwardPath = "/WEB-INF/jsp/user/userRegistForm.jsp";
+					forwardPath = USERREGISTFORM_JSP_PATH;
 				}
 
 				// セッションにユーザ情報を保存
@@ -135,7 +139,8 @@ public class UserRegistServlet extends HttpServlet {
 
 			}
 		} catch (IOException | ServletException e) {
-			throw new SystemException("リダイレクト失敗", e);
+			throw new SystemException(
+					PropertyUtils.getValue(MsgCodeDef.ERR_REDIRECT), e);
 		}
 	}
 

@@ -14,8 +14,6 @@ public class MsgCodeDef {
 	private MsgCodeDef() {
 	}
 
-	
-
 	/**
 	 * 入力チェック（パスワード不一致エラー）
 	 */
@@ -49,7 +47,7 @@ public class MsgCodeDef {
 	/**
 	 * 開始時間と終了時間の差分エラー
 	 */
-	public static final String START_END_ERROR = "w.validation.007";	
+	public static final String START_END_ERROR = "w.validation.007";
 	/**
 	 * 入力チェック（不正な入力）
 	 */
@@ -124,11 +122,19 @@ public class MsgCodeDef {
 	 * 仕掛作業なし
 	 */
 	public static final String NOT_WORKING = "i.business.002";
-	
 
 	/**
 	 * 作業開始時の警告
 	 */
 	public static final String ALREADY_START = "w.business.001";
 
+	/**
+	 * リダイレクト失敗
+	 */
+	public static final String ERR_REDIRECT = "e.business.006";
+
+	/**
+	 * リダイレクト失敗
+	 */
+	public static final String ERR_FORWARD = "e.business.007";
 }
