@@ -1,17 +1,27 @@
 package jp.co.alpha.kgmwmr.common.util;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-
-import jp.co.alpha.kgmwmr.common.exception.BindFormatException;
-
+/**
+ * 変換Utilクラス
+ * 
+ * @author kigami
+ *
+ */
 public class ConvertToModelUtils {
 
+	/**
+	 * プライベートコンストラクタ
+	 */
 	private ConvertToModelUtils() {
 	}
 
+	/**
+	 * 文字列変換<br>
+	 * 変換対象がString型でない場合、nulを返却
+	 * 
+	 * @param target
+	 *            変換対象
+	 * @return 文字列
+	 */
 	public static String convertStr(Object target) {
 
 		if (target instanceof String) {
@@ -21,6 +31,14 @@ public class ConvertToModelUtils {
 		}
 	}
 
+	/**
+	 * 数値変換<br>
+	 * 変換対象がnullの場合、nulを返却
+	 * 
+	 * @param target
+	 *            変換対象
+	 * @return 数値
+	 */
 	public static Integer convertInt(String target) {
 
 		if (target != null) {
@@ -31,48 +49,15 @@ public class ConvertToModelUtils {
 
 	}
 
-	public static boolean convertBoolean(String target)
-			throws BindFormatException {
+	/**
+	 * フラグのboolean変換
+	 * 
+	 * @param target
+	 *            変換対象
+	 * @return onの場合:true それ以外の場合:false
+	 */
+	public static boolean convertBoolean(String target) {
 		return "on".equals(target);
 
-	}
-
-	public static LocalDate convertLocalDate(String target, String targetName)
-			throws BindFormatException {
-
-		if (target == "") {
-			return null;
-		}
-
-		// format
-		DateTimeFormatter dateFormatter = DateTimeFormatter
-				.ofPattern("yyyy/M/d");
-
-		LocalDate result;
-		try {
-			result = LocalDate.parse(target, dateFormatter);
-		} catch (DateTimeParseException e) {
-			throw new BindFormatException(e, targetName, target);
-		}
-		return result;
-	}
-
-	public static LocalTime convertLocalTime(String target, String targetName)
-			throws BindFormatException {
-
-		if (target == "") {
-			return null;
-		}
-
-		// format
-		DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:dd");
-
-		LocalTime result;
-		try {
-			result = LocalTime.parse(target, timeFormatter);
-		} catch (DateTimeParseException e) {
-			throw new BindFormatException(e, targetName, target);
-		}
-		return result;
 	}
 }

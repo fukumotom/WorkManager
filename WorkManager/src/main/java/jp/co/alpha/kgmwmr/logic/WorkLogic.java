@@ -83,8 +83,8 @@ public class WorkLogic {
 
 			// 挿入する作業の開始、終了時間を取得
 			LocalTime time = dao.findStartTime(inputWork);
-			inputWork.setStartTime(DateUtils.getParseTime(time));
-			inputWork.setEndTime(DateUtils.getParseTime(time));
+			inputWork.setStartTime(DateUtils.truncatedTime(time));
+			inputWork.setEndTime(DateUtils.truncatedTime(time));
 
 			// 挿入処理実行
 			dao.insert(inputWork);
@@ -183,9 +183,9 @@ public class WorkLogic {
 		inputWork.setId(ConvertToModelUtils.convertInt(editForm.getId()));
 		inputWork.setUserName(editForm.getUserName());
 		String startTime = editForm.getStartTime();
-		inputWork.setStartTime(DateUtils.getFomatTime(startTime));
+		inputWork.setStartTime(DateUtils.getParseTime(startTime));
 		String endTime = editForm.getEndTime();
-		inputWork.setEndTime(DateUtils.getFomatTime(endTime));
+		inputWork.setEndTime(DateUtils.getParseTime(endTime));
 		// 作業終了時間が入力された場合、作業時間の再計算
 		if (!endTime.isEmpty() | !startTime.isEmpty()) {
 			calcWorkTime(inputWork);
@@ -443,13 +443,13 @@ public class WorkLogic {
 	 */
 	private void calcWorkTime(Work inputWork) {
 
-		LocalTime startTime = DateUtils.getParseTime(inputWork.getStartTime());
+		LocalTime startTime = DateUtils.truncatedTime(inputWork.getStartTime());
 		logger.info("開始時間:{}", startTime);
 
-		LocalTime endTime = DateUtils.getParseTime(inputWork.getEndTime());
+		LocalTime endTime = DateUtils.truncatedTime(inputWork.getEndTime());
 		LocalTime calcTime = endTime.minusHours(startTime.getHour());
 		LocalTime workingTime = calcTime.minusMinutes(startTime.getMinute());
-		inputWork.setWorkingTime(DateUtils.getParseTime(workingTime));
+		inputWork.setWorkingTime(DateUtils.truncatedTime(workingTime));
 		logger.info("作業時間:{}", inputWork.getWorkingTime());
 	}
 
@@ -492,7 +492,7 @@ public class WorkLogic {
 					inputWork.setId(Integer.valueOf(registerForm.getId()));
 				}
 				inputWork.setStartTime(
-						DateUtils.getFomatTime(registerForm.getStartTime()));
+						DateUtils.getParseTime(registerForm.getStartTime()));
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
 
@@ -701,8 +701,8 @@ public class WorkLogic {
 
 			// 追加する作業の開始、終了時間を取得
 			LocalTime time = dao.findEndTime(inputWork);
-			inputWork.setStartTime(DateUtils.getParseTime(time));
-			inputWork.setEndTime(DateUtils.getParseTime(time));
+			inputWork.setStartTime(DateUtils.truncatedTime(time));
+			inputWork.setEndTime(DateUtils.truncatedTime(time));
 
 			dao.insert(inputWork);
 

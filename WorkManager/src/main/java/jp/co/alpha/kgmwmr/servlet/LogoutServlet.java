@@ -22,6 +22,12 @@ public class LogoutServlet extends HttpServlet {
 	private static final Logger logger = LoggerFactory
 			.getLogger(LogoutServlet.class);
 
+	/**
+	 * ログアウト処理
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doGet(HttpServletRequest request,
 			HttpServletResponse response) {

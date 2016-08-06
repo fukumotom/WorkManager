@@ -130,7 +130,8 @@ public class WorkRegistServlet extends HttpServlet {
 	 * 作業終了時のリクエスト情報をフォームに設定
 	 * 
 	 * @param request
-	 * @return
+	 *            リクエスト情報
+	 * @return 作業登録フォーム
 	 */
 	private WorkFinishForm setfinishForm(HttpServletRequest request) {
 
