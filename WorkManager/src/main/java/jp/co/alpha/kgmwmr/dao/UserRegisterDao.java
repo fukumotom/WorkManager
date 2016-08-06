@@ -10,8 +10,17 @@ import jp.co.alpha.kgmwmr.dao.dto.UserDto;
 import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
 import jp.co.alpha.kgmwmr.model.User;
 
+/**
+ * ユーザ登録処理DAOクラス
+ * 
+ * @author kigami
+ *
+ */
 public class UserRegisterDao {
 
+	/**
+	 * ロガー
+	 */
 	private static Logger logger = LoggerFactory
 			.getLogger(UserRegisterDao.class);
 
@@ -19,6 +28,7 @@ public class UserRegisterDao {
 	 * ユーザ登録SQL発行
 	 * 
 	 * @param user
+	 *            登録するユーザ情報
 	 */
 	public void insertUsers(User user) {
 
@@ -47,7 +57,8 @@ public class UserRegisterDao {
 	 * ユーザ検索SQL発行 TODO トランザクション
 	 * 
 	 * @param user
-	 * @return
+	 *            検索対象のユーザ情報
+	 * @return ユーザ情報リスト
 	 */
 	public List<UserDto> findUser(User user) {
 

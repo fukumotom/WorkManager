@@ -71,6 +71,7 @@ public class CommonDbUtil {
 	 * オートコミット：OFF
 	 * 
 	 * @param isAutoCommit
+	 *            自動コミット判定
 	 */
 	public static void openConnection(boolean isAutoCommit) {
 
@@ -82,7 +83,8 @@ public class CommonDbUtil {
 			Context context = new InitialContext();
 
 			// JNDI経由でコネクションを取得
-			ds = (DataSource) context.lookup(PropertyUtils.getValue("db.look.up.name"));
+			ds = (DataSource) context
+					.lookup(PropertyUtils.getValue("db.look.up.name"));
 			con = ds.getConnection();
 			con.setAutoCommit(isAutoCommit);
 			connectionMap.put(connectionId, con);
@@ -104,7 +106,7 @@ public class CommonDbUtil {
 	/**
 	 * コネクションに紐づくスレッドIDを生成
 	 * 
-	 * @return
+	 * @return スレッドID
 	 */
 	private static String getConnectionId() {
 		return Thread.currentThread().getId() + ":"
@@ -172,7 +174,7 @@ public class CommonDbUtil {
 	/**
 	 * JNDIによりデータソースを取得
 	 * 
-	 * @return
+	 * @return データソース
 	 */
 	public static DataSource lookup() {
 
@@ -191,11 +193,11 @@ public class CommonDbUtil {
 	/**
 	 * SQL発行パラメータ作成
 	 * 
-	 * @param <T>
-	 * 
 	 * @param sql
-	 * @param dto
-	 * @return
+	 *            SQL文
+	 * @param dtoClass
+	 *            パラメータ作成用DTOクラス
+	 * @return PreparedStatementにバインドするパラメータMap
 	 */
 	public static <T> HashMap<Integer, Object> createParamMap(StringBuilder sql,
 			T dtoClass) {
@@ -219,10 +221,12 @@ public class CommonDbUtil {
 	}
 
 	/**
-	 * sql文からパラメータ用Map作成
+	 * sql文からパラメータ用Map作成<br>
+	 * SQL文のバインド変数をMapに変換
 	 * 
 	 * @param sql
-	 * @return
+	 *            SQL文
+	 * @return SQLMap
 	 */
 	public static Map<Integer, String> createSqlMap(StringBuilder sql) {
 		// sql文の動的パラメータとパラメータの順番のMapを作成
@@ -244,7 +248,7 @@ public class CommonDbUtil {
 		sql.replace(0, sql.length(), convertQuery);
 
 		for (Entry<Integer, String> entry : sqlParamMap.entrySet()) {
-			logger.info("sqlMap内容[{}]:{}", entry.getKey(), entry.getValue());
+			logger.debug("sqlMap内容[{}]:{}", entry.getKey(), entry.getValue());
 		}
 		return sqlParamMap;
 	}
@@ -255,8 +259,9 @@ public class CommonDbUtil {
 	 * @param pstm
 	 *            クエリーSQL文
 	 * @param paramMap
-	 *            補完用パラメータ
+	 *            バインドパラメータ
 	 * @throws SQLException
+	 *             SQL例外
 	 */
 	public static void bindParam(PreparedStatement pstm,
 			Map<Integer, Object> paramMap) throws SQLException {
@@ -284,12 +289,13 @@ public class CommonDbUtil {
 	/**
 	 * SQL実行結果をDtoに詰め替える
 	 * 
-	 * @param <T>
-	 * 
 	 * @param result
+	 *            SQL発行結果
 	 * @param dtoClass
-	 * @return
+	 *            SQL発行結果を変換するDTOクラス
+	 * @return DTOリスト
 	 * @throws SQLException
+	 *             SQL例外
 	 */
 	public static <T> List<T> resultSetToWorkDtoList(ResultSet result,
 			Class<T> dtoClass) throws SQLException {
@@ -348,8 +354,10 @@ public class CommonDbUtil {
 	 * DB結果取得用のsetterをラベル文字列から作成
 	 * 
 	 * @param label
+	 *            ラベル
 	 * @param dtoClass
-	 * @return
+	 *            DTOクラス
+	 * @return DTO
 	 */
 	private static <T> Method createSetter(String label, Class<T> dtoClass) {
 
@@ -382,11 +390,12 @@ public class CommonDbUtil {
 	}
 
 	/**
-	 * ORマッパー用 ビーンからフィールド名とフィールドの値をmapで取得
+	 * ORマッパー用<br>
+	 * ビーンからフィールド名とフィールドの値をmapで取得
 	 * 
 	 * @param dto
-	 * @param dtoClass
-	 * @return
+	 *            DTO
+	 * @return DTOの項目と値のMap
 	 */
 	public static <T> HashMap<String, Object> createBeanValueMap(T dto) {
 
@@ -427,8 +436,10 @@ public class CommonDbUtil {
 	 * 件数取得
 	 * 
 	 * @param sql
+	 *            発行SQL
 	 * @param paramMap
-	 * @return
+	 *            バインドパラメータ
+	 * @return SQL結果件数
 	 */
 	public static int getDbResultCnt(String sql,
 			Map<Integer, Object> paramMap) {
@@ -452,9 +463,12 @@ public class CommonDbUtil {
 	 * 検索結果を取得
 	 * 
 	 * @param sql
+	 *            SQL文
 	 * @param paramMap
+	 *            バインドパラメータ
 	 * @param dtoClass
-	 * @return
+	 *            結果作成用DTOクラス
+	 * @return DTOリスト
 	 */
 	public static <T> List<T> getDtoList(String sql,
 			Map<Integer, Object> paramMap, Class<T> dtoClass) {
@@ -483,10 +497,13 @@ public class CommonDbUtil {
 	/**
 	 * １件取得
 	 * 
-	 * @param <T>
 	 * @param sql
+	 *            SQL文
 	 * @param paramMap
-	 * @return
+	 *            バインドパラメータ
+	 * @param dtoClass
+	 *            結果作成用DTOクラス
+	 * @return DTO
 	 */
 	public static <T> T findOne(String sql, HashMap<Integer, Object> paramMap,
 			Class<T> dtoClass) {
@@ -503,7 +520,9 @@ public class CommonDbUtil {
 	 * DB更新
 	 * 
 	 * @param sql
+	 *            SQL文
 	 * @param paramMap
+	 *            バインドパラメータ
 	 * @return 更新件数
 	 */
 	public static int updata(String sql, HashMap<Integer, Object> paramMap) {
@@ -573,10 +592,11 @@ public class CommonDbUtil {
 	}
 
 	/**
-	 * SQL型とjava型の相互変換
+	 * SQL型とjava型の日付相互変換
 	 * 
 	 * @param value
-	 * @return
+	 *            変換対象
+	 * @return 変換したオブジェクト
 	 */
 	private static Object convertDate(Object value) {
 
@@ -597,7 +617,9 @@ public class CommonDbUtil {
 	 * 編集時の今日のデータを未保存状態で複製
 	 * 
 	 * @param sql
+	 *            SQL文
 	 * @param paramMap
+	 *            バインドパラメータ
 	 */
 	public static void copyWork(String sql, HashMap<Integer, Object> paramMap) {
 

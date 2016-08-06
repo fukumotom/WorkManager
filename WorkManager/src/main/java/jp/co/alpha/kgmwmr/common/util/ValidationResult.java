@@ -25,7 +25,7 @@ public class ValidationResult {
 	 * エラーメッセージ用連結文字列
 	 */
 	private static final String DELIMITER = "<BR />";
-	
+
 	/**
 	 * メッセージリストの初期化
 	 */
@@ -36,7 +36,7 @@ public class ValidationResult {
 	/**
 	 * すべてのエラーメッセージを結合して取得
 	 * 
-	 * @return the errorMsg
+	 * @return エラーメッセージ
 	 */
 	public String getErrorMsgs() {
 
@@ -47,7 +47,7 @@ public class ValidationResult {
 	 * リストにメッセージを追加
 	 * 
 	 * @param errorMsg
-	 *            the errorMsg to add
+	 *            追加メッセージ
 	 */
 	public void addErrorMsg(String errorMsg) {
 		this.errorMsgList.add(errorMsg);

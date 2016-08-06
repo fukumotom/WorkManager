@@ -31,12 +31,12 @@ public class InputValidation {
 	 * データサイズチェック
 	 * 
 	 * @param target
-	 *            check data
+	 *            チェック対象
 	 * @param min
-	 *            data's minimum size
+	 *            データ最小値
 	 * @param maxdata
-	 *            's maximum size
-	 * @return
+	 *            データ最大値
+	 * @return チェック結果
 	 */
 	public static boolean inputSize(String target, int min, int max) {
 
@@ -49,10 +49,10 @@ public class InputValidation {
 	 * パスワード入力確認
 	 * 
 	 * @param target1
-	 *            password
+	 *            パスワード
 	 * @param target2
-	 *            confirmPassword
-	 * @return checkResult
+	 *            確認用パスワード
+	 * @return パスワード同値確認
 	 */
 	public static boolean confilm(String target1, String target2) {
 
@@ -63,6 +63,9 @@ public class InputValidation {
 	 * 数字判定
 	 * 
 	 * @param id
+	 *            チェック対象
+	 *
+	 * @return チェック結果
 	 */
 	public static boolean isNumber(String id) {
 
@@ -78,14 +81,15 @@ public class InputValidation {
 	/**
 	 * 時間（HH:mm）判定
 	 * 
-	 * @param startTime
-	 * @return
+	 * @param target
+	 *            チェック対象
+	 * @return チェック結果
 	 */
 	public static boolean isTime(String target) {
 
 		boolean result = true;
 		try {
-			DateUtils.getFomatTime(target);
+			DateUtils.getParseTime(target);
 		} catch (DateTimeException e) {
 			result = false;
 		}
@@ -97,7 +101,8 @@ public class InputValidation {
 	 * 作業idチェック
 	 * 
 	 * @param id
-	 * @return
+	 *            チェック対象
+	 * @return チェック結果
 	 */
 	public static boolean idCheck(String id) {
 
@@ -118,7 +123,8 @@ public class InputValidation {
 	 * 作業中フラグチェック
 	 * 
 	 * @param workingFlgStr
-	 * @return
+	 *            チェック対象
+	 * @return チェック結果
 	 */
 	public static boolean flgCheck(String workingFlgStr) {
 

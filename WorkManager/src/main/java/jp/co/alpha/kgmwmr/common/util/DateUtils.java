@@ -5,57 +5,122 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
+/**
+ * DateUtils
+ * @author kigami
+ *
+ */
+/**
+ * @author kigami
+ *
+ */
 public class DateUtils {
 
-	public static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy/M/d");
+	/**
+	 * 日付フォーマット
+	 */
+	public static final DateTimeFormatter DATEFORMATTER = DateTimeFormatter
+			.ofPattern("yyyy/M/d");
 
-	public static final DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+	/**
+	 * 時間フォーマット
+	 */
+	public static final DateTimeFormatter TIMEFORMATTER = DateTimeFormatter
+			.ofPattern("HH:mm");
 
+	/**
+	 * プライベートコンストラクタ
+	 */
 	private DateUtils() {
 	}
 
+	/**
+	 * 今日の日付取得
+	 * 
+	 * @return 今日の日付文字列
+	 */
 	public static String getTodayStr() {
-		return LocalDate.now().format(dateFormatter);
+		return LocalDate.now().format(DATEFORMATTER);
 	}
 
+	/**
+	 * 現在時間（文字列）取得
+	 * 
+	 * @return 現在時間
+	 */
 	public static String getNowTimeStr() {
-		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS).format(timeFormatter);
+		return LocalTime.now().truncatedTo(ChronoUnit.SECONDS)
+				.format(TIMEFORMATTER);
 	}
 
+	/**
+	 * 現在時間取得
+	 * 
+	 * @return 現在時間
+	 */
 	public static LocalTime getNowTime() {
-		String now = LocalTime.now().format(timeFormatter);
+		String now = LocalTime.now().format(TIMEFORMATTER);
 		return LocalTime.parse(now).truncatedTo(ChronoUnit.SECONDS);
 	}
 
-	public static LocalTime getParseTime(LocalTime time) {
+	/**
+	 * 秒切り捨て時間の取得
+	 * 
+	 * @param time
+	 *            時間
+	 * @return HH:ｍｍ形式の時間
+	 */
+	public static LocalTime truncatedTime(LocalTime time) {
 
-		String timeStr = time.format(timeFormatter);
+		String timeStr = time.format(TIMEFORMATTER);
 		return LocalTime.parse(timeStr).truncatedTo(ChronoUnit.SECONDS);
 	}
 
-	public static LocalTime getFomatTime(String time) {
+	/**
+	 * 文字列をLocalTime型に変換
+	 * 
+	 * @param time
+	 *            時間文字列
+	 * @return HH:mm 時間
+	 */
+	public static LocalTime getParseTime(String time) {
 
-		return LocalTime.parse(time, timeFormatter);
+		return LocalTime.parse(time, TIMEFORMATTER);
 	}
 
+	/**
+	 * 日付フォーマット
+	 * 
+	 * @param localDate
+	 *            フォーマット対象
+	 * @return yyyy/M/d形式の日付
+	 */
 	public static String formatDate(LocalDate localDate) {
 
-		return localDate.format(dateFormatter);
+		return localDate.format(DATEFORMATTER);
 	}
 
+	/**
+	 * 時間フォーマット
+	 * 
+	 * @param localTime
+	 *            フォーマット対象
+	 * @return HH:mm形式の時間
+	 */
 	public static String formatTime(LocalTime localTime) {
 
-		return localTime.format(timeFormatter);
+		return localTime.format(TIMEFORMATTER);
 	}
 
 	/**
 	 * 文字列をLocalDate型に変換
 	 * 
 	 * @param date
-	 * @return
+	 *            日付文字列
+	 * @return yyyy/M/d形式の日付
 	 */
 	public static LocalDate getParseDate(String date) {
-		return LocalDate.parse(date, dateFormatter);
+		return LocalDate.parse(date, DATEFORMATTER);
 	}
 
 }

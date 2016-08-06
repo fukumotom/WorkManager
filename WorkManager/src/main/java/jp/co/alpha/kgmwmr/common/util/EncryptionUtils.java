@@ -6,17 +6,46 @@ import java.security.NoSuchAlgorithmException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 暗号化クラス
+ * 
+ * @author kigami
+ *
+ */
 public class EncryptionUtils {
 
-	private static final Logger logger = LoggerFactory.getLogger(EncryptionUtils.class);
+	/**
+	 * ロガー
+	 */
+	private static final Logger logger = LoggerFactory
+			.getLogger(EncryptionUtils.class);
 
+	/**
+	 * プライベートコンストラクタ
+	 */
 	private EncryptionUtils() {
 	}
 
+	/**
+	 * 暗号化パスワードの取得
+	 * 
+	 * @param plainPassword
+	 *            プレーンパスワード
+	 * @return 暗号化パスワード
+	 */
 	public static String getEncPassword(String plainPassword) {
-		return getSHA256(plainPassword);
+		String password = getSHA256(plainPassword);
+
+		return password;
 	}
 
+	/**
+	 * パスワードの暗号化
+	 * 
+	 * @param target
+	 *            暗号化対象
+	 * @return 暗号化パスワード
+	 */
 	private static String getSHA256(String target) {
 		MessageDigest md;
 		StringBuilder buf = new StringBuilder();

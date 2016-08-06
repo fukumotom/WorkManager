@@ -31,7 +31,8 @@ public class WorkDao {
 	 * 編集作業取得SQL発行
 	 * 
 	 * @param inputWork
-	 * @return
+	 *            検索条件
+	 * @return 編集対象の作業情報
 	 */
 	public Work getEditWork(Work inputWork) {
 
@@ -59,7 +60,8 @@ public class WorkDao {
 	 * 画面から取得したIDから作業を取得するSQL発行
 	 * 
 	 * @param inputWork
-	 * @return
+	 *            検索条件
+	 * @return 作業情報
 	 */
 	public Work getSelectWork(Work inputWork) {
 
@@ -87,7 +89,8 @@ public class WorkDao {
 	 * 作業中の作業取得SQL発行
 	 * 
 	 * @param inputWork
-	 * @return
+	 *            検索条件
+	 * @return 未完了の作業リスト
 	 */
 	public List<Work> findWorking(Work inputWork) {
 
@@ -121,7 +124,9 @@ public class WorkDao {
 	 * 作業終了SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public void finishWork(Work inputWork) throws BusinessException {
 
@@ -148,6 +153,7 @@ public class WorkDao {
 	 * 作業開始SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void startWork(Work inputWork) {
 
@@ -172,7 +178,8 @@ public class WorkDao {
 	 * 作業リスト取得SQL発行
 	 * 
 	 * @param inputWork
-	 * @return
+	 *            検索条件
+	 * @return 作業リスト
 	 */
 	public List<Work> findAllWork(Work inputWork) {
 
@@ -211,8 +218,9 @@ public class WorkDao {
 	/**
 	 * 開始時間取得SQL発行
 	 * 
-	 * @param inputWork
-	 * @return
+	 * @param inputWor
+	 *            検索条件k
+	 * @return 開始時間
 	 */
 	public LocalTime findStartTime(Work inputWork) {
 
@@ -242,8 +250,10 @@ public class WorkDao {
 	 * 終了時間取得SQL発行
 	 * 
 	 * @param inputWork
-	 * @return
+	 *            検索条件
+	 * @return 終了時間
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public LocalTime findEndTime(Work inputWork) throws BusinessException {
 
@@ -277,6 +287,7 @@ public class WorkDao {
 	 * 作業挿入SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void insert(Work inputWork) {
 
@@ -300,7 +311,9 @@ public class WorkDao {
 	 * 作業削除SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public void delete(Work inputWork) throws BusinessException {
 
@@ -327,6 +340,7 @@ public class WorkDao {
 	 * 作業更新SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void updateWork(Work inputWork) {
 
@@ -348,6 +362,7 @@ public class WorkDao {
 	 * 作業保存SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void saveWork(Work inputWork) {
 		// SQL読み込み
@@ -368,6 +383,7 @@ public class WorkDao {
 	 * 未保存データの削除SQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void deleteUnSaveWork(Work inputWork) {
 		// SQL読み込み
@@ -389,6 +405,7 @@ public class WorkDao {
 	 * 今日の作業を未保存状態で複製するSQL発行
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void copyTodayWork(Work inputWork) {
 
@@ -409,6 +426,7 @@ public class WorkDao {
 	 * 保存処理時に複製した元のデータを削除
 	 * 
 	 * @param inputWork
+	 *            更新条件
 	 */
 	public void deleteCopyBase(Work inputWork) {
 

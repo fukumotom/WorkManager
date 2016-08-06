@@ -24,9 +24,6 @@ import jp.co.alpha.kgmwmr.model.User;
  */
 public class UserRegistLogic {
 
-	/**
-	 * ロガー
-	 */
 	private static final Logger logger = LoggerFactory
 			.getLogger(UserRegistLogic.class);
 
@@ -34,6 +31,7 @@ public class UserRegistLogic {
 	 * ユーザ情報登録
 	 * 
 	 * @param userForm
+	 *            ユーザ情報
 	 */
 	public void register(UserForm userForm) {
 
@@ -69,7 +67,8 @@ public class UserRegistLogic {
 	 * ユーザ登録入力チェック
 	 * 
 	 * @param userForm
-	 * @return
+	 *            チェック対象のユーザ情報
+	 * @return 表示用ユーザ情報
 	 */
 	public UserForm inputvalidation(UserForm userForm) {
 
@@ -124,7 +123,8 @@ public class UserRegistLogic {
 	 * ユーザ重複チェック
 	 * 
 	 * @param userName
-	 * @return
+	 *            ユーザ名
+	 * @return チェック結果
 	 */
 	private boolean multiUserCheck(String userName) {
 

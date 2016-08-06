@@ -29,8 +29,15 @@ public class WorkEditServlet extends HttpServlet {
 	 */
 	private static final String WORKLIST_JSP_PATH = "/WEB-INF/jsp/work/workList.jsp";
 
+	/**
+	 * 作業編集処理
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
-	public void doPost(HttpServletRequest request, HttpServletResponse response) {
+	public void doPost(HttpServletRequest request,
+			HttpServletResponse response) {
 
 		WorkEditForm editForm = setForm(request);
 
@@ -39,9 +46,11 @@ public class WorkEditServlet extends HttpServlet {
 		logic.updateWork(editForm);
 
 		// 作業リストへ戻る
-		WorkListViewForm viewForm = logic.getWorkListViewForm(editForm.getUserName(), LocalDate.now(), false);
+		WorkListViewForm viewForm = logic.getWorkListViewForm(
+				editForm.getUserName(), LocalDate.now(), false);
 		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
-		RequestDispatcher dispatcher = request.getRequestDispatcher(WORKLIST_JSP_PATH);
+		RequestDispatcher dispatcher = request
+				.getRequestDispatcher(WORKLIST_JSP_PATH);
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
@@ -54,7 +63,8 @@ public class WorkEditServlet extends HttpServlet {
 	 * 入力チェック
 	 * 
 	 * @param request
-	 * @return
+	 *            リクエスト情報
+	 * @return 作業編集フォーム
 	 */
 	private WorkEditForm setForm(HttpServletRequest request) {
 

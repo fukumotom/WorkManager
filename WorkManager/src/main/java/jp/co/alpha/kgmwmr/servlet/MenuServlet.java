@@ -17,6 +17,12 @@ import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
 
+/**
+ * MenuServletクラス
+ * 
+ * @author kigami
+ *
+ */
 @WebServlet("/Menu")
 public class MenuServlet extends HttpServlet {
 
@@ -25,6 +31,13 @@ public class MenuServlet extends HttpServlet {
 	private static final Logger logger = LoggerFactory
 			.getLogger(MenuServlet.class);
 
+	/**
+	 * メニュー画面表示<br>
+	 * 未保存処理を削除、セッション情報から検索条件を削除
+	 * 
+	 * @see javax.servlet.http.HttpServlet#doGet(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
+	 */
 	@Override
 	public void doGet(HttpServletRequest request,
 			HttpServletResponse response) {
