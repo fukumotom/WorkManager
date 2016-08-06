@@ -39,29 +39,6 @@ public class WorkLogic {
 	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
 
 	/**
-	 * 作業リスト表示データ取得
-	 * 
-	 * @param inputWork
-	 * @return
-	 */
-	private List<Work> findAllWork(Work inputWork) {
-
-		try {
-			// 接続開始
-			CommonDbUtil.openConnection();
-
-			WorkDao dao = new WorkDao();
-			List<Work> workList = dao.findAllWork(inputWork);
-			return workList;
-
-		} finally {
-			// 処理完了後、コネクションMapからコネクションを削除
-			CommonDbUtil.closeConnection();
-		}
-
-	}
-
-	/**
 	 * 作業挿入処理
 	 * 
 	 * @param inputWork
@@ -403,7 +380,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 完了する作業情報を取得 TODO notForm
+	 * 完了する作業情報を取得
 	 *
 	 * @param userName
 	 * @param deleteId
@@ -757,12 +734,23 @@ public class WorkLogic {
 
 		WorkListViewForm form = new WorkListViewForm();
 
-		Work work = new Work();
-		work.setUserName(userName);
-		work.setWorkDate(listDate);
-		work.setDelete(delete);
+		Work inputWork = new Work();
+		inputWork.setUserName(userName);
+		inputWork.setWorkDate(listDate);
+		inputWork.setDelete(delete);
 
-		List<Work> workList = findAllWork(work);
+		List<Work> workList;
+		try {
+			// 接続開始
+			CommonDbUtil.openConnection();
+
+			WorkDao dao = new WorkDao();
+			workList = dao.findAllWork(inputWork);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
 
 		form.setWorkList(workList);
 
