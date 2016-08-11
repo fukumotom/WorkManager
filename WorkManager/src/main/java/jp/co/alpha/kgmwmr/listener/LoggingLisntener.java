@@ -44,7 +44,7 @@ public class LoggingLisntener implements ServletRequestListener {
 		String url = request.getRequestURI();
 		if (!url.contains(URI_PATTERN)) {
 			// リソース取得時はログ出力しない
-			logger.info("===== リクエスト終了 URL:{} =====", url);
+			logger.debug("===== リクエスト終了 URL:{} =====", url);
 		}
 	}
 
@@ -61,7 +61,7 @@ public class LoggingLisntener implements ServletRequestListener {
 		String url = request.getRequestURI();
 		if (!url.contains(URI_PATTERN)) {
 			// リソース取得時はログ出力しない
-			logger.info("===== リクエスト開始 URL:{} =====", url);
+			logger.debug("===== リクエスト開始 URL:{} =====", url);
 		}
 	}
 }
