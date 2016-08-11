@@ -141,7 +141,7 @@ public class WorkListServlet extends HttpServlet {
 				viewForm = logic.saveWork(inputForm);
 			} else if (request.getParameter("csvExportBtn") != null) {
 				logger.info("CSVエクスポート処理開始:");
-				File csvFile = logic.csvExport(inputWork);
+				File csvFile = logic.csvExport(inputForm);
 				download(response, csvFile);
 			} else {
 				// 編集

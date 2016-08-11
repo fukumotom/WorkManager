@@ -66,32 +66,11 @@ public class WorkLogic {
 	private static final String NEW_LINE = "\n";
 
 	/**
-	 * 作業リスト表示データ取得
-	 * 
-	 * @param work
-	 * @return
-	 */
-	public List<Work> findAllWork(Work work) {
-
-		try {
-			// 接続開始
-			CommonDbUtil.openConnection();
-
-			WorkDao dao = new WorkDao();
-			List<Work> workList = dao.findAllWork(work);
-			return workList;
-
-		} finally {
-			// 処理完了後、コネクションMapからコネクションを削除
-			CommonDbUtil.closeConnection();
-		}
-
-	}
-
-	/**
 	 * 作業挿入処理
 	 * 
-	 * @param inputWork
+	 * @param inputForm
+	 *            入力情報
+	 * @return 画面表示情報
 	 */
 	public WorkListViewForm insertWork(WorkListForm inputForm) {
 
@@ -134,8 +113,10 @@ public class WorkLogic {
 	 * 作業論理削除処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkListViewForm delete(WorkListForm inputForm)
 			throws BusinessException {
@@ -172,7 +153,8 @@ public class WorkLogic {
 	 * 編集作業検索処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 作業編集用情報
 	 */
 	public WorkEditForm getEditWork(WorkListForm inputForm) {
 
@@ -211,7 +193,9 @@ public class WorkLogic {
 	 * 作業更新処理
 	 * 
 	 * @param editForm
+	 *            <<<<<<< ddf992619a9e5a40934eefec2bea757d4fdffd3f
 	 * @throws BusinessException
+	 *             ======= 入力情報 >>>>>>> fix model to form and add javadoc #103
 	 */
 	public void updateWork(WorkEditForm editForm) throws BusinessException {
 
@@ -312,7 +296,8 @@ public class WorkLogic {
 	 * 作業保存処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 */
 	public WorkListViewForm saveWork(WorkListForm inputForm) {
 
@@ -353,6 +338,7 @@ public class WorkLogic {
 	 * 未保存作業削除処理
 	 * 
 	 * @param userName
+	 *            ログインユーザ名
 	 */
 	public void deleteUnSaveWork(String userName) {
 
@@ -379,7 +365,8 @@ public class WorkLogic {
 	 * 画面表示用データを取得
 	 * 
 	 * @param userName
-	 * @return
+	 *            ログインユーザ名
+	 * @return 画面表示情報
 	 */
 	public WorkRegisterViewForm getViewdata(String userName) {
 
@@ -404,7 +391,8 @@ public class WorkLogic {
 	 * 画面表示用フォームの取得
 	 * 
 	 * @param userName
-	 * @return
+	 *            ログインユーザ名
+	 * @return 画面表示情報
 	 */
 	private WorkRegisterViewForm getWorkRegisterViewForm(String userName) {
 
@@ -463,11 +451,13 @@ public class WorkLogic {
 	/**
 	 * 作業完了処理
 	 * 
-	 * @param finshForm
-	 * 
-	 * @param inputWork
-	 * @return
+	 * @param userName
+	 *            ログインユーザ名
+	 * @param deleteId
+	 *            削除する作業ID
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkRegisterViewForm finishWork(String userName, String deleteId)
 			throws BusinessException {
@@ -508,9 +498,11 @@ public class WorkLogic {
 	 * 完了する作業情報を取得
 	 *
 	 * @param userName
+	 *            ログインユーザ名
 	 * @param deleteId
 	 * @return
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	private Work getFinishWork(String userName, Integer deleteId)
 			throws BusinessException {
@@ -568,9 +560,12 @@ public class WorkLogic {
 	 * 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
+	 *            ログインユーザ名
 	 * @param registerForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkRegisterViewForm register(String userName,
 			WorkRegisterForm registerForm) throws BusinessException {
@@ -630,10 +625,12 @@ public class WorkLogic {
 	}
 
 	/**
-	 * （同期処理）
+	 * 登録（同期処理）
 	 * 
 	 * @param inputWork
+	 *            作業情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	private synchronized void workRegiste(Work inputWork)
 			throws BusinessException {
@@ -678,8 +675,8 @@ public class WorkLogic {
 	 * 作業開始ボタン押下時の入力チェック
 	 * 
 	 * @param form
-	 * @param inputWork
-	 * @return
+	 *            入力情報
+	 * @return 入力チェック結果
 	 */
 	private ValidationResult inputCheckWhenStart(WorkRegisterForm form) {
 
@@ -758,8 +755,10 @@ public class WorkLogic {
 	 * 履歴表示ロジック TODO実装途中
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力所法
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkListViewForm history(WorkListForm inputForm)
 			throws BusinessException {
@@ -807,8 +806,10 @@ public class WorkLogic {
 	 * 作業追加処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkListViewForm addWork(WorkListForm inputForm)
 			throws BusinessException {
@@ -876,9 +877,12 @@ public class WorkLogic {
 	 * 作業リスト表示用フォームを取得
 	 * 
 	 * @param userName
+	 *            ログインユーザ名
 	 * @param listDate
+	 *            表示する作業日付
 	 * @param delete
-	 * @return
+	 *            検索条件（削除済みを含むかの判定用）
+	 * @return 画面表示情報
 	 */
 	public WorkListViewForm getWorkListViewForm(String userName,
 			LocalDate listDate, boolean delete) {
@@ -916,7 +920,8 @@ public class WorkLogic {
 	 * 作業編集用Formへの詰め替え
 	 * 
 	 * @param work
-	 * @return
+	 *            作業情報
+	 * @return 作業編集用Form
 	 */
 	private WorkEditForm setWorkEditForm(Work work) {
 
@@ -956,15 +961,24 @@ public class WorkLogic {
 	/**
 	 * CSVエクスポート処理
 	 * 
-	 * @param inputWork
-	 * @return
+	 * @param inputForm
+	 *            入力情報
+	 * @return 出力するCSVファイル
 	 * @throws BusinessException
+	 *             業務例外
 	 */
-	public File csvExport(Work inputWork) throws BusinessException {
+	public File csvExport(WorkListForm inputForm) throws BusinessException {
+
+		// form情報を処理用モデルに設定
+		Work inputWork = new Work();
+		String userName = inputForm.getUserName();
+		inputWork.setUserName(userName);
+		// inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
+		LocalDate workDate = DateUtils.getParseDate(inputForm.getWorkDate());
+		inputWork.setWorkDate(workDate);
 
 		// 検索条件から日付を取得
-		String fileName = DateUtils.csvFormatDate(inputWork.getWorkDate())
-				+ "_workList.csv";
+		String fileName = DateUtils.csvFormatDate(workDate) + "_workList.csv";
 		File csvFile = new File(fileName);
 
 		List<Work> dataList;
