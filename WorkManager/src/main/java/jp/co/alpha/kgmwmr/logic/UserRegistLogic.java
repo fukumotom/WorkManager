@@ -32,8 +32,7 @@ public class UserRegistLogic {
 		// 更新前セッションチェック
 		if (userForm == null) {
 			// セッションから情報が取得できなかった場合、不正操作
-			throw new IllegalOperationException(
-					PropertyUtils.getValue(MsgCodeDef.BAD_OPERATION));
+			throw new IllegalOperationException(MsgCodeDef.BAD_OPERATION);
 		}
 
 		// formをmodelに詰め替え

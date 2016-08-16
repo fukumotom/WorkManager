@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
-import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
 
 @WebServlet("/Logout")
@@ -48,13 +47,12 @@ public class LogoutServlet extends HttpServlet {
 		// ログイン情報削除
 		HttpSession session = request.getSession();
 		session.invalidate();
-		logger.debug("sessionを削除しました。　:userName:{}" + userName);
+		logger.debug("sessionを削除しました。 :userName:{}" + userName);
 
 		try {
 			response.sendRedirect("/WorkManager/Menu");
 		} catch (IOException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.ERR_REDIRECT), e);
+			throw new SystemException(e, MsgCodeDef.ERR_REDIRECT);
 		}
 	}
 

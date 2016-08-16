@@ -14,7 +14,6 @@ import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.common.util.EncryptionUtils;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
-import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.form.UserForm;
 import jp.co.alpha.kgmwmr.logic.UserRegistLogic;
 
@@ -82,8 +81,7 @@ public class UserRegistServlet extends HttpServlet {
 		try {
 			dispacher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
+			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
 	}
 
@@ -139,8 +137,7 @@ public class UserRegistServlet extends HttpServlet {
 
 			}
 		} catch (IOException | ServletException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.ERR_REDIRECT), e);
+			throw new SystemException(e, MsgCodeDef.ERR_REDIRECT);
 		}
 	}
 

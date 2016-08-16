@@ -94,7 +94,7 @@ public class MsgCodeDef {
 	public static final String DB_UPDATE = "i.db.003";
 
 	/**
-	 * DB更新失敗
+	 * DB挿入失敗
 	 */
 	public static final String MISS_DB_INSERT = "e.db.001";
 
@@ -114,6 +114,11 @@ public class MsgCodeDef {
 	public static final String MISS_DB_FIND = "e.db.004";
 
 	/**
+	 * DB更新失敗
+	 */
+	public static final String MISS_DB_UPDATE = "e.db.005";
+
+	/**
 	 * 仕掛作業あり
 	 */
 	public static final String WORKING = "i.business.001";
@@ -129,6 +134,46 @@ public class MsgCodeDef {
 	public static final String ALREADY_START = "w.business.001";
 
 	/**
+	 * 作業追加時の警告
+	 */
+	public static final String CAN_NOT_ADD = "w.business.002";
+
+	/**
+	 * 作業追加時の警告
+	 */
+	public static final String CONNECTION_CLOSE_ERROR = "w.business.003";
+	
+	/**
+	 * 不正な入力値
+	 */
+	public static final String INPUT_ERROR = "w.business.004";
+
+	/**
+	 * バインドに失敗しました
+	 */
+	public static final String BIND_ERROR = "e.business.001";
+
+	/**
+	 * リフレクション失敗
+	 */
+	public static final String REFLECTION_ERROR = "e.business.002";
+
+	/**
+	 * JNDI接続エラー
+	 */
+	public static final String CONNECTION_ERROR = "e.business.003";
+
+	/**
+	 * SQLファイル読み込み失敗
+	 */
+	public static final String SQL_LOAD_ERROR = "e.business.004";
+
+	/**
+	 * 複数件存在
+	 */
+	public static final String ALREADY_EXIT = "e.business.005";
+
+	/**
 	 * リダイレクト失敗
 	 */
 	public static final String ERR_REDIRECT = "e.business.006";
@@ -137,4 +182,9 @@ public class MsgCodeDef {
 	 * リダイレクト失敗
 	 */
 	public static final String ERR_FORWARD = "e.business.007";
+
+	/**
+	 * プロパティファイル読み込み失敗
+	 */
+	public static final String PROP_LOAD_ERROR = "e.business.008";
 }

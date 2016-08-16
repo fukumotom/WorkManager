@@ -3,6 +3,8 @@ package jp.co.alpha.kgmwmr.common.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
+
 /**
  * システム例外クラス
  * 
@@ -25,33 +27,38 @@ public class SystemException extends RuntimeException {
 	/**
 	 * システム例外
 	 * 
-	 * @param e
-	 *            例外情報
-	 */
-	public SystemException(Throwable e) {
-		this("システムエラー", e);
-	}
-
-	/**
-	 * システム例外
-	 * 
-	 * @param message
-	 *            エラーメッセージ
-	 */
-	public SystemException(String message) {
-		this(message, null);
-	}
-
-	/**
-	 * システム例外
-	 * 
-	 * @param message
-	 *            エラーメッセージ
 	 * @param cause
 	 *            例外情報
 	 */
-	public SystemException(String message, Throwable cause) {
-		super(message, cause);
-		logger.error(message + ":{}", cause);
+	public SystemException(Throwable cause) {
+		this(cause, null);
+	}
+
+	/**
+	 * システム例外
+	 * 
+	 * @param messageCode
+	 *            メッセージコード
+	 * @param args
+	 *            メッセージ生成引数
+	 */
+	public SystemException(String messageCode, String... args) {
+		this(null, messageCode, args);
+	}
+
+	/**
+	 * システム例外
+	 * 
+	 * @param cause
+	 *            例外情報
+	 * @param messageCode
+	 *            メッセージコード
+	 * @param args
+	 *            メッセージ生成引数
+	 */
+	public SystemException(Throwable cause, String messageCode,
+			String... args) {
+		super(messageCode, cause);
+		logger.error(PropertyUtils.getValue(messageCode), cause);
 	}
 }

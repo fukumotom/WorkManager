@@ -71,8 +71,7 @@ public class WorkRegistServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
+			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
 	}
 
@@ -128,8 +127,7 @@ public class WorkRegistServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.ERR_FORWARD), e);
+			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
 	}
 

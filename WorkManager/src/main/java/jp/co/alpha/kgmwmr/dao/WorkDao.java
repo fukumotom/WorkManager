@@ -143,11 +143,13 @@ public class WorkDao {
 
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt == 0) {
-			throw new BusinessException("すでに完了した作業です。");
+			throw new BusinessException(MsgCodeDef.ALREADY_FINISHED);
 		} else if (resultCnt == 1) {
-			logger.info("正常に作業が終了");
+			if (logger.isDebugEnabled()) {
+				logger.debug("正常に作業が終了");
+			}
 		} else {
-			throw new SystemException("作業終了が正常に行われませんでした。");
+			throw new SystemException(MsgCodeDef.MISS_DB_UPDATE);
 		}
 	}
 
@@ -169,10 +171,15 @@ public class WorkDao {
 				dto);
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt > 0) {
-			logger.info("正常に作業を開始");
-			logger.info("作業開始件数:{}件", resultCnt);
+
+			if (logger.isDebugEnabled()) {
+				logger.debug("正常に作業を開始");
+			}
+
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_REGISTER,
+					String.valueOf(resultCnt)));
 		} else {
-			throw new SystemException("作業開始が正常に行われませんでした。");
+			throw new SystemException(MsgCodeDef.MISS_DB_INSERT);
 		}
 	}
 
@@ -275,7 +282,7 @@ public class WorkDao {
 				WorkDto.class);
 
 		if (resultDto.getEndTime() == null) {
-			throw new BusinessException("作業中の下に追加はできません。");
+			throw new BusinessException(MsgCodeDef.CAN_NOT_ADD);
 		}
 
 		// modelに詰め替え
@@ -333,11 +340,9 @@ public class WorkDao {
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 
 		if (resultCnt == 0) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.ALREADY_DELETE));
+			throw new BusinessException(MsgCodeDef.ALREADY_DELETE);
 		} else if (resultCnt > 1) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.MISS_DB_DELETE));
+			throw new SystemException(MsgCodeDef.MISS_DB_DELETE);
 		} else {
 			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
 					String.valueOf(resultCnt)));

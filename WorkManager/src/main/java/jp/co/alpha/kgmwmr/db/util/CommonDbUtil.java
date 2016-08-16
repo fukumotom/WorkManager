@@ -68,31 +68,6 @@ public class CommonDbUtil {
 	private static final String DS_NAME = "db.look.up.name";
 
 	/**
-	 * バインドに失敗しました
-	 */
-	private static final String ERR_BUSINESS_001 = "e.business.001";
-
-	/**
-	 * リフレクション失敗
-	 */
-	private static final String ERR_BUSINESS_002 = "e.business.002";
-
-	/**
-	 * JNDI接続エラー
-	 */
-	private static final String ERR_BUSINESS_003 = "e.business.003";
-
-	/**
-	 * SQLファイル読み込み失敗
-	 */
-	private static final String ERR_BUSINESS_004 = "e.business.004";
-
-	/**
-	 * 複数件存在
-	 */
-	private static final String ERR_BUSINESS_005 = "e.business.005";
-
-	/**
 	 * プライベートコンストラクタ
 	 */
 	private CommonDbUtil() {
@@ -120,7 +95,7 @@ public class CommonDbUtil {
 			con.setAutoCommit(isAutoCommit);
 			connectionMap.put(connectionId, con);
 		} catch (NamingException | SQLException e) {
-			throw new SystemException(ERR_BUSINESS_003, e);
+			throw new SystemException(e, MsgCodeDef.CONNECTION_ERROR);
 		}
 	}
 
@@ -169,7 +144,8 @@ public class CommonDbUtil {
 			try {
 				con.close();
 			} catch (SQLException e) {
-				logger.warn("DBコネクションクローズ時に失敗:{}", e);
+				logger.warn(PropertyUtils
+						.getValue(MsgCodeDef.CONNECTION_CLOSE_ERROR), e);
 			}
 		}
 	}
@@ -201,7 +177,7 @@ public class CommonDbUtil {
 			}
 
 		} catch (IOException e) {
-			throw new SystemException(ERR_BUSINESS_004, e);
+			throw new SystemException(e, MsgCodeDef.SQL_LOAD_ERROR);
 		}
 		logger.debug("読み込みSQL：{}", builder.toString());
 		return builder;
@@ -220,7 +196,7 @@ public class CommonDbUtil {
 			ds = (DataSource) context
 					.lookup(PropertyUtils.getValue(ConstantDef.DB_LOOK_UP));
 		} catch (NamingException e) {
-			throw new SystemException(ERR_BUSINESS_003, e);
+			throw new SystemException(e, MsgCodeDef.CONNECTION_ERROR);
 		}
 		return ds;
 	}
@@ -354,7 +330,7 @@ public class CommonDbUtil {
 			try {
 				dto = dtoClass.newInstance();
 			} catch (InstantiationException | IllegalAccessException e) {
-				throw new SystemException(ERR_BUSINESS_002, e);
+				throw new SystemException(e, MsgCodeDef.REFLECTION_ERROR);
 			}
 			for (Entry<String, String> entry : clmNameMap.entrySet()) {
 				String label = entry.getKey();
@@ -379,7 +355,7 @@ public class CommonDbUtil {
 
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
-					throw new SystemException(ERR_BUSINESS_001, e);
+					throw new SystemException(e, MsgCodeDef.BIND_ERROR);
 				}
 			}
 			dtoList.add(dto);
@@ -421,7 +397,7 @@ public class CommonDbUtil {
 		if (setter == null) {
 			logger.error("{}内に{}のsetterが見つかりませんでした。", dtoClass.getName(),
 					label);
-			throw new SystemException(PropertyUtils.getValue(ERR_BUSINESS_001));
+			throw new SystemException(MsgCodeDef.BIND_ERROR);
 		}
 		return setter;
 	}
@@ -457,7 +433,7 @@ public class CommonDbUtil {
 					value = method.invoke(dto);
 				} catch (IllegalAccessException | IllegalArgumentException
 						| InvocationTargetException e) {
-					throw new SystemException(ERR_BUSINESS_002, e);
+					throw new SystemException(e, MsgCodeDef.REFLECTION_ERROR);
 				}
 				dtoMap.put(fieldName, value);
 			}
@@ -489,8 +465,7 @@ public class CommonDbUtil {
 			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.MISS_DB_FIND), e);
+			throw new SystemException(e, MsgCodeDef.MISS_DB_FIND);
 		}
 
 		return resultCnt;
@@ -524,8 +499,7 @@ public class CommonDbUtil {
 			dtoList = resultSetToWorkDtoList(result, dtoClass);
 
 		} catch (SQLException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.MISS_DB_FIND), e);
+			throw new SystemException(e, MsgCodeDef.MISS_DB_FIND);
 		}
 
 		return dtoList;
@@ -547,7 +521,7 @@ public class CommonDbUtil {
 
 		List<T> dtoList = getDtoList(sql, paramMap, dtoClass);
 		if (dtoList.size() != 1) {
-			throw new SystemException(ERR_BUSINESS_005);
+			throw new SystemException(MsgCodeDef.ALREADY_EXIT);
 		}
 
 		return dtoList.get(0);
@@ -575,8 +549,7 @@ public class CommonDbUtil {
 			resultCnt = pstm.executeUpdate();
 
 		} catch (SQLException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.MISS_DB_INSERT), e);
+			throw new SystemException(e, MsgCodeDef.MISS_DB_INSERT);
 		}
 
 		return resultCnt;
@@ -624,7 +597,7 @@ public class CommonDbUtil {
 
 		} catch (IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
-			throw new SystemException(ERR_BUSINESS_001, e);
+			throw new SystemException(e, MsgCodeDef.BIND_ERROR);
 		}
 	}
 
@@ -671,8 +644,7 @@ public class CommonDbUtil {
 			pstm.execute();
 
 		} catch (SQLException e) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.MISS_DB_COPY), e);
+			throw new SystemException(e, MsgCodeDef.MISS_DB_COPY);
 		}
 	}
 }

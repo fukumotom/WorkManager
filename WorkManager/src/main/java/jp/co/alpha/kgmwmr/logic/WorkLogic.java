@@ -410,8 +410,7 @@ public class WorkLogic {
 
 		// 入力(id)チェック
 		if (!InputValidation.idCheck(deleteId)) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(MsgCodeDef.BAD_INPUT);
 		}
 
 		// 画面表示用情報
@@ -462,11 +461,9 @@ public class WorkLogic {
 		Work finishWork = dao.getSelectWork(inputWork);
 		// 取得した作業チェック
 		if (finishWork.isDelete()) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.ALREADY_FINISHED));
+			throw new BusinessException(MsgCodeDef.ALREADY_FINISHED);
 		} else if (finishWork.getEndTime() != null) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.ALREADY_DELETE));
+			throw new BusinessException(MsgCodeDef.ALREADY_DELETE);
 		}
 
 		// 終了時間を設定
@@ -583,8 +580,7 @@ public class WorkLogic {
 		if (workList.size() == 1) {
 			if (inputWork.getId() == 0) {
 				// 別の操作で作業が追加されていた場合
-				throw new BusinessException(
-						PropertyUtils.getValue(MsgCodeDef.ALREADY_START, "作業"));
+				throw new BusinessException(MsgCodeDef.ALREADY_START, "作業");
 			}
 
 			// DBに登録されている仕掛処理を取得
@@ -633,15 +629,13 @@ public class WorkLogic {
 		// idチェック
 		String id = form.getId();
 		if (!InputValidation.idCheck(id)) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(MsgCodeDef.BAD_INPUT);
 		}
 
 		// 開始時間チェック
 		String startTime = form.getStartTime();
 		if (startTime == null) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(MsgCodeDef.BAD_INPUT);
 		}
 		if (!startTime.isEmpty()) {
 			// フォーマットチェック
