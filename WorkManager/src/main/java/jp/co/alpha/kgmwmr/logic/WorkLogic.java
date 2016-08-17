@@ -1008,15 +1008,13 @@ public class WorkLogic {
 			// 内容を出力
 			for (Work data : dataList) {
 				// 時間は""で囲む
-				String startTime = DateUtils.formatTime(data.getStartTime())
-						.replaceAll("\"", "\"\"");
-				sb.append("\"" + startTime + "\"").append(CSV_DELIMITER);
+				String startTime = DateUtils.formatTime(data.getStartTime());
+				sb.append(addDoublequotes(startTime)).append(CSV_DELIMITER);
 
 				if (data.getEndTime() != null) {
 					// 時間は""で囲む
-					String endTime = DateUtils.formatTime(data.getEndTime())
-							.replaceAll("\"", "\"\"");
-					sb.append("\"" + endTime + "\"").append(CSV_DELIMITER);
+					String endTime = DateUtils.formatTime(data.getEndTime());
+					sb.append(addDoublequotes(endTime)).append(CSV_DELIMITER);
 				} else {
 					// 未終了作業の終了時間は空白
 					sb.append(CSV_DELIMITER);
@@ -1025,21 +1023,21 @@ public class WorkLogic {
 				if (data.getWorkingTime() != null) {
 					// 時間は""で囲む
 					String WorkingTime = DateUtils
-							.formatTime(data.getWorkingTime())
-							.replaceAll("\"", "\"\"");
-					sb.append("\"" + WorkingTime + "\"").append(CSV_DELIMITER);
+							.formatTime(data.getWorkingTime());
+					sb.append(addDoublequotes(WorkingTime))
+							.append(CSV_DELIMITER);
 				} else {
 					// 未終了の作業時間は空白
 					sb.append(CSV_DELIMITER);
 				}
 
 				// ""（引用符）がある場合、CSV出力用にエスケープする。
-				String Contents = data.getContents().replaceAll("\"", "\"\"");
-				sb.append("\"" + Contents + "\"").append(CSV_DELIMITER);
+				String Contents = csvEscape(data.getContents());
+				sb.append(addDoublequotes(Contents)).append(CSV_DELIMITER);
 
 				// ""（引用符）がある場合、CSV出力用にエスケープする。
-				String note = data.getNote().replaceAll("\"", "\"\"");
-				sb.append("\"" + note + "\"").append(CSV_DELIMITER);
+				String note = csvEscape(data.getNote());
+				sb.append(addDoublequotes(note)).append(CSV_DELIMITER);
 				// 行の改行を追加
 				sb.append(NEW_LINE);
 			}
@@ -1052,5 +1050,27 @@ public class WorkLogic {
 		}
 
 		return csvFile;
+	}
+
+	/**
+	 * 対象文字をcsv出力用にダブルクォートでエスケープ
+	 * 
+	 * @param target
+	 * @return エスケープした文字列
+	 */
+	private String csvEscape(String target) {
+
+		String escape = target.replaceAll("\"", "\"\"");
+		return escape;
+	}
+
+	/**
+	 * 対象文字をダブルクォートで囲む
+	 * 
+	 * @param target
+	 * @return ダブルクォートで囲んだ文字列
+	 */
+	private String addDoublequotes(String target) {
+		return "\"" + target + "\"";
 	}
 }
