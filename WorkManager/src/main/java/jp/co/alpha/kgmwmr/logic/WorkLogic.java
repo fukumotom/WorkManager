@@ -1001,15 +1001,8 @@ public class WorkLogic {
 			logger.debug("作成ファイルのパス:{}", csvFile.getAbsolutePath());
 
 			StringBuilder sb = new StringBuilder();
-			for (int i = 0; i < csvTitles.length; i++) {
-
-				sb.append("\"" + csvTitles[i] + "\"");
-
-				// 行の最後はカンマを付けない
-				if (i != csvTitles.length - 1) {
-					sb.append(CSV_DELIMITER);
-				}
-			}
+			// タイトル列を作成
+			sb.append(String.join(CSV_DELIMITER, csvTitles));
 			sb.append(NEW_LINE);
 
 			// 内容を出力
