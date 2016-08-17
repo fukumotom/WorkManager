@@ -973,7 +973,7 @@ public class WorkLogic {
 		Work inputWork = new Work();
 		String userName = inputForm.getUserName();
 		inputWork.setUserName(userName);
-		// inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
+
 		LocalDate workDate = DateUtils.getParseDate(inputForm.getWorkDate());
 		inputWork.setWorkDate(workDate);
 
@@ -1002,7 +1002,9 @@ public class WorkLogic {
 
 			StringBuilder sb = new StringBuilder();
 			for (int i = 0; i < csvTitles.length; i++) {
+
 				sb.append("\"" + csvTitles[i] + "\"");
+
 				// 行の最後はカンマを付けない
 				if (i != csvTitles.length - 1) {
 					sb.append(CSV_DELIMITER);

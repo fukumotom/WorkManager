@@ -27,7 +27,6 @@ import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
-import jp.co.alpha.kgmwmr.model.Work;
 
 /**
  * 作業リスト表示サーブレット
@@ -72,14 +71,10 @@ public class WorkListServlet extends HttpServlet {
 		// ログインユーザ取得
 		String userName = request.getUserPrincipal().getName();
 
-		Work work = new Work();
-		work.setUserName(userName);
-		work.setWorkDate(LocalDate.now());
-		// 一覧表示時は削除済みを含まない
-		work.setDelete(false);
+		WorkListForm criteria = setForm(request);
 
 		// 初期表示の作業リスト検索条件をセッションに設定
-		request.getSession().setAttribute(ConstantDef.CRITERIA, work);
+		request.getSession().setAttribute(ConstantDef.CRITERIA, criteria);
 
 		WorkLogic logic = new WorkLogic();
 		logic.copyTodayWork(userName);
