@@ -63,6 +63,10 @@
 		</form-login-config>
 	</login-config>
 
+	<!-- ルートアクセス時の遷移 -->
+	<welcome-file-list>
+		<welcome-file>/WEB-INF/jsp/menu.jsp</welcome-file>
+	</welcome-file-list>
 
 	<resource-ref>
 		<description>postgreSQL Datasource example</description>
