@@ -160,6 +160,8 @@ public class WorkListServlet extends HttpServlet {
 
 			// エラーメッセージ設定
 			viewForm.setErrMsgs(e.getMessage());
+		} finally {
+
 		}
 
 		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
@@ -220,7 +222,7 @@ public class WorkListServlet extends HttpServlet {
 		response.setContentType("application/octet-stream");
 		response.setContentLength((int) csvFile.length());
 		response.setHeader("Content-disposition",
-				"attachment; filename=\"" + csvFile.getName() + "\"");
+				"attachment; filename=\"" + csvFile.getName() + "\"");// csvFile.getName()
 
 		// キャッシュの無効化
 		response.setHeader("Cache-Control",
@@ -246,6 +248,9 @@ public class WorkListServlet extends HttpServlet {
 			// ヘッダーのリセット
 			response.reset();
 			throw new SystemException(e);
+		} finally {
+			// ダウンロード失敗時、ファイルを削除
+			csvFile.delete();
 		}
 	}
 }
