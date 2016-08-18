@@ -1,5 +1,7 @@
 package jp.co.alpha.kgmwmr.form;
 
+import java.util.ArrayList;
+
 /**
  * 作業登録処理のフォーム
  * 
@@ -34,6 +36,11 @@ public class WorkEditForm {
 	private String contents;
 
 	/**
+	 * 選択用作業内容リスト
+	 */
+	private ArrayList<String> contentsList;
+
+	/**
 	 * 備考
 	 */
 	private String note;
@@ -42,6 +49,11 @@ public class WorkEditForm {
 	 * エラーメッセージ
 	 */
 	private String errMsgs;
+
+	/**
+	 * 選択用備考リスト
+	 */
+	private ArrayList<String> noteList;
 
 	/**
 	 * @return the id
@@ -105,6 +117,21 @@ public class WorkEditForm {
 	}
 
 	/**
+	 * @return the contentsList
+	 */
+	public ArrayList<String> getContentsList() {
+		return contentsList;
+	}
+
+	/**
+	 * @param contentsList
+	 *            the contentsList to set
+	 */
+	public void setContentsList(ArrayList<String> contentsList) {
+		this.contentsList = contentsList;
+	}
+
+	/**
 	 * @return the note
 	 */
 	public String getNote() {
@@ -119,18 +146,20 @@ public class WorkEditForm {
 		this.note = note;
 	}
 
-	/**
-	 * @return the errMsgs
-	 */
 	public String getErrMsgs() {
 		return errMsgs;
 	}
 
-	/**
-	 * @param errMsgs the errMsgs to set
-	 */
 	public void setErrMsgs(String errMsgs) {
 		this.errMsgs = errMsgs;
+	}
+
+	public ArrayList<String> getNoteList() {
+		return noteList;
+	}
+
+	public void setNoteList(ArrayList<String> noteList) {
+		this.noteList = noteList;
 	}
 
 }

@@ -51,8 +51,25 @@
 							<th>備考</th>
 						</tr>
 						<tr>
-							<td><input type="text" name="contents" /></td>
-							<td><input type="text" name="note" /></td>
+							<td><input type="text" name="contents" list="contentsList" />
+								<datalist id="contentsList">
+									<option value="${form.contents}" selected></option>
+									<%
+										for (String selectContents : form.getContentsList()) {
+											out.println(
+													"<option value=\"" + selectContents + "\"></option>");
+										}
+									%>
+								</datalist></td>
+							<td><input type="text" name="note" list="noteList" /> <datalist
+									id="noteList">
+									<option value="${form.note}" selected></option>
+									<%
+										for (String selectNote : form.getNoteList()) {
+											out.println("<option value=\"" + selectNote + "\"></option>");
+										}
+									%>
+								</datalist></td>
 						</tr>
 					</table>
 				</td>

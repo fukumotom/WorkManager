@@ -2,6 +2,7 @@ package jp.co.alpha.kgmwmr.logic;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -132,6 +133,7 @@ public class WorkLogic {
 		inputWork.setUserName(userName);
 		inputWork.setId(ConvertToModelUtils.convertInt(inputForm.getId()));
 		Work output;
+		WorkEditForm editForm;
 		try {
 			// 接続開始
 			CommonDbUtil.openConnection();
@@ -139,13 +141,20 @@ public class WorkLogic {
 			WorkDao dao = new WorkDao();
 			output = dao.getEditWork(inputWork);
 
+			// 編集するデータ（画面初期表示用）取得
+			editForm = setWorkEditForm(output);
+
+			// コンボボックス用作業内容取得
+			ArrayList<String> contentsList = getConbbox("contents", inputWork);
+			editForm.setContentsList(contentsList);
+			ArrayList<String> noteList = getConbbox("note", inputWork);
+			editForm.setNoteList(noteList);
+
 		} finally {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
 
-		// 編集するデータ（画面初期表示用）取得
-		WorkEditForm editForm = setWorkEditForm(output);
 		return editForm;
 	}
 
@@ -378,6 +387,12 @@ public class WorkLogic {
 
 		// 作業開始時間(初期表示用)を設定
 		form.setNowTime(DateUtils.getNowTimeStr());
+
+		// コンボボックス用作業内容取得
+		ArrayList<String> contentsList = getConbbox("contents", inputWork);
+		form.setContentsList(contentsList);
+		ArrayList<String> noteList = getConbbox("note", inputWork);
+		form.setNoteList(noteList);
 
 		return form;
 	}
@@ -863,5 +878,26 @@ public class WorkLogic {
 		editForm.setNote(work.getNote());
 
 		return editForm;
+	}
+
+	/**
+	 * コンボボックスのデータを取得
+	 * 
+	 * @param taget
+	 *            取得対象
+	 * @param inputWork
+	 *            検索条件
+	 * @return コンボボックス用データ
+	 */
+	private ArrayList<String> getConbbox(String taget, Work inputWork) {
+
+		WorkDao dao = new WorkDao();
+		ArrayList<String> targetList;
+		if ("contents".equals(taget)) {
+			targetList = dao.findAllContets(inputWork);
+		} else {
+			targetList = dao.findAllNote(inputWork);
+		}
+		return targetList;
 	}
 }
