@@ -153,29 +153,53 @@ public class WorkLogic {
 	 * 作業更新処理
 	 * 
 	 * @param editForm
+	 * @throws BusinessException
 	 */
-	public void updateWork(WorkEditForm editForm) {
-
-		Work inputWork = new Work();
-		inputWork.setId(ConvertToModelUtils.convertInt(editForm.getId()));
-		inputWork.setUserName(editForm.getUserName());
-		String startTime = editForm.getStartTime();
-		inputWork.setStartTime(DateUtils.getParseTime(startTime));
-		String endTime = editForm.getEndTime();
-		inputWork.setEndTime(DateUtils.getParseTime(endTime));
-		// 作業終了時間が入力された場合、作業時間の再計算
-		if (!endTime.isEmpty() | !startTime.isEmpty()) {
-			calcWorkTime(inputWork);
-		}
-		inputWork.setContents(editForm.getContents());
-		inputWork.setNote(editForm.getNote());
+	public void updateWork(WorkEditForm editForm) throws BusinessException {
 
 		try {
 			// トランザクション管理設定
 			CommonDbUtil.openConnection(false);
 
-			// 更新処理実行
+			// 作業中のチェック用に、更新する作業データを取得
+			Work inputWork = new Work();
+			inputWork.setUserName(editForm.getUserName());
 			WorkDao dao = new WorkDao();
+			List<Work> working = dao.findWorking(inputWork);
+
+			// 作業中の作業がある場合に終了時間が入力されなければエラー
+			if (working.size() == 1 && editForm.getEndTime().isEmpty()) {
+				throw new BusinessException(PropertyUtils
+						.getValue(MsgCodeDef.ALREADY_EXIT_WORKING));
+			}
+
+			// 入力チェック
+			ValidationResult result = editValidationCheck(editForm);
+			if (!result.isCheckResult()) {
+				throw new BusinessException(result.getErrorMsgs());
+			}
+
+			// 更新のためのデータを設定
+			inputWork.setId(ConvertToModelUtils.convertInt(editForm.getId()));
+			String startTime = editForm.getStartTime();
+			inputWork.setStartTime(DateUtils.getParseTime(startTime));
+			String endTime = editForm.getEndTime();
+			// 終了時間が入力されていない場合、nullを設定
+			if (endTime.isEmpty()) {
+				inputWork.setEndTime(null);
+				// 終了時間が空の場合、作業時間も空を設定
+				inputWork.setWorkingTime(null);
+			} else {
+				inputWork.setEndTime(DateUtils.getParseTime(endTime));
+			}
+			// 作業終了時間が入力された場合、作業時間の再計算
+			if (!endTime.isEmpty() && !startTime.isEmpty()) {
+				calcWorkTime(inputWork);
+			}
+			inputWork.setContents(editForm.getContents());
+			inputWork.setNote(editForm.getNote());
+
+			// 更新処理実行
 			dao.updateWork(inputWork);
 
 			// コミット
@@ -185,6 +209,45 @@ public class WorkLogic {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
+	}
+
+	/**
+	 * 作業編集フォームの入力チェック
+	 * 
+	 * @param editForm
+	 *            入力情報
+	 * @return チェック結果
+	 */
+	private ValidationResult editValidationCheck(WorkEditForm editForm) {
+
+		ValidationResult result = new ValidationResult();
+		result.setCheckResult(true);
+
+		// 開始時間の入力チェック
+		if (editForm.getStartTime().isEmpty()) {
+			result.setCheckResult(false);
+			result.addErrorMsg(
+					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
+		} else if (!InputValidation.isTime(editForm.getStartTime())) {
+			result.setCheckResult(false);
+			result.addErrorMsg(PropertyUtils
+					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "開始時間"));
+		}
+
+		// 終了時間の入力チェック
+		if (!editForm.getEndTime().isEmpty()
+				&& !InputValidation.isTime(editForm.getEndTime())) {
+			// 終了時間は空を許容
+			result.setCheckResult(false);
+			result.addErrorMsg(PropertyUtils
+					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "終了時間"));
+		}
+
+		// 作業内容と備考のチェック
+		validationSizeCheck(editForm.getContents(), "作業内容", result);
+		validationSizeCheck(editForm.getNote(), "備考", result);
+
+		return result;
 	}
 
 	/**
@@ -417,13 +480,20 @@ public class WorkLogic {
 	 * 作業時間の計算処理
 	 * 
 	 * @param inputWork
+	 * @throws BusinessException
 	 */
-	private void calcWorkTime(Work inputWork) {
+	private void calcWorkTime(Work inputWork) throws BusinessException {
 
 		LocalTime startTime = DateUtils.truncatedTime(inputWork.getStartTime());
 		logger.info("開始時間:{}", startTime);
 
 		LocalTime endTime = DateUtils.truncatedTime(inputWork.getEndTime());
+		
+		// 開始時間<終了時間チェック
+		if(endTime.isBefore(startTime)){
+			throw new BusinessException(PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
+		}
+		
 		LocalTime calcTime = endTime.minusHours(startTime.getHour());
 		LocalTime workingTime = calcTime.minusMinutes(startTime.getMinute());
 		inputWork.setWorkingTime(DateUtils.truncatedTime(workingTime));
@@ -583,35 +653,41 @@ public class WorkLogic {
 					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
 		}
 
+		// 作業内容と備考のチェック
+		validationSizeCheck(form.getContents(), "作業内容", result);
+		validationSizeCheck(form.getNote(), "備考", result);
+
+		return result;
+	}
+
+	/**
+	 * 文字サイズチェック
+	 * 
+	 * @param target
+	 *            チェック対象
+	 * @param targetName
+	 *            チェック対象の項目名(作業内容/備考)
+	 * @param result
+	 *            チェック結果
+	 */
+	private void validationSizeCheck(String target, String targetName,
+			ValidationResult result) {
+
+		boolean validationChek = false;
+
 		// 作業内容
-		String contents = form.getContents();
-		if (contents == null) {
+		if (target == null) {
 			throw new SystemException(
 					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
 		} else {
 			// サイズチェック
-			validationChek = InputValidation.inputSize(contents, 0, 40);
+			validationChek = InputValidation.inputSize(target, 0, 40);
 			if (!validationChek) {
 				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
-						"作業内容", "0", "40"));
-				result.setCheckResult(false);
-			}
-		}
-
-		// 備考チェック
-		String note = form.getNote();
-		if (note == null) {
-			throw new SystemException("不正な入力");
-		} else {
-			// サイズチェック
-			validationChek = InputValidation.inputSize(note, 0, 40);
-			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
-						"備考", "0", "40"));
+						targetName, "0", "40"));
 				result.setCheckResult(validationChek);
 			}
 		}
-		return result;
 	}
 
 	/**
@@ -624,13 +700,20 @@ public class WorkLogic {
 	public WorkListViewForm history(WorkListForm inputForm)
 			throws BusinessException {
 
+		ValidationResult result = new ValidationResult();
+		result.setCheckResult(true);
+
 		String workDateStr = inputForm.getWorkDate();
+		// 入力チェック
+		if (workDateStr == null || !InputValidation.isDate(workDateStr)) {
+
+			throw new BusinessException(PropertyUtils
+					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "日付"));
+		}
+
 		logger.info("入力日付:{}", workDateStr);
 		String userName = inputForm.getUserName();
 
-		if (workDateStr == null) {
-			throw new BusinessException("日付を入力してください。");
-		}
 		LocalDate workDate = DateUtils.getParseDate(workDateStr);
 
 		// 過去日チェック
@@ -649,6 +732,7 @@ public class WorkLogic {
 		// 画面表示データ再取得
 		WorkListViewForm viewForm = getWorkListViewForm(userName, workDate,
 				delete);
+
 		return viewForm;
 	}
 

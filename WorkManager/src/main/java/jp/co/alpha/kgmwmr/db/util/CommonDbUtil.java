@@ -279,6 +279,8 @@ public class CommonDbUtil {
 				pstm.setTime(entry.getKey(), (Time) entry.getValue());
 			} else if (value instanceof Date) {
 				pstm.setDate(entry.getKey(), (Date) entry.getValue());
+			} else if (value == null) {
+				pstm.setObject(entry.getKey(), null);
 			} else {
 				// 想定外の型は一律String型に置換
 				pstm.setString(entry.getKey(), entry.getValue().toString());
