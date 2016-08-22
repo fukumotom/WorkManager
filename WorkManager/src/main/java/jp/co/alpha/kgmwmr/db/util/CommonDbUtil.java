@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
+import jp.co.alpha.kgmwmr.common.util.ThreadIdentifier;
 
 /**
  * DB汎用ユーティリティ
@@ -75,7 +76,7 @@ public class CommonDbUtil {
 	 */
 	public static void openConnection(boolean isAutoCommit) {
 
-		String connectionId = getConnectionId();
+		String connectionId = getThreadId();
 
 		DataSource ds = null;
 		Connection con = null;
@@ -108,9 +109,9 @@ public class CommonDbUtil {
 	 * 
 	 * @return スレッドID
 	 */
-	private static String getConnectionId() {
-		return Thread.currentThread().getId() + ":"
-				+ Thread.currentThread().getName();
+	private static String getThreadId() {
+
+		return String.valueOf(ThreadIdentifier.getThreadId()) + ":";
 	}
 
 	/**
@@ -118,7 +119,7 @@ public class CommonDbUtil {
 	 */
 	public static void commit() {
 		try {
-			connectionMap.get(getConnectionId()).commit();
+			connectionMap.get(getThreadId()).commit();
 		} catch (SQLException e) {
 			throw new SystemException(e);
 		}
@@ -128,7 +129,13 @@ public class CommonDbUtil {
 	 * コネクションをコネクションMapから削除してクローズする
 	 */
 	public static void closeConnection() {
-		Connection con = connectionMap.remove(getConnectionId());
+
+		// コネクションマップからスレッドIDの開放
+		Connection con = connectionMap.remove(getThreadId());
+
+		// メモリリーク防止のためのスレッド破棄
+		ThreadIdentifier.remove();
+
 		if (con != null) {
 			try {
 				con.close();
@@ -445,7 +452,7 @@ public class CommonDbUtil {
 			Map<Integer, Object> paramMap) {
 
 		int resultCnt = 0;
-		Connection con = connectionMap.get(getConnectionId());
+		Connection con = connectionMap.get(getThreadId());
 		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			bindParam(pstm, paramMap);
@@ -474,7 +481,7 @@ public class CommonDbUtil {
 			Map<Integer, Object> paramMap, Class<T> dtoClass) {
 
 		List<T> dtoList = new ArrayList<>();
-		Connection con = connectionMap.get(getConnectionId());
+		Connection con = connectionMap.get(getThreadId());
 		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
@@ -528,7 +535,7 @@ public class CommonDbUtil {
 	public static int updata(String sql, HashMap<Integer, Object> paramMap) {
 
 		int resultCnt = 0;
-		Connection con = connectionMap.get(getConnectionId());
+		Connection con = connectionMap.get(getThreadId());
 		try (PreparedStatement pstm = con.prepareStatement(sql);) {
 
 			logger.info("発行SQL:{}", sql);
