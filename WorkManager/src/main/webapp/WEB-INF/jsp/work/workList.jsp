@@ -81,5 +81,10 @@
 			</tr>
 		</table>
 	</form>
+	<form action="/WorkManager/WorkList" method="post"
+		enctype="multipart/form-data">
+		<input type="file" name="csvFile" /> <input type="submit"
+			value="アップロード" name="csvUploadBtn" />
+	</form>
 </body>
 </html>

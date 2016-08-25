@@ -69,7 +69,8 @@ public class MsgCodeDef {
 	public static final String ALREADY_FINISHED = "w.db.002";
 
 	/**
-	 * <<<<<<< 4aa0652a7bb3f2f23441d1e522345c2ec4c4a9f3 削除済みデータ削除時警告
+	 * <<<<<<< f2e032d3d0d62be6985d3127e1e8028ddd3cf02f <<<<<<<
+	 * 4aa0652a7bb3f2f23441d1e522345c2ec4c4a9f3 削除済みデータ削除時警告
 	 */
 	public static final String ALREADY_DELETE = "w.db.003";
 
@@ -142,6 +143,11 @@ public class MsgCodeDef {
 	 * 不正な入力値
 	 */
 	public static final String INPUT_ERROR = "w.business.004";
+
+	/**
+	 * ファイルアップロード警告
+	 */
+	public static final String FAILURE_FILE_UPLOAD = "w.business.005";
 
 	/**
 	 * バインドに失敗しました

@@ -13,6 +13,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,6 +143,20 @@ public class WorkListServlet extends HttpServlet {
 				logger.info("CSVダウンロード処理開始:");
 				File csvFile = logic.csvDownload(inputForm);
 				download(response, csvFile);
+			} else if (request.getParameter("csvUploadBtn") != null) {
+				logger.info("csvアップロード処理開始:");
+
+				Part part;
+				try {
+					part = request.getPart("csvFile");
+					String fileName = getFileName(part);
+					// ファイル保存
+					part.write(fileName);
+				} catch (IOException | ServletException e) {
+					throw new BusinessException(e,
+							MsgCodeDef.FAILURE_FILE_UPLOAD);
+				}
+
 			} else {
 				// 編集
 				logger.info("編集処理開始:");
@@ -182,6 +197,27 @@ public class WorkListServlet extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
+	}
+
+	/**
+	 * アップロードファイル名取得
+	 * 
+	 * @param part
+	 *            パート情報
+	 * @return アップロードファイル名
+	 */
+	private String getFileName(Part part) {
+
+		String fileName = null;
+		String dispotions = part.getHeader("Content-Disposition");
+		for (String dispotion : dispotions.split(";")) {
+			// ヘッダー内のファイル名を抽出
+			if (dispotion.trim().startsWith("filename")) {
+				fileName = dispotion.substring(dispotion.indexOf("=") + 2,
+						dispotion.length() - 1);
+			}
+		}
+		return fileName;
 	}
 
 	/**
@@ -236,7 +272,7 @@ public class WorkListServlet extends HttpServlet {
 		response.setContentType("application/octet-stream");
 		response.setContentLength((int) csvFile.length());
 		response.setHeader("Content-disposition",
-				"attachment; filename=\"" + csvFile.getName() + "\"");// csvFile.getName()
+				"attachment; filename=\"" + csvFile.getName() + "\"");
 
 		// キャッシュの無効化
 		response.setHeader("Cache-Control",
