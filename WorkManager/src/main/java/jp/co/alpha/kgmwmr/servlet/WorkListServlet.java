@@ -134,9 +134,9 @@ public class WorkListServlet extends HttpServlet {
 			} else if (request.getParameter("saveBtn") != null) {
 				logger.debug("保存処理開始:");
 				viewForm = logic.saveWork(inputForm);
-			} else if (request.getParameter("csvExportBtn") != null) {
-				logger.info("CSVエクスポート処理開始:");
-				File csvFile = logic.csvExport(inputForm);
+			} else if (request.getParameter("csvDownloadBtn") != null) {
+				logger.info("CSVダウンロード処理開始:");
+				File csvFile = logic.csvDownload(inputForm);
 				download(response, csvFile);
 			} else {
 				// 編集

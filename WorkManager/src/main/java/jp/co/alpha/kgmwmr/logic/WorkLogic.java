@@ -967,7 +967,7 @@ public class WorkLogic {
 	 * @throws BusinessException
 	 *             業務例外
 	 */
-	public File csvExport(WorkListForm inputForm) throws BusinessException {
+	public File csvDownload(WorkListForm inputForm) throws BusinessException {
 
 		// form情報を処理用モデルに設定
 		Work inputWork = new Work();
