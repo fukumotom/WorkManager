@@ -98,6 +98,25 @@ public class InputValidation {
 	}
 
 	/**
+	 * 日付（yyyy/MM/dd）判定
+	 * 
+	 * @param target
+	 *            チェック対象
+	 * @return チェック結果
+	 */
+	public static boolean isDate(String target) {
+
+		boolean result = true;
+		try {
+			DateUtils.getParseDate(target);
+		} catch (DateTimeException e) {
+			result = false;
+		}
+
+		return result;
+	}
+
+	/**
 	 * 作業idチェック
 	 * 
 	 * @param id

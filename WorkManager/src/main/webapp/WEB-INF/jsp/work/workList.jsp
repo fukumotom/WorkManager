@@ -17,7 +17,7 @@
 				.getAttribute(ConstantDef.ATTR_FORM);
 	%>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
-	<h2 id="errMsg">${form.errMsgs}</h2>
+	<H2 id="errMsg">${form.errMsgs}</H2>
 	<H1>${form.listDate}の作業リスト</H1>
 	<form method="post" action="/WorkManager/WorkList">
 		<table>

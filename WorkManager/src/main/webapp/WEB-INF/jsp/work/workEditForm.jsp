@@ -12,6 +12,8 @@
 </head>
 <body>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
+	<H2 id="errMsg">${editForm.errMsgs}</H2>
+	<H1>作業編集フォーム</H1>
 	<form method="post" action="/WorkManager/WorkEdit">
 		<table>
 			<tr>

@@ -40,6 +40,15 @@ public class MsgCodeDef {
 	public static final String EXIT_USER = "w.validation.005";
 
 	/**
+	 * 既に作業中の作業が存在
+	 */
+	public static final String ALREADY_EXIT_WORKING = "w.validation.006";
+
+	/**
+	 * 開始時間と終了時間の差分エラー
+	 */
+	public static final String START_END_ERROR = "w.validation.007";	
+	/**
 	 * 入力チェック（不正な入力）
 	 */
 	public static final String BAD_INPUT = "e.validation.001";

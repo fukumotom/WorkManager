@@ -65,6 +65,15 @@ public class WorkListServlet extends HttpServlet {
 		WorkListViewForm form = logic.getWorkListViewForm(userName,
 				LocalDate.now(), false);
 
+		// 作業リスト表示条件をセッションに保持
+		WorkListForm creteriaForm = (WorkListForm) request.getSession()
+				.getAttribute(ConstantDef.CRITERIA);
+		if (creteriaForm == null) {
+			// 検索条件を設定
+			request.getSession().setAttribute(ConstantDef.CRITERIA,
+					setForm(request));
+		}
+
 		request.setAttribute(ConstantDef.ATTR_FORM, form);
 
 		RequestDispatcher dispatcher = request
@@ -86,16 +95,8 @@ public class WorkListServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		// // 画面情報をFormに詰める
+		// 画面情報をFormに詰める
 		WorkListForm inputForm = setForm(request);
-
-		// 作業リスト表示条件をセッションに保持
-		WorkListForm creteriaForm = (WorkListForm) request.getSession()
-				.getAttribute(ConstantDef.CRITERIA);
-		if (creteriaForm == null) {
-			// 検索条件を設定
-			request.getSession().setAttribute(ConstantDef.CRITERIA, inputForm);
-		}
 
 		String requestPath = WORKLIST_JSP_PATH;
 		WorkLogic logic = new WorkLogic();
@@ -128,10 +129,13 @@ public class WorkListServlet extends HttpServlet {
 		} catch (BusinessException e) {
 			logger.warn("入力チェックエラー");
 			// 作業リストの再表示
-			LocalDate date = DateUtils.getParseDate(inputForm.getWorkDate());
-			boolean delete = inputForm.getDeleteCechk()
+			// セッションにある検索条件を取得
+			WorkListForm criteria = (WorkListForm) request.getSession()
+					.getAttribute(ConstantDef.CRITERIA);
+			LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
+			boolean delete = criteria.getDeleteCechk()
 					.equals(ConstantDef.DELETE_CHECK_ON);
-			viewForm = logic.getWorkListViewForm(inputForm.getUserName(), date,
+			viewForm = logic.getWorkListViewForm(criteria.getUserName(), date,
 					delete);
 
 			// エラーメッセージ設定
@@ -166,7 +170,7 @@ public class WorkListServlet extends HttpServlet {
 		String userName = request.getUserPrincipal().getName();
 		form.setUserName(userName);
 		String workDate = request.getParameter("workDate");
-		if (workDate.isEmpty()) {
+		if (workDate == null || workDate.isEmpty()) {
 			if (request.getParameter("historyBtn") != null) {
 				// 履歴処理の日付未入力はnullを設定
 				form.setWorkDate(null);

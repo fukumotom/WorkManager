@@ -9,7 +9,7 @@
 <body>
 	<%
 		if ("true".equals(request.getParameter("error"))) {
-	%><p>ID または PW が違います。</p>
+	%><h2 id="errMsg">ID または PW が違います。</h2>
 	<%
 		}
 	%>

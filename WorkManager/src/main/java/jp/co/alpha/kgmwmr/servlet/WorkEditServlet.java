@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.form.WorkEditForm;
@@ -30,6 +31,11 @@ public class WorkEditServlet extends HttpServlet {
 	private static final String WORKLIST_JSP_PATH = "/WEB-INF/jsp/work/workList.jsp";
 
 	/**
+	 * 作業編集フォームへの遷移パス
+	 */
+	private static final String WORKDEIT_JSP_PATH = "/WEB-INF/jsp/work/workEditForm.jsp";
+
+	/**
 	 * 作業編集処理
 	 * 
 	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
@@ -39,18 +45,30 @@ public class WorkEditServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) {
 
+		String requestPath = WORKLIST_JSP_PATH;
+
 		WorkEditForm editForm = setForm(request);
 
 		WorkLogic logic = new WorkLogic();
 
-		logic.updateWork(editForm);
+		try {
+			logic.updateWork(editForm);
 
-		// 作業リストへ戻る
-		WorkListViewForm viewForm = logic.getWorkListViewForm(
-				editForm.getUserName(), LocalDate.now(), false);
-		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
+			// 作業リストへ戻る
+			WorkListViewForm viewForm = logic.getWorkListViewForm(
+					editForm.getUserName(), LocalDate.now(), false);
+			request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
+
+		} catch (BusinessException e1) {
+			// 入力チェックエラーの場合、作業編集フォーム再表示
+			requestPath = WORKDEIT_JSP_PATH;
+			// エラーメッセージ設定
+			editForm.setErrMsgs(e1.getMessage());
+			request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
+		}
+
 		RequestDispatcher dispatcher = request
-				.getRequestDispatcher(WORKLIST_JSP_PATH);
+				.getRequestDispatcher(requestPath);
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {

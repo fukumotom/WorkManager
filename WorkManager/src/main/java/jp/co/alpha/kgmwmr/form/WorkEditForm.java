@@ -39,6 +39,11 @@ public class WorkEditForm {
 	private String note;
 
 	/**
+	 * エラーメッセージ
+	 */
+	private String errMsgs;
+
+	/**
 	 * @return the id
 	 */
 	public String getId() {
@@ -112,6 +117,20 @@ public class WorkEditForm {
 	 */
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	/**
+	 * @return the errMsgs
+	 */
+	public String getErrMsgs() {
+		return errMsgs;
+	}
+
+	/**
+	 * @param errMsgs the errMsgs to set
+	 */
+	public void setErrMsgs(String errMsgs) {
+		this.errMsgs = errMsgs;
 	}
 
 }
