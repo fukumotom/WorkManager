@@ -45,7 +45,8 @@
 			</tr>
 		</table>
 		<input type="hidden" name="id" value="${editForm.id}" /><input
-			type="submit" value="更新" />
+			type="submit" value="更新" /> <input type="hidden" name="workDate"
+			value="${editForm.workDate}" />
 	</form>
 </body>
 </html>

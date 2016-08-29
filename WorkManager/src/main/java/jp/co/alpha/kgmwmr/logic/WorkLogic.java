@@ -276,7 +276,7 @@ public class WorkLogic {
 			CommonDbUtil.commit();
 
 			// 画面表示用にデータを複製
-			dao.copyTodayWork(inputWork);
+			dao.copyWork(inputWork);
 			// コミット
 			CommonDbUtil.commit();
 
@@ -285,9 +285,9 @@ public class WorkLogic {
 			CommonDbUtil.closeConnection();
 		}
 
-		// 画面表示データ取得(保存後は当日のデータを表示)
+		// 画面表示データ取得
 		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
-				LocalDate.now(), false);
+				inputWork.getWorkDate(), false);
 		return viewForm;
 	}
 
@@ -488,12 +488,13 @@ public class WorkLogic {
 		logger.info("開始時間:{}", startTime);
 
 		LocalTime endTime = DateUtils.truncatedTime(inputWork.getEndTime());
-		
+
 		// 開始時間<終了時間チェック
-		if(endTime.isBefore(startTime)){
-			throw new BusinessException(PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
+		if (endTime.isBefore(startTime)) {
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
 		}
-		
+
 		LocalTime calcTime = endTime.minusHours(startTime.getHour());
 		LocalTime workingTime = calcTime.minusMinutes(startTime.getMinute());
 		inputWork.setWorkingTime(DateUtils.truncatedTime(workingTime));
@@ -691,7 +692,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 履歴表示ロジック TODO実装途中
+	 * 履歴表示ロジック
 	 * 
 	 * @param inputForm
 	 * @return
@@ -724,6 +725,9 @@ public class WorkLogic {
 
 		// 未保存データ削除
 		deleteUnSaveWork(userName);
+
+		// 編集用に指定された日付分の登録作業を複製
+		copyWork(userName, workDate);
 
 		// 削除反映
 		boolean delete = ConstantDef.DELETE_CHECK_ON
@@ -784,19 +788,22 @@ public class WorkLogic {
 	/**
 	 * 編集用作業リスト複製処理
 	 * 
+	 * @param workDate
+	 * 
 	 * @param inputWork
 	 */
-	public void copyTodayWork(String userName) {
+	public void copyWork(String userName, LocalDate workDate) {
 
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
+		inputWork.setWorkDate(workDate);
 
 		try {
 			// コネクション開始
 			CommonDbUtil.openConnection();
 
 			WorkDao dao = new WorkDao();
-			dao.copyTodayWork(inputWork);
+			dao.copyWork(inputWork);
 
 		} finally {
 
@@ -861,6 +868,7 @@ public class WorkLogic {
 		}
 		editForm.setContents(work.getContents());
 		editForm.setNote(work.getNote());
+		editForm.setWorkDate(DateUtils.formatDate(work.getWorkDate()));
 
 		return editForm;
 	}

@@ -44,6 +44,11 @@ public class WorkEditForm {
 	private String errMsgs;
 
 	/**
+	 * 作業日付
+	 */
+	private String workDate;
+
+	/**
 	 * @return the id
 	 */
 	public String getId() {
@@ -131,6 +136,20 @@ public class WorkEditForm {
 	 */
 	public void setErrMsgs(String errMsgs) {
 		this.errMsgs = errMsgs;
+	}
+
+	/**
+	 * @return the workDate
+	 */
+	public String getWorkDate() {
+		return workDate;
+	}
+
+	/**
+	 * @param workDate the workDate to set
+	 */
+	public void setWorkDate(String workDate) {
+		this.workDate = workDate;
 	}
 
 }

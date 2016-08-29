@@ -18,7 +18,7 @@ ${userName}
 ,'00:00:00'
 ,'サンプル内容X'
 ,'サンプルメモX'
-,Date 'now'
+,${workDate}
 ,TIMESTAMP 'now'
 ,0
 ,1
