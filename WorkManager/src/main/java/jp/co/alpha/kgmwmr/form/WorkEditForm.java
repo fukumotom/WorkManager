@@ -46,10 +46,14 @@ public class WorkEditForm {
 	private String note;
 
 	/**
+	 * 選択用備考リスト
+	 */
+	private ArrayList<String> noteList;
+
+	/**
 	 * エラーメッセージ
 	 */
 	private String errMsgs;
-
 
 	/**
 	 * 作業日付
@@ -162,21 +166,6 @@ public class WorkEditForm {
 	}
 
 	/**
-	 * @return the errMsgs
-	 */
-	public String getErrMsgs() {
-		return errMsgs;
-	}
-
-	/**
-	 * @param errMsgs
-	 *            the errMsgs to set
-	 */
-	public void setErrMsgs(String errMsgs) {
-		this.errMsgs = errMsgs;
-	}
-
-	/**
 	 * @return the noteList
 	 */
 	public ArrayList<String> getNoteList() {
@@ -192,6 +181,21 @@ public class WorkEditForm {
 	}
 
 	/**
+	 * @return the errMsgs
+	 */
+	public String getErrMsgs() {
+		return errMsgs;
+	}
+
+	/**
+	 * @param errMsgs
+	 *            the errMsgs to set
+	 */
+	public void setErrMsgs(String errMsgs) {
+		this.errMsgs = errMsgs;
+	}
+
+	/**
 	 * @return the workDate
 	 */
 	public String getWorkDate() {
@@ -199,15 +203,11 @@ public class WorkEditForm {
 	}
 
 	/**
-	 * @param workDate the workDate to set
+	 * @param workDate
+	 *            the workDate to set
 	 */
 	public void setWorkDate(String workDate) {
 		this.workDate = workDate;
 	}
-
-	/**
-	 * 選択用備考リスト
-	 */
-	private ArrayList<String> noteList;
 
 }
