@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
+import jp.co.alpha.kgmwmr.common.util.DateUtils;
 import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
@@ -47,7 +48,7 @@ public class WorkEditServlet extends HttpServlet {
 
 		// 作業リストへ戻る
 		WorkListViewForm viewForm = logic.getWorkListViewForm(
-				editForm.getUserName(), LocalDate.now(), false);
+				editForm.getUserName(), DateUtils.getParseDate(editForm.getWorkDate()), false);
 		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher(WORKLIST_JSP_PATH);
@@ -84,6 +85,9 @@ public class WorkEditServlet extends HttpServlet {
 		editForm.setContents(contents);
 		String note = (String) request.getParameter("note");
 		editForm.setNote(note);
+
+		String workDate = request.getParameter("workDate");
+		editForm.setWorkDate(workDate);
 
 		return editForm;
 	}

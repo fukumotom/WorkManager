@@ -4,6 +4,7 @@ SELECT
     ,end_time
     ,contents
     ,note
+    ,work_date
 FROM
     WorkManage w
 WHERE

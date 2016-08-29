@@ -39,6 +39,11 @@ public class WorkEditForm {
 	private String note;
 
 	/**
+	 * 作業日付
+	 */
+	private String workDate;
+
+	/**
 	 * @return the id
 	 */
 	public String getId() {
@@ -112,6 +117,21 @@ public class WorkEditForm {
 	 */
 	public void setNote(String note) {
 		this.note = note;
+	}
+
+	/**
+	 * @return the workDate
+	 */
+	public String getWorkDate() {
+		return workDate;
+	}
+
+	/**
+	 * @param workDate
+	 *            the workDate to set
+	 */
+	public void setWorkDate(String workDate) {
+		this.workDate = workDate;
 	}
 
 }

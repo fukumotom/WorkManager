@@ -60,8 +60,9 @@ public class WorkListServlet extends HttpServlet {
 		// ログインユーザ取得
 		String userName = request.getUserPrincipal().getName();
 
+		// 現在日時分の登録作業を編集用に複製
 		WorkLogic logic = new WorkLogic();
-		logic.copyTodayWork(userName);
+		logic.copyWork(userName, LocalDate.now());
 		WorkListViewForm form = logic.getWorkListViewForm(userName,
 				LocalDate.now(), false);
 
@@ -86,7 +87,7 @@ public class WorkListServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request,
 			HttpServletResponse response) {
 
-		// // 画面情報をFormに詰める
+		// 画面情報をFormに詰める
 		WorkListForm inputForm = setForm(request);
 
 		// 作業リスト表示条件をセッションに保持
@@ -128,11 +129,17 @@ public class WorkListServlet extends HttpServlet {
 		} catch (BusinessException e) {
 			logger.warn("入力チェックエラー");
 			// 作業リストの再表示
-			LocalDate date = DateUtils.getParseDate(inputForm.getWorkDate());
-			boolean delete = inputForm.getDeleteCechk()
+			WorkListForm sessionForm = (WorkListForm) request.getSession()
+					.getAttribute(ConstantDef.CRITERIA);
+			String listDate = sessionForm.getWorkDate();
+			if (listDate == null) {
+				listDate = DateUtils.getTodayStr();
+			}
+			LocalDate date = DateUtils.getParseDate(listDate);
+			boolean delete = creteriaForm.getDeleteCechk()
 					.equals(ConstantDef.DELETE_CHECK_ON);
-			viewForm = logic.getWorkListViewForm(inputForm.getUserName(), date,
-					delete);
+			viewForm = logic.getWorkListViewForm(sessionForm.getUserName(),
+					date, delete);
 
 			// エラーメッセージ設定
 			viewForm.setErrMsgs(e.getMessage());
@@ -171,13 +178,14 @@ public class WorkListServlet extends HttpServlet {
 				// 履歴処理の日付未入力はnullを設定
 				form.setWorkDate(null);
 			}
-			form.setWorkDate(DateUtils.getTodayStr());
 		} else {
 			form.setWorkDate(workDate);
 		}
 		String deleteCheck = request.getParameter("deleteFlg");
 		if (deleteCheck == null) {
 			form.setDeleteCechk(ConstantDef.DELETE_CHECK_OFF);
+		} else {
+			form.setDeleteCechk(deleteCheck);
 		}
 		return form;
 	}
