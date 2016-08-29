@@ -50,6 +50,12 @@ public class WorkEditForm {
 	 */
 	private String errMsgs;
 
+
+	/**
+	 * 作業日付
+	 */
+	private String workDate;
+
 	/**
 	 * @return the id
 	 */
@@ -183,6 +189,20 @@ public class WorkEditForm {
 	 */
 	public void setNoteList(ArrayList<String> noteList) {
 		this.noteList = noteList;
+	}
+
+	/**
+	 * @return the workDate
+	 */
+	public String getWorkDate() {
+		return workDate;
+	}
+
+	/**
+	 * @param workDate the workDate to set
+	 */
+	public void setWorkDate(String workDate) {
+		this.workDate = workDate;
 	}
 
 	/**

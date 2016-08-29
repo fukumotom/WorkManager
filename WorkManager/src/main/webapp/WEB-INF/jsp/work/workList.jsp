@@ -64,7 +64,8 @@
 				<td><input type="submit" value="CSVダウンロード" name="csvDownloadBtn"
 					style=${(empty form.workList)?'display:none':''} /></td>
 				<td><input type="checkbox" name="deleteFlg" /> 削除を含む <input
-					type="text" name="workDate" /> (yyyy/MM/dd) <input type="submit"
+					type="text" name="workDate" /> (yyyy/MM/dd) <input type="hidden"
+					name="listDate" value="${form.listDate}" /> <input type="submit"
 					value="履歴" name="historyBtn" /></td>
 
 
