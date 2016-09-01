@@ -58,9 +58,7 @@ public class MenuServlet extends HttpServlet {
 		HttpSession session = request.getSession();
 		session.removeAttribute(ConstantDef.CRITERIA);
 
-		if (logger.isDebugEnabled()) {
-			logger.debug("検索条件を削除。");
-		}
+		logger.debug("検索条件を削除。");
 
 		// 未保存作業削除
 		String userName = request.getUserPrincipal().getName();

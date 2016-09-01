@@ -716,7 +716,9 @@ public class WorkLogic {
 		LocalDate workDate = DateUtils.getParseDate(workDateStr);
 
 		// 過去日チェック
-		logger.debug("今日の日付:{}", LocalDate.now());
+		if (logger.isDebugEnabled()) {
+			logger.debug("今日の日付:{}", LocalDate.now());
+		}
 		if (workDate.isAfter(LocalDate.now())) {
 			throw new BusinessException(
 					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "過去日"));
@@ -840,7 +842,7 @@ public class WorkLogic {
 
 		// 表示用日付
 		form.setListDate(DateUtils.formatDate(listDate));
-		logger.debug("作業リストの日付:{}", DateUtils.getTodayStr());
+		logger.debug("作業リストの日付:{}", listDate);
 
 		return form;
 	}

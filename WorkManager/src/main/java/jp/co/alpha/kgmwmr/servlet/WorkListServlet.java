@@ -18,6 +18,7 @@ import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
 import jp.co.alpha.kgmwmr.common.util.DateUtils;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
@@ -133,7 +134,7 @@ public class WorkListServlet extends HttpServlet {
 			}
 
 		} catch (BusinessException e) {
-			logger.warn("入力チェックエラー");
+			logger.warn(PropertyUtils.getValue(MsgCodeDef.INPUT_ERROR));
 			// 作業リストの再表示
 			// セッションにある検索条件を取得
 			WorkListForm criteria = (WorkListForm) request.getSession()

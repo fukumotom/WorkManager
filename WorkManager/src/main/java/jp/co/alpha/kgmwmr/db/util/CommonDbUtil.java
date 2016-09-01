@@ -260,8 +260,11 @@ public class CommonDbUtil {
 		// クエリに置換
 		sql.replace(0, sql.length(), convertQuery);
 
-		for (Entry<Integer, String> entry : sqlParamMap.entrySet()) {
-			logger.debug("sqlMap内容[{}]:{}", entry.getKey(), entry.getValue());
+		if (logger.isDebugEnabled()) {
+			for (Entry<Integer, String> entry : sqlParamMap.entrySet()) {
+				logger.debug("sqlMap内容[{}]:{}", entry.getKey(),
+						entry.getValue());
+			}
 		}
 		return sqlParamMap;
 	}
@@ -439,8 +442,11 @@ public class CommonDbUtil {
 			}
 		}
 
-		for (Entry<String, Object> entry : dtoMap.entrySet()) {
-			logger.debug("DtoMap内容[{}]:{}", entry.getKey(), entry.getValue());
+		if (logger.isDebugEnabled()) {
+			for (Entry<String, Object> entry : dtoMap.entrySet()) {
+				logger.debug("DtoMap内容[{}]:{}", entry.getKey(),
+						entry.getValue());
+			}
 		}
 		return dtoMap;
 	}

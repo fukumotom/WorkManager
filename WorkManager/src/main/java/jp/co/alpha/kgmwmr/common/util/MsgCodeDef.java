@@ -74,24 +74,19 @@ public class MsgCodeDef {
 	public static final String ALREADY_DELETE = "w.db.003";
 
 	/**
-	 * DB登録
-	 */
-	public static final String DB_REGISTER = "i.db.001";
-
-	/**
 	 * DB挿入
 	 */
-	public static final String DB_INSERT = "i.db.002";
-
-	/**
-	 * DB削除
-	 */
-	public static final String DB_DELETE = "i.db.004";
+	public static final String DB_INSERT = "i.db.001";
 
 	/**
 	 * DB更新
 	 */
-	public static final String DB_UPDATE = "i.db.003";
+	public static final String DB_UPDATE = "i.db.002";
+	
+	/**
+	 * DB削除
+	 */
+	public static final String DB_DELETE = "i.db.003";
 
 	/**
 	 * DB挿入失敗

@@ -145,9 +145,10 @@ public class WorkDao {
 		if (resultCnt == 0) {
 			throw new BusinessException(MsgCodeDef.ALREADY_FINISHED);
 		} else if (resultCnt == 1) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("正常に作業が終了");
-			}
+			logger.debug("正常に作業が終了");
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+					String.valueOf(resultCnt)));
+			
 		} else {
 			throw new SystemException(MsgCodeDef.MISS_DB_UPDATE);
 		}
@@ -172,11 +173,8 @@ public class WorkDao {
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt > 0) {
 
-			if (logger.isDebugEnabled()) {
-				logger.debug("正常に作業を開始");
-			}
-
-			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_REGISTER,
+			logger.debug("正常に作業を開始");
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT,
 					String.valueOf(resultCnt)));
 		} else {
 			throw new SystemException(MsgCodeDef.MISS_DB_INSERT);
