@@ -146,6 +146,15 @@ public class WorkListServlet extends HttpServlet {
 				request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
 
+			// 作業リスト表示条件をセッションに保持
+			WorkListForm creteriaForm = (WorkListForm) request.getSession()
+					.getAttribute(ConstantDef.CRITERIA);
+			if (creteriaForm == null) {
+				// 検索条件を設定
+				request.getSession().setAttribute(ConstantDef.CRITERIA,
+						inputForm);
+			}
+
 		} catch (BusinessException e) {
 			logger.warn(PropertyUtils.getValue(MsgCodeDef.INPUT_ERROR));
 			// セッションにある検索条件を取得
@@ -154,6 +163,12 @@ public class WorkListServlet extends HttpServlet {
 			LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
 			boolean delete = criteria.getDeleteCechk()
 					.equals(ConstantDef.DELETE_CHECK_ON);
+			// String listDate = sessionForm.getWorkDate();
+			// if (listDate == null) {
+			// listDate = DateUtils.getTodayStr();
+			// }
+			// LocalDate date = DateUtils.getParseDate(listDate);
+
 			// 作業リストの再表示
 			viewForm = logic.getWorkListViewForm(criteria.getUserName(), date,
 					delete);
@@ -196,10 +211,15 @@ public class WorkListServlet extends HttpServlet {
 			if (request.getParameter("historyBtn") != null) {
 				// 履歴処理の日付未入力はnullを設定
 				form.setWorkDate(null);
+			} else {
+				// 履歴処理以外の日付未入力は表示日付を設定
+				String listDate = request.getParameter("listDate");
+				form.setWorkDate(listDate);
 			}
 		} else {
 			form.setWorkDate(workDate);
 		}
+
 		String deleteCheck = request.getParameter("deleteFlg");
 		if (deleteCheck == null) {
 			form.setDeleteCechk(ConstantDef.DELETE_CHECK_OFF);
