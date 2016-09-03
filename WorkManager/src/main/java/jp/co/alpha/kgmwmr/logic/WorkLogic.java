@@ -1,6 +1,5 @@
 package jp.co.alpha.kgmwmr.logic;
 
-import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -707,28 +706,21 @@ public class WorkLogic {
 
 		String workDateStr = inputForm.getWorkDate();
 		// 入力チェック
-		if (workDateStr == null || !InputValidation.isDate(workDateStr)) {
+		if (workDateStr == null) {
+
+			throw new BusinessException(
+					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "履歴"));
+		}
+		if (!InputValidation.isDate(workDateStr)) {
 
 			throw new BusinessException(PropertyUtils
-					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "日付"));
+					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "履歴"));
 		}
 
 		logger.info("入力日付:{}", workDateStr);
 		String userName = inputForm.getUserName();
 
-<<<<<<< 83b87efde2ca9cc710e79e224ebe0ece06473584
 		LocalDate workDate = DateUtils.getParseDate(workDateStr);
-=======
-		if (workDateStr == null) {
-			throw new BusinessException("日付を入力してください。");
-		}
-		LocalDate workDate;
-		try {
-			workDate = DateUtils.getParseDate(workDateStr);
-		} catch (DateTimeException e) {
-			throw new BusinessException("履歴のフォーマットが違います", e);
-		}
->>>>>>> fix history and delete check inheriting #131
 
 		// 過去日チェック
 		logger.info("今日の日付:{}", LocalDate.now());
