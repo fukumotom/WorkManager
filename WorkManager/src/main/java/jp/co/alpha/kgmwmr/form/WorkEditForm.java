@@ -125,6 +125,7 @@ public class WorkEditForm {
 	}
 
 	/**
+	 * 
 	 * @return the errMsgs
 	 */
 	public String getErrMsgs() {
@@ -132,7 +133,8 @@ public class WorkEditForm {
 	}
 
 	/**
-	 * @param errMsgs the errMsgs to set
+	 * @param errMsgs
+	 *            the errMsgs to set
 	 */
 	public void setErrMsgs(String errMsgs) {
 		this.errMsgs = errMsgs;
@@ -146,7 +148,8 @@ public class WorkEditForm {
 	}
 
 	/**
-	 * @param workDate the workDate to set
+	 * @param workDate
+	 *            the workDate to set
 	 */
 	public void setWorkDate(String workDate) {
 		this.workDate = workDate;
