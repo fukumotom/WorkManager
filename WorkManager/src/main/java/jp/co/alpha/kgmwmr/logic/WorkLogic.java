@@ -1,10 +1,14 @@
 package jp.co.alpha.kgmwmr.logic;
 
+<<<<<<< 105043bb9d58190f38b51347af76238fb826dabc
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
+=======
+import java.time.DateTimeException;
+>>>>>>> fix history and delete check inheriting #131
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
