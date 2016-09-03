@@ -66,16 +66,20 @@ public class WorkListServlet extends HttpServlet {
 		WorkListViewForm form = logic.getWorkListViewForm(userName,
 				LocalDate.now(), false);
 
-		// 作業リスト表示条件をセッションに保持
+		request.setAttribute(ConstantDef.ATTR_FORM, form);
+		// 最初の作業リスト表示条件をセッションに保持
 		WorkListForm creteriaForm = (WorkListForm) request.getSession()
 				.getAttribute(ConstantDef.CRITERIA);
 		if (creteriaForm == null) {
 			// 検索条件を設定
-			request.getSession().setAttribute(ConstantDef.CRITERIA,
-					setForm(request));
-		}
+			WorkListForm initCreteria = new WorkListForm();
+			initCreteria.setUserName(userName);
+			initCreteria.setWorkDate(DateUtils.getTodayStr());
+			initCreteria.setDeleteCechk(ConstantDef.DELETE_CHECK_OFF);
 
-		request.setAttribute(ConstantDef.ATTR_FORM, form);
+			request.getSession().setAttribute(ConstantDef.CRITERIA,
+					initCreteria);
+		}
 
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher(WORKLIST_JSP_PATH);
@@ -127,14 +131,8 @@ public class WorkListServlet extends HttpServlet {
 				request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
 
-			// 作業リスト表示条件をセッションに保持
-			WorkListForm creteriaForm = (WorkListForm) request.getSession()
-					.getAttribute(ConstantDef.CRITERIA);
-			if (creteriaForm == null) {
-				// 検索条件を設定
-				request.getSession().setAttribute(ConstantDef.CRITERIA,
-						inputForm);
-			}
+			// 新しい検索条件をセッションに保存
+			request.getSession().setAttribute(ConstantDef.CRITERIA, inputForm);
 
 		} catch (BusinessException e) {
 			logger.warn("入力チェックエラー");
