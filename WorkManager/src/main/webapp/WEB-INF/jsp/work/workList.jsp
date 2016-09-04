@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<%@page import="jp.co.alpha.kgmwmr.form.WorkListForm"%>
 <%@page import="jp.co.alpha.kgmwmr.model.Work"%>
 <%@page import="jp.co.alpha.kgmwmr.common.util.ConstantDef"%>
 <%@page import="jp.co.alpha.kgmwmr.form.WorkListViewForm"%>
@@ -15,10 +16,19 @@
 	<%
 		WorkListViewForm form = (WorkListViewForm) request
 				.getAttribute(ConstantDef.ATTR_FORM);
+
+		WorkListForm sessionForm = (WorkListForm) session
+				.getAttribute(ConstantDef.CRITERIA);
+		boolean delFlg = ConstantDef.DELETE_CHECK_ON
+				.equals(sessionForm.getDeleteCechk());
+		if (delFlg) {
+			pageContext.setAttribute("delCheck", "(削除済み)");
+		}
+		pageContext.setAttribute("delFlg", delFlg);
 	%>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
 	<H2 id="errMsg">${form.errMsgs}</H2>
-	<H1>${form.listDate}の作業リスト</H1>
+	<H1>${form.listDate}の作業リスト(${delCheck}</H1>
 	<form method="post" action="/WorkManager/WorkList">
 		<table>
 			<tr>
@@ -52,15 +62,15 @@
 		<table>
 			<tr>
 				<td><input type="submit" value="挿入" name="insertBtn"
-					style=${(empty form.workList)?'display:none':''} /></td>
+					style=${(empty form.workList) || delFlg?'display:none':''} /></td>
 				<td><input type="submit" value="追加" name="addBtn"
-					style=${(empty form.workList)?'display:none':''} /></td>
+					style=${(empty form.workList) || delFlg?'display:none':''} /></td>
 				<td><input type="submit" value="編集" name="editBtn"
-					style=${(empty form.workList)?'display:none':''} /></td>
+					style=${(empty form.workList) || delFlg?'display:none':''} /></td>
 				<td><input type="submit" value="削除" name="deleteBtn"
-					style=${(empty form.workList)?'display:none':''} /></td>
+					style=${(empty form.workList) || delFlg?'display:none':''} /></td>
 				<td><input type="submit" value="保存" name="saveBtn"
-					style=${(empty form.workList)?'display:none':''} /></td>
+					style=${(empty form.workList) || delFlg?'display:none':''} /></td>
 				<td><input type="checkbox" name="deleteFlg" /> 削除を含む <input
 					type="text" name="workDate" /> (yyyy/MM/dd) <input type="hidden"
 					name="listDate" value="${form.listDate}" /> <input type="submit"
