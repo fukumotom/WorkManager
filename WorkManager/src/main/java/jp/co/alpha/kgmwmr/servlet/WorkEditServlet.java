@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
-import jp.co.alpha.kgmwmr.common.util.DateUtils;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
@@ -38,7 +37,8 @@ public class WorkEditServlet extends HttpServlet {
 	private static final String WORKDEIT_JSP_PATH = "/WEB-INF/jsp/work/workEditForm.jsp";
 
 	/**
-	 * 作業編集処理
+	 * <<<<<<< ecdfc4eeae663c6d7c1f2e51fbf1f2cc19cff04c 作業編集処理 ======= 作業編集処理
+	 * TODO #98代理 コミットしない >>>>>>> csv import working #102
 	 * 
 	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
 	 *      javax.servlet.http.HttpServletResponse)
@@ -69,11 +69,6 @@ public class WorkEditServlet extends HttpServlet {
 			request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 		}
 
-		// 作業リストへ戻る
-		WorkListViewForm viewForm = logic.getWorkListViewForm(
-				editForm.getUserName(),
-				DateUtils.getParseDate(editForm.getWorkDate()), false);
-		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher(requestPath);
 		try {

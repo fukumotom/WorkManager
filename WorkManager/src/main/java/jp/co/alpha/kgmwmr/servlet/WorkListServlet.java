@@ -9,12 +9,14 @@ import java.time.LocalDate;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ import jp.co.alpha.kgmwmr.logic.WorkLogic;
  *
  */
 @WebServlet("/WorkList")
+@MultipartConfig(location = "C:/apache-tomcat-8.0.32/temp", fileSizeThreshold = 1048576)
 public class WorkListServlet extends HttpServlet {
 
 	/**
@@ -143,15 +146,27 @@ public class WorkListServlet extends HttpServlet {
 				logger.info("CSVダウンロード処理開始:");
 				File csvFile = logic.csvDownload(inputForm);
 				download(response, csvFile);
-			} else if (request.getParameter("csvUploadBtn") != null) {
+			} else if (ServletFileUpload.isMultipartContent(request)) {
 				logger.info("csvアップロード処理開始:");
 
 				Part part;
 				try {
 					part = request.getPart("csvFile");
+
 					String fileName = getFileName(part);
+					if (fileName.isEmpty()) {
+						throw new BusinessException(MsgCodeDef.NOT_SELECT_FILE);
+					}
+
 					// ファイル保存
 					part.write(fileName);
+
+					// アップデート処理
+					logic.upload(fileName, inputForm.getUserName(),
+							inputForm.getWorkDate());
+
+					// 作業リストの再表示
+					viewForm = getWorkListViaSession(request);
 				} catch (IOException | ServletException e) {
 					throw new BusinessException(e,
 							MsgCodeDef.FAILURE_FILE_UPLOAD);
@@ -165,26 +180,22 @@ public class WorkListServlet extends HttpServlet {
 				request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
 
-			// 新しい検索条件をセッションに保存
-			request.getSession().setAttribute(ConstantDef.CRITERIA, inputForm);
+			if (!ServletFileUpload.isMultipartContent(request)
+					|| request.getParameter("csvDownloadBtn") != null) {
+				// csvアップロード/ダウンロード時以外の時
+				// 新しい検索条件をセッションに保存
+				request.getSession().setAttribute(ConstantDef.CRITERIA,
+						inputForm);
+			}
 
 		} catch (BusinessException e) {
 			logger.warn(PropertyUtils.getValue(MsgCodeDef.INPUT_ERROR));
-			// セッションにある検索条件を取得
-			WorkListForm criteria = (WorkListForm) request.getSession()
-					.getAttribute(ConstantDef.CRITERIA);
-			LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
-			boolean delete = criteria.getDeleteCechk()
-					.equals(ConstantDef.DELETE_CHECK_ON);
 
 			// 作業リストの再表示
-			viewForm = logic.getWorkListViewForm(criteria.getUserName(), date,
-					delete);
+			viewForm = getWorkListViaSession(request);
 
 			// エラーメッセージ設定
 			viewForm.setErrMsgs(e.getMessage());
-		} finally {
-
 		}
 
 		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
@@ -197,6 +208,26 @@ public class WorkListServlet extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
+	}
+
+	/**
+	 * セッションにある検索条件を取得
+	 * 
+	 * @param request
+	 *            リクエスト情報
+	 * @return 作業リスト
+	 */
+	private WorkListViewForm getWorkListViaSession(HttpServletRequest request) {
+
+		WorkListForm criteria = (WorkListForm) request.getSession()
+				.getAttribute(ConstantDef.CRITERIA);
+		LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
+		boolean delete = criteria.getDeleteCechk()
+				.equals(ConstantDef.DELETE_CHECK_ON);
+		WorkLogic logic = new WorkLogic();
+		WorkListViewForm viewForm = logic
+				.getWorkListViewForm(criteria.getUserName(), date, delete);
+		return viewForm;
 	}
 
 	/**

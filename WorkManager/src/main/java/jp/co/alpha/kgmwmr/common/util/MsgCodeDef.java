@@ -48,6 +48,12 @@ public class MsgCodeDef {
 	 * 開始時間と終了時間の差分エラー
 	 */
 	public static final String START_END_ERROR = "w.validation.007";
+
+	/**
+	 * 入力チェック（アップロードファイル未指定）
+	 */
+	public static final String NOT_SELECT_FILE = "w.validation.008";
+
 	/**
 	 * 入力チェック（不正な入力）
 	 */
@@ -150,7 +156,7 @@ public class MsgCodeDef {
 	public static final String FAILURE_FILE_UPLOAD = "w.business.005";
 
 	/**
-	 * バインドに失敗しました
+	 * <<<<<<< ecdfc4eeae663c6d7c1f2e51fbf1f2cc19cff04c バインドに失敗しました
 	 */
 	public static final String BIND_ERROR = "e.business.001";
 

@@ -209,5 +209,4 @@ public class WorkEditForm {
 	public void setWorkDate(String workDate) {
 		this.workDate = workDate;
 	}
-
 }

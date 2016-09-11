@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
+import jp.co.alpha.kgmwmr.common.util.ValidationResult;
 
 /**
  * 業務例外クラス<br>
@@ -15,7 +16,7 @@ public class BusinessException extends Exception {
 	/**
 	 * シリアルバージョン
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 6284263294377594771L;
 
 	/**
 	 * ロガー
@@ -46,7 +47,7 @@ public class BusinessException extends Exception {
 	}
 
 	/**
-	 * エラーメッセージをログ出力
+	 * 入力チェックエラー時のメッセージを作成
 	 * 
 	 * @param cause
 	 *            例外情報
@@ -59,6 +60,17 @@ public class BusinessException extends Exception {
 			String... args) {
 		super(PropertyUtils.getValue(messageCode, args), cause);
 		logger.warn(PropertyUtils.getValue(messageCode, args), cause);
+	}
+
+	/**
+	 * 入力チェックエラー時のメッセージを生成
+	 * 
+	 * @param result
+	 *            入力チェック結果
+	 */
+	public BusinessException(ValidationResult result) {
+		super(result.getErrorMsgs(), null);
+		logger.warn(result.getErrorMsgs());
 	}
 
 }

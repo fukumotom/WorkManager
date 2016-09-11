@@ -148,7 +148,7 @@ public class WorkDao {
 			logger.debug("正常に作業が終了");
 			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
 					String.valueOf(resultCnt)));
-			
+
 		} else {
 			throw new SystemException(MsgCodeDef.MISS_DB_UPDATE);
 		}
@@ -522,5 +522,33 @@ public class WorkDao {
 		}
 
 		return noteList;
+	}
+
+	/**
+	 * csvの内容をDBに保存
+	 * 
+	 * @param workList
+	 *            アップロード情報
+	 */
+	public void upload(List<Work> workList) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("uploadWorkDate.sql");
+
+		int cnt = 0;
+		for (Work inputWork : workList) {
+
+			// DTOに詰め替え
+			WorkDto dto = new WorkDto();
+			CommonDbUtil.beanMaping(inputWork, dto);
+
+			// パラメータ設定
+			HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
+					dto);
+
+			int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+			cnt += resultCnt;
+		}
+		logger.info("{}件挿入しました", cnt);
 	}
 }

@@ -1,13 +1,16 @@
 package jp.co.alpha.kgmwmr.logic;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -47,7 +50,7 @@ public class WorkLogic {
 	/**
 	 * CSV出力タイトル
 	 */
-	private static final String[] csvTitles = {"開始時間", "終了時間", "作業時間", "作業内容",
+	private static final String[] CSV_TITLES = {"開始時間", "終了時間", "作業時間", "作業内容",
 			"備考"};
 
 	/**
@@ -889,6 +892,162 @@ public class WorkLogic {
 	}
 
 	/**
+	 * 作業情報リストCSVファイルのアップロード
+	 * 
+	 * @param fileName
+	 *            アップロードファイル名
+	 * @param loginUserName
+	 *            ログインユーザ名
+	 * @param workDate
+	 *            作業日付
+	 * @throws BusinessException
+	 *             業務例外
+	 */
+	public void upload(String fileName, String loginUserName, String workDate)
+			throws BusinessException {
+
+		// アップロードする作業リスト格納用
+		List<Work> workList = new ArrayList<>();
+
+		// ファイルの内容チェック
+		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+			String line;
+			int cnt = 0;
+			while ((line = br.readLine()) != null) {
+				// カンマ区切りで分解
+				if (cnt == 0) {
+					// タイトル部分確認
+					String[] titles = line.split(CSV_DELIMITER);
+					if (!Arrays.equals(titles, CSV_TITLES)) {
+						throw new BusinessException(
+								MsgCodeDef.INPUT_FORMAT_ERROR,
+								"アップロードファイルのタイトル");
+					}
+					cnt++;
+				} else {
+					// データ部分確認
+					String[] datas = line.split(CSV_DELIMITER);
+
+					ValidationResult result = csvDataFormatCheck(datas);
+					if (!result.isCheckResult()) {
+						throw new BusinessException(result);
+					}
+
+					// 開始時間
+					LocalTime startTime = DateUtils.getParseTime(datas[0]);
+					// 終了時間
+					LocalTime endTime = DateUtils.getParseTime(datas[1]);
+
+					// データ詰め替え
+					Work inputWork = new Work();
+					inputWork.setUserName(loginUserName);
+					inputWork.setStartTime(startTime);
+					inputWork.setEndTime(endTime);
+					// 作業時間計算
+					calcWorkTime(inputWork);
+					inputWork.setContents(datas[3]);
+					inputWork.setNote(datas[4]);
+
+					workList.add(inputWork);
+				}
+			}
+		} catch (IOException e) {
+
+			throw new BusinessException(e);
+		}
+
+		try {
+			// トランザクション管理設定
+			CommonDbUtil.openConnection(false);
+
+			WorkDao dao = new WorkDao();
+			// ファイル読み込みデータをDBに保存
+			dao.upload(workList);
+
+			// コミット
+			CommonDbUtil.commit();
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+			// アップロード処理後の後片付け
+			File uploadFile = new File(fileName);
+			if (uploadFile.exists()) {
+				uploadFile.delete();
+			}
+		}
+	}
+
+	/**
+	 * CSVアップロード時のフォーマットチェック
+	 * 
+	 * @param datas
+	 *            csv情報
+	 * @return チェック結果
+	 */
+	private ValidationResult csvDataFormatCheck(String[] datas) {
+
+		ValidationResult result = new ValidationResult();
+		result.setCheckResult(true);
+
+		boolean validationChek = false;
+
+		// 開始時間
+		if (!datas[0].isEmpty()) {
+			// フォーマットチェック
+			validationChek = InputValidation.isTime(datas[0]);
+			if (!validationChek) {
+				result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+						"アップロードファイルの開始時間");
+				result.setCheckResult(false);
+			}
+		} else {
+			// 入力チェック
+			result.setCheckResult(false);
+			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの開始時間");
+		}
+
+		// 終了時間
+		if (!datas[1].isEmpty()) {
+			// フォーマットチェック
+			validationChek = InputValidation.isTime(datas[1]);
+			if (!validationChek) {
+				result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+						"アップロードファイルの終了時間");
+				result.setCheckResult(false);
+			}
+		} else {
+			// 入力チェック
+			result.setCheckResult(false);
+			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの終了時間");
+		}
+
+		if (result.isCheckResult()) {
+			// 開始時間<終了時間チェック
+			if (DateUtils.getParseTime(datas[1])
+					.isBefore(DateUtils.getParseTime(datas[0]))) {
+				result.addErrorMsg(MsgCodeDef.START_END_ERROR);
+				result.setCheckResult(false);
+			}
+		}
+
+		// 作業内容サイズチェック
+		validationChek = InputValidation.inputSize(datas[3], 0, 40);
+		if (!validationChek) {
+			result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40");
+			result.setCheckResult(false);
+		}
+
+		// 備考 サイズチェック
+		validationChek = InputValidation.inputSize(datas[4], 0, 40);
+		if (!validationChek) {
+			result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "備考", "0", "40");
+			result.setCheckResult(validationChek);
+		}
+
+		return result;
+	}
+
+	/**
 	 * 作業リスト表示用フォームを取得
 	 * 
 	 * @param userName
@@ -1010,7 +1169,7 @@ public class WorkLogic {
 
 		StringBuilder sb = new StringBuilder();
 		// タイトル列を作成
-		sb.append(String.join(CSV_DELIMITER, csvTitles));
+		sb.append(String.join(CSV_DELIMITER, CSV_TITLES));
 		sb.append(NEW_LINE);
 
 		// 内容を出力
