@@ -50,13 +50,13 @@ public class UserRegisterDao {
 
 		// DB更新
 		int cnt = CommonDbUtil.updata(sql1.toString(), paramMap);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_REGISTER), cnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT), cnt);
 		int cnt2 = CommonDbUtil.updata(sql2.toString(), paramMap2);
-		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_REGISTER), cnt2);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT), cnt2);
 	}
 
 	/**
-	 * ユーザ検索SQL発行 TODO トランザクション
+	 * ユーザ検索SQL発行
 	 * 
 	 * @param user
 	 *            検索対象のユーザ情報
