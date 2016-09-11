@@ -49,8 +49,8 @@ public class ValidationResult {
 	 * @param errorMsg
 	 *            追加メッセージ
 	 */
-	public void addErrorMsg(String errorMsg) {
-		this.errorMsgList.add(errorMsg);
+	public void addErrorMsg(String errorMsgCode, String... args) {
+		this.errorMsgList.add(PropertyUtils.getValue(errorMsgCode, args));
 	}
 
 	/**
