@@ -30,7 +30,7 @@ public class WorkRegisterViewForm {
 	/**
 	 * 選択用作業内容リスト
 	 */
-	private ArrayList<String> contentList;
+	private ArrayList<String> contentsList;
 
 	/**
 	 * 備考
@@ -115,16 +115,16 @@ public class WorkRegisterViewForm {
 	/**
 	 * @return the contentList
 	 */
-	public ArrayList<String> getContentList() {
-		return contentList;
+	public ArrayList<String> getContentsList() {
+		return contentsList;
 	}
 
 	/**
 	 * @param contentList
 	 *            the contentList to set
 	 */
-	public void setContentList(ArrayList<String> contentList) {
-		this.contentList = contentList;
+	public void setContentsList(ArrayList<String> contentsList) {
+		this.contentsList = contentsList;
 	}
 
 	/**

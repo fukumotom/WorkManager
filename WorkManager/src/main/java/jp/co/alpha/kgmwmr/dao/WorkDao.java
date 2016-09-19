@@ -461,4 +461,66 @@ public class WorkDao {
 				String.valueOf(resultCnt)));
 
 	}
+
+	/**
+	 * 作業内容リストの取得（削除されたものは含まない）
+	 * 
+	 * @param inputWork
+	 *            検索条件
+	 * @return 作業内容リスト
+	 */
+	public ArrayList<String> findAllContets(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("getContentsList.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(inputWork, dto);
+
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
+				dto);
+
+		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
+				paramMap, WorkDto.class);
+
+		ArrayList<String> contetsList = new ArrayList<>();
+		for (WorkDto dtoElm : dtoList) {
+			// 作業内容のみリストに格納
+			contetsList.add(dtoElm.getContents());
+		}
+
+		return contetsList;
+	}
+
+	/**
+	 * 備考リストの取得（削除されたものは含まない）
+	 * 
+	 * @param inputWork
+	 *            検索条件
+	 * @return 備考リスト
+	 */
+	public ArrayList<String> findAllNote(Work inputWork) {
+
+		// SQL読み込み
+		StringBuilder sql = CommonDbUtil.readSql("getNoteList.sql");
+
+		// DTOに詰め替え
+		WorkDto dto = new WorkDto();
+		CommonDbUtil.beanMaping(inputWork, dto);
+
+		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
+				dto);
+
+		List<WorkDto> dtoList = CommonDbUtil.getDtoList(sql.toString(),
+				paramMap, WorkDto.class);
+
+		ArrayList<String> noteList = new ArrayList<>();
+		for (WorkDto dtoElm : dtoList) {
+			// 作業内容のみリストに格納
+			noteList.add(dtoElm.getNote());
+		}
+
+		return noteList;
+	}
 }

@@ -1,5 +1,7 @@
 package jp.co.alpha.kgmwmr.form;
 
+import java.util.ArrayList;
+
 /**
  * 作業登録処理のフォーム
  * 
@@ -34,6 +36,11 @@ public class WorkEditForm {
 	private String contents;
 
 	/**
+	 * 選択用作業内容リスト
+	 */
+	private ArrayList<String> contentsList;
+
+	/**
 	 * 備考
 	 */
 	private String note;
@@ -58,10 +65,17 @@ public class WorkEditForm {
 		this.id = id;
 	}
 
+	/**
+	 * @return the userName
+	 */
 	public String getUserName() {
 		return userName;
 	}
 
+	/**
+	 * @param userName
+	 *            the userName to set
+	 */
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
@@ -81,10 +95,17 @@ public class WorkEditForm {
 		this.startTime = startTime;
 	}
 
+	/**
+	 * @return the endTime
+	 */
 	public String getEndTime() {
 		return endTime;
 	}
 
+	/**
+	 * @param endTime
+	 *            the endTime to set
+	 */
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
 	}
@@ -102,6 +123,21 @@ public class WorkEditForm {
 	 */
 	public void setContents(String contents) {
 		this.contents = contents;
+	}
+
+	/**
+	 * @return the contentsList
+	 */
+	public ArrayList<String> getContentsList() {
+		return contentsList;
+	}
+
+	/**
+	 * @param contentsList
+	 *            the contentsList to set
+	 */
+	public void setContentsList(ArrayList<String> contentsList) {
+		this.contentsList = contentsList;
 	}
 
 	/**
@@ -127,10 +163,31 @@ public class WorkEditForm {
 	}
 
 	/**
-	 * @param errMsgs the errMsgs to set
+	 * @param errMsgs
+	 *            the errMsgs to set
 	 */
 	public void setErrMsgs(String errMsgs) {
 		this.errMsgs = errMsgs;
 	}
+
+	/**
+	 * @return the noteList
+	 */
+	public ArrayList<String> getNoteList() {
+		return noteList;
+	}
+
+	/**
+	 * @param noteList
+	 *            the noteList to set
+	 */
+	public void setNoteList(ArrayList<String> noteList) {
+		this.noteList = noteList;
+	}
+
+	/**
+	 * 選択用備考リスト
+	 */
+	private ArrayList<String> noteList;
 
 }
