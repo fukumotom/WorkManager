@@ -2,9 +2,6 @@ package jp.co.alpha.kgmwmr.logic;
 
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jp.co.alpha.kgmwmr.common.exception.IllegalOperationException;
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
@@ -24,9 +21,6 @@ import jp.co.alpha.kgmwmr.model.User;
  */
 public class UserRegistLogic {
 
-	private static final Logger logger = LoggerFactory
-			.getLogger(UserRegistLogic.class);
-
 	/**
 	 * ユーザ情報登録
 	 * 
@@ -38,7 +32,7 @@ public class UserRegistLogic {
 		// 更新前セッションチェック
 		if (userForm == null) {
 			// セッションから情報が取得できなかった場合、不正操作
-			throw new IllegalOperationException("不正操作がなされました");
+			throw new IllegalOperationException(MsgCodeDef.BAD_OPERATION);
 		}
 
 		// formをmodelに詰め替え

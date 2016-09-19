@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.dao.dto.WorkDto;
 import jp.co.alpha.kgmwmr.db.util.CommonDbUtil;
 import jp.co.alpha.kgmwmr.model.Work;
@@ -141,11 +143,14 @@ public class WorkDao {
 
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt == 0) {
-			throw new BusinessException("すでに完了した作業です。");
+			throw new BusinessException(MsgCodeDef.ALREADY_FINISHED);
 		} else if (resultCnt == 1) {
-			logger.info("正常に作業が終了");
+			logger.debug("正常に作業が終了");
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+					String.valueOf(resultCnt)));
+			
 		} else {
-			throw new SystemException("作業終了が正常に行われませんでした。");
+			throw new SystemException(MsgCodeDef.MISS_DB_UPDATE);
 		}
 	}
 
@@ -167,10 +172,12 @@ public class WorkDao {
 				dto);
 		int resultCnt = CommonDbUtil.getDbResultCnt(sql.toString(), paramMap);
 		if (resultCnt > 0) {
-			logger.info("正常に作業を開始");
-			logger.info("作業開始件数:{}件", resultCnt);
+
+			logger.debug("正常に作業を開始");
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT,
+					String.valueOf(resultCnt)));
 		} else {
-			throw new SystemException("作業開始が正常に行われませんでした。");
+			throw new SystemException(MsgCodeDef.MISS_DB_INSERT);
 		}
 	}
 
@@ -273,7 +280,7 @@ public class WorkDao {
 				WorkDto.class);
 
 		if (resultDto.getEndTime() == null) {
-			throw new BusinessException("作業中の下に追加はできません。");
+			throw new BusinessException(MsgCodeDef.CAN_NOT_ADD);
 		}
 
 		// modelに詰め替え
@@ -303,7 +310,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info("{}件挿入しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_INSERT,
+				String.valueOf(resultCnt)));
 
 	}
 
@@ -330,9 +338,12 @@ public class WorkDao {
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
 
 		if (resultCnt == 0) {
-			throw new BusinessException("データは削除されています。");
+			throw new BusinessException(MsgCodeDef.ALREADY_DELETE);
 		} else if (resultCnt > 1) {
-			throw new SystemException("削除が正常に行われませんでした。");
+			throw new SystemException(MsgCodeDef.MISS_DB_DELETE);
+		} else {
+			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
+					String.valueOf(resultCnt)));
 		}
 	}
 
@@ -355,7 +366,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info("{}件更新しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+				String.valueOf(resultCnt)));
 	}
 
 	/**
@@ -376,7 +388,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.info("{}件保存しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+				String.valueOf(resultCnt)));
 	}
 
 	/**
@@ -397,7 +410,8 @@ public class WorkDao {
 				dto);
 
 		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
-		logger.debug("{}件未保存データ削除しました", resultCnt);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
+				String.valueOf(resultCnt)));
 
 	}
 
@@ -419,7 +433,9 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
 				dto);
 
-		CommonDbUtil.updata(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
+				String.valueOf(resultCnt)));
 	}
 
 	/**
@@ -440,7 +456,9 @@ public class WorkDao {
 		HashMap<Integer, Object> paramMap = CommonDbUtil.createParamMap(sql,
 				dto);
 
-		CommonDbUtil.updata(sql.toString(), paramMap);
+		int resultCnt = CommonDbUtil.updata(sql.toString(), paramMap);
+		logger.info(PropertyUtils.getValue(MsgCodeDef.DB_DELETE,
+				String.valueOf(resultCnt)));
 
 	}
 }

@@ -3,6 +3,8 @@ package jp.co.alpha.kgmwmr.common.exception;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
+
 /**
  * 想定外の操作時の業務例外クラス<br>
  * 二重登録時に発生
@@ -24,12 +26,13 @@ public class IllegalOperationException extends RuntimeException {
 	/**
 	 * エラーメッセージをログ出力
 	 * 
-	 * @param message
-	 *            エラーメッセージ
+	 * @param messageCode
+	 *            メッセージコード
+	 * @param args
+	 *            メッセージ生成引数
 	 */
-	public IllegalOperationException(String message) {
-		super(message, null);
-		logger.warn(message);
+	public IllegalOperationException(String messageCode, String... args) {
+		this(null, messageCode, args);
 	}
 
 	/**
@@ -39,21 +42,22 @@ public class IllegalOperationException extends RuntimeException {
 	 *            例外情報
 	 */
 	public IllegalOperationException(Throwable cause) {
-		super("二重登録:{}", cause);
-		logger.warn("二重登録:{}", cause);
+		super(null, cause);
 	}
 
 	/**
 	 * エラーメッセージをログ出力
 	 * 
-	 * @param message
-	 *            エラーメッセージ
 	 * @param cause
 	 *            例外情報
+	 * @param messageCode
+	 *            メッセージコード
+	 * @param args
+	 *            メッセージ生成引数
 	 */
-	public IllegalOperationException(String message, Throwable cause) {
-		super(message, cause);
-		logger.warn(message);
+	public IllegalOperationException(Throwable cause, String messageCode,
+			String... args) {
+		logger.warn(PropertyUtils.getValue(messageCode, args), cause);
 	}
 
 }

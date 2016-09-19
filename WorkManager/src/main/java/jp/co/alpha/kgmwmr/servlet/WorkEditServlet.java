@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import jp.co.alpha.kgmwmr.common.exception.BusinessException;
 import jp.co.alpha.kgmwmr.common.exception.SystemException;
 import jp.co.alpha.kgmwmr.common.util.ConstantDef;
+import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
 import jp.co.alpha.kgmwmr.form.WorkEditForm;
 import jp.co.alpha.kgmwmr.form.WorkListViewForm;
 import jp.co.alpha.kgmwmr.logic.WorkLogic;
@@ -72,7 +73,7 @@ public class WorkEditServlet extends HttpServlet {
 		try {
 			dispatcher.forward(request, response);
 		} catch (ServletException | IOException e) {
-			throw new SystemException("フォワード失敗", e);
+			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
 	}
 

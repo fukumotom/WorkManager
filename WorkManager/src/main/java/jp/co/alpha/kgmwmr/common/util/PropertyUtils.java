@@ -52,6 +52,7 @@ public class PropertyUtils {
 			prop.load(new InputStreamReader(iStream, StandardCharsets.UTF_8));
 
 		} catch (IOException e) {
+			// プロパティが使用できないため、ハードコーディング
 			logger.error("プロパティファイル読み込み失敗", e);
 		}
 	}
@@ -66,6 +67,7 @@ public class PropertyUtils {
 			prop.load(new InputStreamReader(iStream, StandardCharsets.UTF_8));
 
 		} catch (IOException e) {
+			// プロパティが使用できないため、ハードコーディング
 			logger.error("プロパティファイル読み込み失敗", e);
 		}
 	}
@@ -108,7 +110,7 @@ public class PropertyUtils {
 	public static String getValue(String key, String... args) {
 
 		if (propertyUtils == null) {
-			throw new SystemException("プロパティファイル読み込み失敗");
+			throw new SystemException(MsgCodeDef.PROP_LOAD_ERROR);
 		}
 
 		return propertyUtils.getProperty(key, args);
