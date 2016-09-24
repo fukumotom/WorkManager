@@ -161,11 +161,6 @@ public class WorkListServlet extends HttpServlet {
 			LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
 			boolean delete = criteria.getDeleteCechk()
 					.equals(ConstantDef.DELETE_CHECK_ON);
-			// String listDate = sessionForm.getWorkDate();
-			// if (listDate == null) {
-			// listDate = DateUtils.getTodayStr();
-			// }
-			// LocalDate date = DateUtils.getParseDate(listDate);
 
 			// 作業リストの再表示
 			viewForm = logic.getWorkListViewForm(criteria.getUserName(), date,
