@@ -667,8 +667,7 @@ public class WorkLogic {
 				dao.startWork(inputWork);
 
 			} else {
-				throw new BusinessException(PropertyUtils
-						.getValue(MsgCodeDef.ALREADY_START, "別の作業"));
+				throw new BusinessException(MsgCodeDef.ALREADY_START, "別の作業");
 			}
 		} else {
 			// 仕掛り処理なしの場合
@@ -775,13 +774,11 @@ public class WorkLogic {
 		// 入力チェック
 		if (workDateStr == null) {
 
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "履歴"));
+			throw new BusinessException(MsgCodeDef.EMPTY_INPUT, "履歴");
 		}
 		if (!InputValidation.isDate(workDateStr)) {
 
-			throw new BusinessException(PropertyUtils
-					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "履歴"));
+			throw new BusinessException(MsgCodeDef.INPUT_FORMAT_ERROR, "履歴");
 		}
 
 		logger.info("入力日付:{}", workDateStr);
