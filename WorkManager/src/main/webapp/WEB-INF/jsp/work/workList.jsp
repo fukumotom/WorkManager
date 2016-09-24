@@ -28,7 +28,7 @@
 	%>
 	<jsp:include page="/WEB-INF/jsp/header.jsp" />
 	<H2 id="errMsg">${form.errMsgs}</H2>
-	<H1>${form.listDate}の作業リスト(${delCheck}</H1>
+	<H1>${form.listDate}の作業リスト${delCheck}</H1>
 	<form method="post" action="/WorkManager/WorkList">
 		<table>
 			<tr>
