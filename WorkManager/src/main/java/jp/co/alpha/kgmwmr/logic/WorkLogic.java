@@ -66,6 +66,16 @@ public class WorkLogic {
 	private static final String NEW_LINE = "\n";
 
 	/**
+	 * 作業内容/備考の入力最小サイズ
+	 */
+	private static final int MIN_SIZE = 0;
+
+	/**
+	 * 作業内容/備考の入力最大サイズ
+	 */
+	private static final int MAX_SIZE = 40;
+
+	/**
 	 * 作業挿入処理
 	 * 
 	 * @param inputForm
@@ -193,9 +203,8 @@ public class WorkLogic {
 	 * 作業更新処理
 	 * 
 	 * @param editForm
-	 *            <<<<<<< ddf992619a9e5a40934eefec2bea757d4fdffd3f
+	 *            更新情報
 	 * @throws BusinessException
-	 *             ======= 入力情報 >>>>>>> fix model to form and add javadoc #103
 	 */
 	public void updateWork(WorkEditForm editForm) throws BusinessException {
 
@@ -211,8 +220,7 @@ public class WorkLogic {
 
 			// 作業中の作業がある場合に終了時間が入力されなければエラー
 			if (working.size() == 1 && editForm.getEndTime().isEmpty()) {
-				throw new BusinessException(PropertyUtils
-						.getValue(MsgCodeDef.ALREADY_EXIT_WORKING));
+				throw new BusinessException(MsgCodeDef.ALREADY_EXIT_WORKING);
 			}
 
 			// 入力チェック
@@ -268,8 +276,7 @@ public class WorkLogic {
 		// 開始時間の入力チェック
 		if (editForm.getStartTime().isEmpty()) {
 			result.setCheckResult(false);
-			result.addErrorMsg(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
+			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "開始時間");
 		} else if (!InputValidation.isTime(editForm.getStartTime())) {
 			result.setCheckResult(false);
 			result.addErrorMsg(PropertyUtils
@@ -545,8 +552,7 @@ public class WorkLogic {
 
 		// 開始時間<終了時間チェック
 		if (endTime.isBefore(startTime)) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
+			throw new BusinessException(MsgCodeDef.START_END_ERROR);
 		}
 
 		LocalTime calcTime = endTime.minusHours(startTime.getHour());
@@ -710,8 +716,7 @@ public class WorkLogic {
 		} else {
 			// 入力チェック
 			result.setCheckResult(false);
-			result.addErrorMsg(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
+			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "開始時間");
 		}
 
 		// 作業内容と備考のチェック
@@ -738,14 +743,14 @@ public class WorkLogic {
 
 		// 作業内容
 		if (target == null) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(MsgCodeDef.BAD_INPUT);
 		} else {
 			// サイズチェック
-			validationChek = InputValidation.inputSize(target, 0, 40);
+			validationChek = InputValidation.inputSize(target, MIN_SIZE,
+					MAX_SIZE);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
-						targetName, "0", "40"));
+				result.addErrorMsg(MsgCodeDef.SIZE_ERROR, targetName,
+						String.valueOf(MIN_SIZE), String.valueOf(MAX_SIZE));
 				result.setCheckResult(validationChek);
 			}
 		}
@@ -784,8 +789,7 @@ public class WorkLogic {
 			logger.debug("今日の日付:{}", LocalDate.now());
 		}
 		if (workDate.isAfter(LocalDate.now())) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "過去日"));
+			throw new BusinessException(MsgCodeDef.EMPTY_INPUT, "過去日");
 		}
 
 		// 未保存データ削除
