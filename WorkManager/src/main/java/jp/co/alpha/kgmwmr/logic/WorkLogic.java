@@ -215,6 +215,9 @@ public class WorkLogic {
 			// 作業中のチェック用に、更新する作業データを取得
 			Work inputWork = new Work();
 			inputWork.setUserName(editForm.getUserName());
+			inputWork.setWorkDate(
+					DateUtils.getParseDate(editForm.getWorkDate()));
+
 			WorkDao dao = new WorkDao();
 			List<Work> working = dao.findWorking(inputWork);
 
