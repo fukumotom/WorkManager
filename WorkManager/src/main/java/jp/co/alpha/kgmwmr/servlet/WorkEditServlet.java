@@ -37,8 +37,7 @@ public class WorkEditServlet extends HttpServlet {
 	private static final String WORKDEIT_JSP_PATH = "/WEB-INF/jsp/work/workEditForm.jsp";
 
 	/**
-	 * <<<<<<< ecdfc4eeae663c6d7c1f2e51fbf1f2cc19cff04c 作業編集処理 ======= 作業編集処理
-	 * TODO #98代理 コミットしない >>>>>>> csv import working #102
+	 * 作業編集処理
 	 * 
 	 * @see javax.servlet.http.HttpServlet#doPost(javax.servlet.http.HttpServletRequest,
 	 *      javax.servlet.http.HttpServletResponse)

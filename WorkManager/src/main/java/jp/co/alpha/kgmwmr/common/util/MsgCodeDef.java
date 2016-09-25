@@ -75,8 +75,7 @@ public class MsgCodeDef {
 	public static final String ALREADY_FINISHED = "w.db.002";
 
 	/**
-	 * <<<<<<< f2e032d3d0d62be6985d3127e1e8028ddd3cf02f <<<<<<<
-	 * 4aa0652a7bb3f2f23441d1e522345c2ec4c4a9f3 削除済みデータ削除時警告
+	 * 削除済みデータ削除時警告
 	 */
 	public static final String ALREADY_DELETE = "w.db.003";
 
@@ -156,7 +155,7 @@ public class MsgCodeDef {
 	public static final String FAILURE_FILE_UPLOAD = "w.business.005";
 
 	/**
-	 * <<<<<<< ecdfc4eeae663c6d7c1f2e51fbf1f2cc19cff04c バインドに失敗しました
+	 * バインド失敗
 	 */
 	public static final String BIND_ERROR = "e.business.001";
 
