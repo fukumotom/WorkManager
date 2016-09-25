@@ -89,7 +89,9 @@ public class InputValidation {
 
 		boolean result = true;
 		try {
+
 			DateUtils.getParseTime(target);
+
 		} catch (DateTimeException e) {
 			result = false;
 		}

@@ -1,5 +1,10 @@
 package jp.co.alpha.kgmwmr.logic;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -40,9 +45,42 @@ public class WorkLogic {
 	private static Logger logger = LoggerFactory.getLogger(WorkLogic.class);
 
 	/**
+	 * CSV出力タイトル
+	 */
+	private static final String[] csvTitles = {"開始時間", "終了時間", "作業時間", "作業内容",
+			"備考"};
+
+	/**
+	 * CSV区切り文字
+	 */
+	private static final String CSV_DELIMITER = ",";
+
+	/**
+	 * CSV出力文字コード
+	 */
+	private static final String CSV_CHARSET = "Shift_JIS";
+
+	/**
+	 * CSV改行
+	 */
+	private static final String NEW_LINE = "\n";
+
+	/**
+	 * 作業内容/備考の入力最小サイズ
+	 */
+	private static final int MIN_SIZE = 0;
+
+	/**
+	 * 作業内容/備考の入力最大サイズ
+	 */
+	private static final int MAX_SIZE = 40;
+
+	/**
 	 * 作業挿入処理
 	 * 
-	 * @param inputWork
+	 * @param inputForm
+	 *            入力情報
+	 * @return 画面表示情報
 	 */
 	public WorkListViewForm insertWork(WorkListForm inputForm) {
 
@@ -85,8 +123,10 @@ public class WorkLogic {
 	 * 作業論理削除処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkListViewForm delete(WorkListForm inputForm)
 			throws BusinessException {
@@ -123,7 +163,8 @@ public class WorkLogic {
 	 * 編集作業検索処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 作業編集用情報
 	 */
 	public WorkEditForm getEditWork(WorkListForm inputForm) {
 
@@ -162,6 +203,7 @@ public class WorkLogic {
 	 * 作業更新処理
 	 * 
 	 * @param editForm
+	 *            更新情報
 	 * @throws BusinessException
 	 */
 	public void updateWork(WorkEditForm editForm) throws BusinessException {
@@ -178,8 +220,7 @@ public class WorkLogic {
 
 			// 作業中の作業がある場合に終了時間が入力されなければエラー
 			if (working.size() == 1 && editForm.getEndTime().isEmpty()) {
-				throw new BusinessException(PropertyUtils
-						.getValue(MsgCodeDef.ALREADY_EXIT_WORKING));
+				throw new BusinessException(MsgCodeDef.ALREADY_EXIT_WORKING);
 			}
 
 			// 入力チェック
@@ -235,8 +276,7 @@ public class WorkLogic {
 		// 開始時間の入力チェック
 		if (editForm.getStartTime().isEmpty()) {
 			result.setCheckResult(false);
-			result.addErrorMsg(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
+			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "開始時間");
 		} else if (!InputValidation.isTime(editForm.getStartTime())) {
 			result.setCheckResult(false);
 			result.addErrorMsg(PropertyUtils
@@ -263,7 +303,8 @@ public class WorkLogic {
 	 * 作業保存処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 */
 	public WorkListViewForm saveWork(WorkListForm inputForm) {
 
@@ -304,6 +345,7 @@ public class WorkLogic {
 	 * 未保存作業削除処理
 	 * 
 	 * @param userName
+	 *            ログインユーザ名
 	 */
 	public void deleteUnSaveWork(String userName) {
 
@@ -330,7 +372,8 @@ public class WorkLogic {
 	 * 画面表示用データを取得
 	 * 
 	 * @param userName
-	 * @return
+	 *            ログインユーザ名
+	 * @return 画面表示情報
 	 */
 	public WorkRegisterViewForm getViewdata(String userName) {
 
@@ -355,7 +398,8 @@ public class WorkLogic {
 	 * 画面表示用フォームの取得
 	 * 
 	 * @param userName
-	 * @return
+	 *            ログインユーザ名
+	 * @return 画面表示情報
 	 */
 	private WorkRegisterViewForm getWorkRegisterViewForm(String userName) {
 
@@ -414,11 +458,13 @@ public class WorkLogic {
 	/**
 	 * 作業完了処理
 	 * 
-	 * @param finshForm
-	 * 
-	 * @param inputWork
-	 * @return
+	 * @param userName
+	 *            ログインユーザ名
+	 * @param deleteId
+	 *            削除する作業ID
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkRegisterViewForm finishWork(String userName, String deleteId)
 			throws BusinessException {
@@ -459,9 +505,11 @@ public class WorkLogic {
 	 * 完了する作業情報を取得
 	 *
 	 * @param userName
+	 *            ログインユーザ名
 	 * @param deleteId
 	 * @return
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	private Work getFinishWork(String userName, Integer deleteId)
 			throws BusinessException {
@@ -504,8 +552,7 @@ public class WorkLogic {
 
 		// 開始時間<終了時間チェック
 		if (endTime.isBefore(startTime)) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.START_END_ERROR));
+			throw new BusinessException(MsgCodeDef.START_END_ERROR);
 		}
 
 		LocalTime calcTime = endTime.minusHours(startTime.getHour());
@@ -519,9 +566,12 @@ public class WorkLogic {
 	 * 仕掛作業がある場合は、仕掛作業を終了して 作業を開始する
 	 * 
 	 * @param userName
+	 *            ログインユーザ名
 	 * @param registerForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkRegisterViewForm register(String userName,
 			WorkRegisterForm registerForm) throws BusinessException {
@@ -554,6 +604,7 @@ public class WorkLogic {
 				}
 				inputWork.setStartTime(
 						DateUtils.getParseTime(registerForm.getStartTime()));
+
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
 
@@ -580,10 +631,12 @@ public class WorkLogic {
 	}
 
 	/**
-	 * （同期処理）
+	 * 登録（同期処理）
 	 * 
 	 * @param inputWork
+	 *            作業情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	private synchronized void workRegiste(Work inputWork)
 			throws BusinessException {
@@ -628,8 +681,8 @@ public class WorkLogic {
 	 * 作業開始ボタン押下時の入力チェック
 	 * 
 	 * @param form
-	 * @param inputWork
-	 * @return
+	 *            入力情報
+	 * @return 入力チェック結果
 	 */
 	private ValidationResult inputCheckWhenStart(WorkRegisterForm form) {
 
@@ -663,8 +716,7 @@ public class WorkLogic {
 		} else {
 			// 入力チェック
 			result.setCheckResult(false);
-			result.addErrorMsg(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "開始時間"));
+			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "開始時間");
 		}
 
 		// 作業内容と備考のチェック
@@ -691,14 +743,14 @@ public class WorkLogic {
 
 		// 作業内容
 		if (target == null) {
-			throw new SystemException(
-					PropertyUtils.getValue(MsgCodeDef.BAD_INPUT));
+			throw new SystemException(MsgCodeDef.BAD_INPUT);
 		} else {
 			// サイズチェック
-			validationChek = InputValidation.inputSize(target, 0, 40);
+			validationChek = InputValidation.inputSize(target, MIN_SIZE,
+					MAX_SIZE);
 			if (!validationChek) {
-				result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
-						targetName, "0", "40"));
+				result.addErrorMsg(MsgCodeDef.SIZE_ERROR, targetName,
+						String.valueOf(MIN_SIZE), String.valueOf(MAX_SIZE));
 				result.setCheckResult(validationChek);
 			}
 		}
@@ -708,8 +760,10 @@ public class WorkLogic {
 	 * 履歴表示ロジック TODO実装途中
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力所法
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkListViewForm history(WorkListForm inputForm)
 			throws BusinessException {
@@ -735,8 +789,7 @@ public class WorkLogic {
 			logger.debug("今日の日付:{}", LocalDate.now());
 		}
 		if (workDate.isAfter(LocalDate.now())) {
-			throw new BusinessException(
-					PropertyUtils.getValue(MsgCodeDef.EMPTY_INPUT, "過去日"));
+			throw new BusinessException(MsgCodeDef.EMPTY_INPUT, "過去日");
 		}
 
 		// 未保存データ削除
@@ -757,8 +810,10 @@ public class WorkLogic {
 	 * 作業追加処理
 	 * 
 	 * @param inputForm
-	 * @return
+	 *            入力情報
+	 * @return 画面表示情報
 	 * @throws BusinessException
+	 *             業務例外
 	 */
 	public WorkListViewForm addWork(WorkListForm inputForm)
 			throws BusinessException {
@@ -826,9 +881,12 @@ public class WorkLogic {
 	 * 作業リスト表示用フォームを取得
 	 * 
 	 * @param userName
+	 *            ログインユーザ名
 	 * @param listDate
+	 *            表示する作業日付
 	 * @param delete
-	 * @return
+	 *            検索条件（削除済みを含むかの判定用）
+	 * @return 画面表示情報
 	 */
 	public WorkListViewForm getWorkListViewForm(String userName,
 			LocalDate listDate, boolean delete) {
@@ -866,7 +924,8 @@ public class WorkLogic {
 	 * 作業編集用Formへの詰め替え
 	 * 
 	 * @param work
-	 * @return
+	 *            作業情報
+	 * @return 作業編集用Form
 	 */
 	private WorkEditForm setWorkEditForm(Work work) {
 
@@ -901,5 +960,157 @@ public class WorkLogic {
 			targetList = dao.findAllNote(inputWork);
 		}
 		return targetList;
+	}
+
+	/**
+	 * CSVエクスポート処理
+	 * 
+	 * @param inputForm
+	 *            入力情報
+	 * @return 出力するCSVファイル
+	 * @throws BusinessException
+	 *             業務例外
+	 */
+	public File csvDownload(WorkListForm inputForm) throws BusinessException {
+
+		// form情報を処理用モデルに設定
+		Work inputWork = new Work();
+		String userName = inputForm.getUserName();
+		inputWork.setUserName(userName);
+
+		LocalDate workDate = DateUtils.getParseDate(inputForm.getWorkDate());
+		inputWork.setWorkDate(workDate);
+
+		List<Work> dataList;
+		try {
+
+			// トランザクション管理設定
+			CommonDbUtil.openConnection();
+
+			// 出力内容取得
+			WorkDao dao = new WorkDao();
+			dataList = dao.findAllWork(inputWork);
+
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+
+		StringBuilder sb = new StringBuilder();
+		// タイトル列を作成
+		sb.append(String.join(CSV_DELIMITER, csvTitles));
+		sb.append(NEW_LINE);
+
+		// 内容を出力
+		for (Work data : dataList) {
+			// 時間は""で囲む
+			String startTime = DateUtils.formatTime(data.getStartTime());
+			sb.append(addDoublequotes(startTime)).append(CSV_DELIMITER);
+
+			if (data.getEndTime() != null) {
+				// 時間は""で囲む
+				String endTime = DateUtils.formatTime(data.getEndTime());
+				sb.append(addDoublequotes(endTime)).append(CSV_DELIMITER);
+			} else {
+				// 未終了作業の終了時間は空白
+				sb.append(CSV_DELIMITER);
+			}
+
+			if (data.getWorkingTime() != null) {
+				// 時間は""で囲む
+				String WorkingTime = DateUtils
+						.formatTime(data.getWorkingTime());
+				sb.append(addDoublequotes(WorkingTime)).append(CSV_DELIMITER);
+			} else {
+				// 未終了の作業時間は空白
+				sb.append(CSV_DELIMITER);
+			}
+
+			// ""（引用符）がある場合、CSV出力用にエスケープする。
+			String Contents = csvEscape(data.getContents());
+			sb.append(addDoublequotes(Contents)).append(CSV_DELIMITER);
+
+			// ""（引用符）がある場合、CSV出力用にエスケープする。
+			String note = csvEscape(data.getNote());
+			sb.append(addDoublequotes(note)).append(CSV_DELIMITER);
+			// 行の改行を追加
+			sb.append(NEW_LINE);
+		}
+
+		// 一時ファイル作成
+		File tmpFile = createTmpFile(sb);
+		logger.debug("作成ファイルのパス:{}", tmpFile.getAbsolutePath());
+
+		return tmpFile;
+	}
+
+	/**
+	 * 一時ファイル作成
+	 * 
+	 * @param sb
+	 * 
+	 * @return 一時ファイル
+	 * @throws BusinessException
+	 * @throws IOException
+	 *             例外情報
+	 */
+	private File createTmpFile(StringBuilder sb) throws BusinessException {
+
+		File tmpFile = null;
+		FileOutputStream fw = null;
+		OutputStreamWriter outsw = null;
+		try {
+			tmpFile = File.createTempFile("worklist", ".csv");
+
+			fw = new FileOutputStream(tmpFile);
+			outsw = new OutputStreamWriter(fw, Charset.forName(CSV_CHARSET));
+
+			outsw.write(sb.toString());
+			outsw.flush();
+
+		} catch (IOException e) {
+			throw new BusinessException(e, "CSV作成に失敗");
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+
+			if (fw != null) {
+				try {
+					fw.close();
+				} catch (IOException e) {
+					logger.warn(PropertyUtils.getValue(MsgCodeDef.MISS_CLOSE));
+				}
+			}
+			if (outsw != null) {
+				try {
+					outsw.close();
+				} catch (IOException e) {
+					logger.warn(PropertyUtils.getValue(MsgCodeDef.MISS_CLOSE));
+				}
+			}
+		}
+		return tmpFile;
+	}
+
+	/**
+	 * 対象文字をcsv出力用にダブルクォートでエスケープ
+	 * 
+	 * @param target
+	 * @return エスケープした文字列
+	 */
+	private String csvEscape(String target) {
+
+		String escape = target.replaceAll("\"", "\"\"");
+		return escape;
+	}
+
+	/**
+	 * 対象文字をダブルクォートで囲む
+	 * 
+	 * @param target
+	 * @return ダブルクォートで囲んだ文字列
+	 */
+	private String addDoublequotes(String target) {
+		return "\"" + target + "\"";
 	}
 }

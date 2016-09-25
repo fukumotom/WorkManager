@@ -69,7 +69,7 @@ public class MsgCodeDef {
 	public static final String ALREADY_FINISHED = "w.db.002";
 
 	/**
-	 * 削除済みデータ削除時警告
+	 * <<<<<<< 4aa0652a7bb3f2f23441d1e522345c2ec4c4a9f3 削除済みデータ削除時警告
 	 */
 	public static final String ALREADY_DELETE = "w.db.003";
 
@@ -82,7 +82,7 @@ public class MsgCodeDef {
 	 * DB更新
 	 */
 	public static final String DB_UPDATE = "i.db.002";
-	
+
 	/**
 	 * DB削除
 	 */
@@ -137,7 +137,7 @@ public class MsgCodeDef {
 	 * 作業追加時の警告
 	 */
 	public static final String CONNECTION_CLOSE_ERROR = "w.business.003";
-	
+
 	/**
 	 * 不正な入力値
 	 */
@@ -182,4 +182,9 @@ public class MsgCodeDef {
 	 * プロパティファイル読み込み失敗
 	 */
 	public static final String PROP_LOAD_ERROR = "e.business.008";
+
+	/**
+	 * クローズ失敗
+	 */
+	public static final String MISS_CLOSE = "e.business.009";
 }
