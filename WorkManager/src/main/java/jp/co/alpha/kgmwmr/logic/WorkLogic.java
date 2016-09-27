@@ -610,6 +610,8 @@ public class WorkLogic {
 				}
 				inputWork.setStartTime(
 						DateUtils.getParseTime(registerForm.getStartTime()));
+				// 登録処理なので、作業日に当日を設定
+				inputWork.setWorkDate(LocalDate.now());
 
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
