@@ -3,8 +3,9 @@ package jp.co.alpha.kgmwmr.logic;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
@@ -12,6 +13,8 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -896,44 +899,51 @@ public class WorkLogic {
 	/**
 	 * 作業情報リストCSVファイルのアップロード
 	 * 
-	 * @param fileName
+	 * @param inputStream
 	 *            アップロードファイル名
 	 * @param loginUserName
 	 *            ログインユーザ名
 	 * @param workDate
 	 *            作業日付
+	 * @return アップロード結果
 	 * @throws BusinessException
 	 *             業務例外
 	 */
-	public void upload(String fileName, String loginUserName, String workDate)
-			throws BusinessException {
+	public ValidationResult upload(InputStream uploadData, String loginUserName,
+			String workDate) throws BusinessException {
 
 		// アップロードする作業リスト格納用
 		List<Work> workList = new ArrayList<>();
 
+		// ファイルチェック結果格納用
+		ValidationResult check = new ValidationResult();
+
 		// ファイルの内容チェック
-		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(uploadData))) {
+
 			String line;
-			int cnt = 0;
+			int lineNo = 1;
 			while ((line = br.readLine()) != null) {
 				// カンマ区切りで分解
-				if (cnt == 0) {
+				if (lineNo == 1) {
 					// タイトル部分確認
-					String[] titles = line.split(CSV_DELIMITER);
-					if (!Arrays.equals(titles, CSV_TITLES)) {
-						throw new BusinessException(
-								MsgCodeDef.INPUT_FORMAT_ERROR,
-								"アップロードファイルのタイトル");
+					csvDataCheck(line, lineNo, check);
+					if (!check.isCheckResult()) {
+						// CSVタイトルエラー
+						throw new BusinessException(check);
 					}
-					cnt++;
+					lineNo++;
 				} else {
 					// データ部分確認
-					String[] datas = line.split(CSV_DELIMITER);
-
-					ValidationResult result = csvDataFormatCheck(datas);
-					if (!result.isCheckResult()) {
-						throw new BusinessException(result);
+					csvDataCheck(line, lineNo, check);
+					if (!check.isCheckResult()) {
+						// CSVデータエラー
+						throw new BusinessException(check);
 					}
+
+					// アップロードデータ設定
+					String[] datas = trimData(line);
 
 					// 開始時間
 					LocalTime startTime = DateUtils.getParseTime(datas[0]);
@@ -949,8 +959,11 @@ public class WorkLogic {
 					calcWorkTime(inputWork);
 					inputWork.setContents(datas[3]);
 					inputWork.setNote(datas[4]);
+					// 作業時間
+					inputWork.setWorkDate(DateUtils.getParseDate(workDate));
 
 					workList.add(inputWork);
+
 				}
 			}
 		} catch (IOException e) {
@@ -971,82 +984,121 @@ public class WorkLogic {
 		} finally {
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
-			// アップロード処理後の後片付け
-			File uploadFile = new File(fileName);
-			if (uploadFile.exists()) {
-				uploadFile.delete();
-			}
 		}
+		return check;
 	}
 
 	/**
 	 * CSVアップロード時のフォーマットチェック
 	 * 
-	 * @param datas
-	 *            csv情報
-	 * @return チェック結果
+	 * @param line
+	 *            csvファイル内容
+	 * @param lineNo
+	 *            行数
+	 * @param チェック結果
 	 */
-	private ValidationResult csvDataFormatCheck(String[] datas) {
+	private void csvDataCheck(String line, int lineNo,
+			ValidationResult result) {
 
-		ValidationResult result = new ValidationResult();
-		result.setCheckResult(true);
-
-		boolean validationChek = false;
-
-		// 開始時間
-		if (!datas[0].isEmpty()) {
-			// フォーマットチェック
-			validationChek = InputValidation.isTime(datas[0]);
-			if (!validationChek) {
+		if (lineNo == 1) {
+			// タイトル部分確認
+			String[] titles = line.split(CSV_DELIMITER);
+			if (!Arrays.equals(titles, CSV_TITLES)) {
 				result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
-						"アップロードファイルの開始時間");
+						"アップロードファイルのタイトル");
 				result.setCheckResult(false);
+			} else {
+				result.setCheckResult(true);
 			}
 		} else {
-			// 入力チェック
-			result.setCheckResult(false);
-			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの開始時間");
-		}
 
-		// 終了時間
-		if (!datas[1].isEmpty()) {
-			// フォーマットチェック
-			validationChek = InputValidation.isTime(datas[1]);
+			String[] datas = trimData(line);
+			result.setCheckResult(true);
+
+			boolean validationChek = false;
+
+			// 開始時間
+			if (!datas[0].isEmpty()) {
+				// フォーマットチェック
+				validationChek = InputValidation.isTime(datas[0]);
+				if (!validationChek) {
+					result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+							"アップロードファイルの開始時間");
+					result.setCheckResult(false);
+				}
+			} else {
+				// 未入力エラー
+				result.setCheckResult(false);
+				result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの開始時間");
+			}
+
+			// 終了時間
+			if (!datas[1].isEmpty()) {
+				// フォーマットチェック
+				validationChek = InputValidation.isTime(datas[1]);
+				if (!validationChek) {
+					result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+							"アップロードファイルの終了時間");
+					result.setCheckResult(false);
+				}
+			} else {
+				// 未入力エラー
+				result.setCheckResult(false);
+				result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの終了時間");
+			}
+
+			if (result.isCheckResult()) {
+				// 開始時間<終了時間チェック
+				if (DateUtils.getParseTime(datas[1])
+						.isBefore(DateUtils.getParseTime(datas[0]))) {
+					result.addErrorMsg(MsgCodeDef.START_END_ERROR);
+					result.setCheckResult(false);
+				}
+			}
+
+			// 作業内容サイズチェック
+			validationChek = InputValidation.inputSize(datas[3], 0, 40);
 			if (!validationChek) {
-				result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
-						"アップロードファイルの終了時間");
+				result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40");
 				result.setCheckResult(false);
 			}
-		} else {
-			// 入力チェック
-			result.setCheckResult(false);
-			result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの終了時間");
-		}
 
-		if (result.isCheckResult()) {
-			// 開始時間<終了時間チェック
-			if (DateUtils.getParseTime(datas[1])
-					.isBefore(DateUtils.getParseTime(datas[0]))) {
-				result.addErrorMsg(MsgCodeDef.START_END_ERROR);
-				result.setCheckResult(false);
+			// 備考 サイズチェック
+			validationChek = InputValidation.inputSize(datas[4], 0, 40);
+			if (!validationChek) {
+				result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "備考", "0", "40");
+				result.setCheckResult(validationChek);
 			}
 		}
+	}
 
-		// 作業内容サイズチェック
-		validationChek = InputValidation.inputSize(datas[3], 0, 40);
-		if (!validationChek) {
-			result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40");
-			result.setCheckResult(false);
+	/**
+	 * CSVファイルの文字囲みを除去
+	 * 
+	 * @param line
+	 *            CSVファイルの1行データ
+	 * @return 文字囲み除去後のデータ配列
+	 */
+	private String[] trimData(String line) {
+
+		String[] bfDatas = line.split(CSV_DELIMITER);
+
+		ArrayList<String> dataList = new ArrayList<>();
+		// 文字の囲み「""」を除去
+		Pattern ptn = Pattern.compile("^\".*\"$");
+		for (String data : bfDatas) {
+			Matcher matcher = ptn.matcher(data);
+			if (matcher.find()) {
+				String afData = matcher
+						.replaceAll(data.substring(1, data.length() - 1));
+				dataList.add(afData);
+			} else {
+				dataList.add(data);
+			}
 		}
+		String[] datas = dataList.toArray(new String[dataList.size()]);
 
-		// 備考 サイズチェック
-		validationChek = InputValidation.inputSize(datas[4], 0, 40);
-		if (!validationChek) {
-			result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "備考", "0", "40");
-			result.setCheckResult(validationChek);
-		}
-
-		return result;
+		return datas;
 	}
 
 	/**

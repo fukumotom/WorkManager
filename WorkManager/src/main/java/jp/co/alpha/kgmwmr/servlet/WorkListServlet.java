@@ -9,14 +9,11 @@ import java.time.LocalDate;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
-import org.apache.tomcat.util.http.fileupload.servlet.ServletFileUpload;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,7 +35,6 @@ import jp.co.alpha.kgmwmr.logic.WorkLogic;
  *
  */
 @WebServlet("/WorkList")
-@MultipartConfig(location = "C:/apache-tomcat-8.0.32/temp", fileSizeThreshold = 1048576)
 public class WorkListServlet extends HttpServlet {
 
 	/**
@@ -76,6 +72,8 @@ public class WorkListServlet extends HttpServlet {
 		String userName = request.getUserPrincipal().getName();
 
 		WorkListForm criteria = setForm(request);
+		// 初期表示時は今日の日付を設定
+		criteria.setWorkDate(DateUtils.getTodayStr());
 
 		// 初期表示の作業リスト検索条件をセッションに設定
 		request.getSession().setAttribute(ConstantDef.CRITERIA, criteria);
@@ -146,32 +144,6 @@ public class WorkListServlet extends HttpServlet {
 				logger.info("CSVダウンロード処理開始:");
 				File csvFile = logic.csvDownload(inputForm);
 				download(response, csvFile);
-			} else if (ServletFileUpload.isMultipartContent(request)) {
-				logger.info("csvアップロード処理開始:");
-
-				Part part;
-				try {
-					part = request.getPart("csvFile");
-
-					String fileName = getFileName(part);
-					if (fileName.isEmpty()) {
-						throw new BusinessException(MsgCodeDef.NOT_SELECT_FILE);
-					}
-
-					// ファイル保存
-					part.write(fileName);
-
-					// アップデート処理
-					logic.upload(fileName, inputForm.getUserName(),
-							inputForm.getWorkDate());
-
-					// 作業リストの再表示
-					viewForm = getWorkListViaSession(request);
-				} catch (IOException | ServletException e) {
-					throw new BusinessException(e,
-							MsgCodeDef.FAILURE_FILE_UPLOAD);
-				}
-
 			} else {
 				// 編集
 				logger.info("編集処理開始:");
@@ -180,9 +152,8 @@ public class WorkListServlet extends HttpServlet {
 				request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
 
-			if (!ServletFileUpload.isMultipartContent(request)
-					|| request.getParameter("csvDownloadBtn") != null) {
-				// csvアップロード/ダウンロード時以外の時
+			if (request.getParameter("csvDownloadBtn") != null) {
+				// ダウンロード時以外の時
 				// 新しい検索条件をセッションに保存
 				request.getSession().setAttribute(ConstantDef.CRITERIA,
 						inputForm);
@@ -228,27 +199,6 @@ public class WorkListServlet extends HttpServlet {
 		WorkListViewForm viewForm = logic
 				.getWorkListViewForm(criteria.getUserName(), date, delete);
 		return viewForm;
-	}
-
-	/**
-	 * アップロードファイル名取得
-	 * 
-	 * @param part
-	 *            パート情報
-	 * @return アップロードファイル名
-	 */
-	private String getFileName(Part part) {
-
-		String fileName = null;
-		String dispotions = part.getHeader("Content-Disposition");
-		for (String dispotion : dispotions.split(";")) {
-			// ヘッダー内のファイル名を抽出
-			if (dispotion.trim().startsWith("filename")) {
-				fileName = dispotion.substring(dispotion.indexOf("=") + 2,
-						dispotion.length() - 1);
-			}
-		}
-		return fileName;
 	}
 
 	/**
