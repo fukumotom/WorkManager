@@ -15,9 +15,9 @@ INSERT INTO WorkManage(
 ${userName}
 ,${startTime}
 ,${endTime}
-,'00:00:00'
-,'サンプル内容X'
-,'サンプルメモX'
+,${workingTime}
+,${contents}
+,${note}
 ,${workDate}
 ,TIMESTAMP 'now'
 ,0

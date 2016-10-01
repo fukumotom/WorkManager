@@ -46,7 +46,7 @@ public class ValidationResult {
 	/**
 	 * リストにメッセージを追加
 	 * 
-	 * @param errorMsg
+	 * @param errorMsgCode
 	 *            追加メッセージ
 	 */
 	public void addErrorMsg(String errorMsgCode, String... args) {

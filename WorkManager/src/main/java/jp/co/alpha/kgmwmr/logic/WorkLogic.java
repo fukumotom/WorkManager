@@ -1,14 +1,20 @@
 package jp.co.alpha.kgmwmr.logic;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +53,7 @@ public class WorkLogic {
 	/**
 	 * CSV出力タイトル
 	 */
-	private static final String[] csvTitles = {"開始時間", "終了時間", "作業時間", "作業内容",
+	private static final String[] CSV_TITLES = {"開始時間", "終了時間", "作業時間", "作業内容",
 			"備考"};
 
 	/**
@@ -215,6 +221,9 @@ public class WorkLogic {
 			// 作業中のチェック用に、更新する作業データを取得
 			Work inputWork = new Work();
 			inputWork.setUserName(editForm.getUserName());
+			inputWork.setWorkDate(
+					DateUtils.getParseDate(editForm.getWorkDate()));
+
 			WorkDao dao = new WorkDao();
 			List<Work> working = dao.findWorking(inputWork);
 
@@ -326,7 +335,7 @@ public class WorkLogic {
 			CommonDbUtil.commit();
 
 			// 画面表示用にデータを複製
-			dao.copyTodayWork(inputWork);
+			dao.copyWork(inputWork);
 			// コミット
 			CommonDbUtil.commit();
 
@@ -335,9 +344,9 @@ public class WorkLogic {
 			CommonDbUtil.closeConnection();
 		}
 
-		// 画面表示データ取得(保存後は当日のデータを表示)
+		// 画面表示データ取得
 		WorkListViewForm viewForm = getWorkListViewForm(inputWork.getUserName(),
-				LocalDate.now(), false);
+				inputWork.getWorkDate(), false);
 		return viewForm;
 	}
 
@@ -604,6 +613,8 @@ public class WorkLogic {
 				}
 				inputWork.setStartTime(
 						DateUtils.getParseTime(registerForm.getStartTime()));
+				// 登録処理なので、作業日に当日を設定
+				inputWork.setWorkDate(LocalDate.now());
 
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
@@ -667,8 +678,7 @@ public class WorkLogic {
 				dao.startWork(inputWork);
 
 			} else {
-				throw new BusinessException(PropertyUtils
-						.getValue(MsgCodeDef.ALREADY_START, "別の作業"));
+				throw new BusinessException(MsgCodeDef.ALREADY_START, "別の作業");
 			}
 		} else {
 			// 仕掛り処理なしの場合
@@ -757,7 +767,7 @@ public class WorkLogic {
 	}
 
 	/**
-	 * 履歴表示ロジック TODO実装途中
+	 * 履歴表示ロジック
 	 * 
 	 * @param inputForm
 	 *            入力所法
@@ -773,10 +783,13 @@ public class WorkLogic {
 
 		String workDateStr = inputForm.getWorkDate();
 		// 入力チェック
-		if (workDateStr == null || !InputValidation.isDate(workDateStr)) {
+		if (workDateStr == null) {
 
-			throw new BusinessException(PropertyUtils
-					.getValue(MsgCodeDef.INPUT_FORMAT_ERROR, "日付"));
+			throw new BusinessException(MsgCodeDef.EMPTY_INPUT, "履歴");
+		}
+		if (!InputValidation.isDate(workDateStr)) {
+
+			throw new BusinessException(MsgCodeDef.INPUT_FORMAT_ERROR, "履歴");
 		}
 
 		logger.info("入力日付:{}", workDateStr);
@@ -794,6 +807,9 @@ public class WorkLogic {
 
 		// 未保存データ削除
 		deleteUnSaveWork(userName);
+
+		// 編集用に指定された日付分の登録作業を複製
+		copyWork(userName, workDate);
 
 		// 削除反映
 		boolean delete = ConstantDef.DELETE_CHECK_ON
@@ -856,25 +872,233 @@ public class WorkLogic {
 	/**
 	 * 編集用作業リスト複製処理
 	 * 
+	 * @param workDate
+	 * 
 	 * @param inputWork
 	 */
-	public void copyTodayWork(String userName) {
+	public void copyWork(String userName, LocalDate workDate) {
 
 		Work inputWork = new Work();
 		inputWork.setUserName(userName);
+		inputWork.setWorkDate(workDate);
 
 		try {
 			// コネクション開始
 			CommonDbUtil.openConnection();
 
 			WorkDao dao = new WorkDao();
-			dao.copyTodayWork(inputWork);
+			dao.copyWork(inputWork);
 
 		} finally {
 
 			// 処理完了後、コネクションMapからコネクションを削除
 			CommonDbUtil.closeConnection();
 		}
+	}
+
+	/**
+	 * 作業情報リストCSVファイルのアップロード
+	 * 
+	 * @param inputStream
+	 *            アップロードファイル名
+	 * @param loginUserName
+	 *            ログインユーザ名
+	 * @param workDate
+	 *            作業日付
+	 * @return アップロード結果
+	 * @throws BusinessException
+	 *             業務例外
+	 */
+	public ValidationResult upload(InputStream uploadData, String loginUserName,
+			String workDate) throws BusinessException {
+
+		// アップロードする作業リスト格納用
+		List<Work> workList = new ArrayList<>();
+
+		// ファイルチェック結果格納用
+		ValidationResult check = new ValidationResult();
+
+		// ファイルの内容チェック
+		try (BufferedReader br = new BufferedReader(
+				new InputStreamReader(uploadData))) {
+
+			String line;
+			int lineNo = 1;
+			while ((line = br.readLine()) != null) {
+				// カンマ区切りで分解
+				if (lineNo == 1) {
+					// タイトル部分確認
+					csvDataCheck(line, lineNo, check);
+					if (!check.isCheckResult()) {
+						// CSVタイトルエラー
+						throw new BusinessException(check);
+					}
+					lineNo++;
+				} else {
+					// データ部分確認
+					csvDataCheck(line, lineNo, check);
+					if (!check.isCheckResult()) {
+						// CSVデータエラー
+						throw new BusinessException(check);
+					}
+
+					// アップロードデータ設定
+					String[] datas = trimData(line);
+
+					// 開始時間
+					LocalTime startTime = DateUtils.getParseTime(datas[0]);
+					// 終了時間
+					LocalTime endTime = DateUtils.getParseTime(datas[1]);
+
+					// データ詰め替え
+					Work inputWork = new Work();
+					inputWork.setUserName(loginUserName);
+					inputWork.setStartTime(startTime);
+					inputWork.setEndTime(endTime);
+					// 作業時間計算
+					calcWorkTime(inputWork);
+					inputWork.setContents(datas[3]);
+					inputWork.setNote(datas[4]);
+					// 作業時間
+					inputWork.setWorkDate(DateUtils.getParseDate(workDate));
+
+					workList.add(inputWork);
+
+				}
+			}
+		} catch (IOException e) {
+
+			throw new BusinessException(e);
+		}
+
+		try {
+			// トランザクション管理設定
+			CommonDbUtil.openConnection(false);
+
+			WorkDao dao = new WorkDao();
+			// ファイル読み込みデータをDBに保存
+			dao.upload(workList);
+
+			// コミット
+			CommonDbUtil.commit();
+		} finally {
+			// 処理完了後、コネクションMapからコネクションを削除
+			CommonDbUtil.closeConnection();
+		}
+		return check;
+	}
+
+	/**
+	 * CSVアップロード時のフォーマットチェック
+	 * 
+	 * @param line
+	 *            csvファイル内容
+	 * @param lineNo
+	 *            行数
+	 * @param チェック結果
+	 */
+	private void csvDataCheck(String line, int lineNo,
+			ValidationResult result) {
+
+		if (lineNo == 1) {
+			// タイトル部分確認
+			String[] titles = line.split(CSV_DELIMITER);
+			if (!Arrays.equals(titles, CSV_TITLES)) {
+				result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+						"アップロードファイルのタイトル");
+				result.setCheckResult(false);
+			} else {
+				result.setCheckResult(true);
+			}
+		} else {
+
+			String[] datas = trimData(line);
+			result.setCheckResult(true);
+
+			boolean validationChek = false;
+
+			// 開始時間
+			if (!datas[0].isEmpty()) {
+				// フォーマットチェック
+				validationChek = InputValidation.isTime(datas[0]);
+				if (!validationChek) {
+					result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+							"アップロードファイルの開始時間");
+					result.setCheckResult(false);
+				}
+			} else {
+				// 未入力エラー
+				result.setCheckResult(false);
+				result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの開始時間");
+			}
+
+			// 終了時間
+			if (!datas[1].isEmpty()) {
+				// フォーマットチェック
+				validationChek = InputValidation.isTime(datas[1]);
+				if (!validationChek) {
+					result.addErrorMsg(MsgCodeDef.INPUT_FORMAT_ERROR,
+							"アップロードファイルの終了時間");
+					result.setCheckResult(false);
+				}
+			} else {
+				// 未入力エラー
+				result.setCheckResult(false);
+				result.addErrorMsg(MsgCodeDef.EMPTY_INPUT, "アップロードファイルの終了時間");
+			}
+
+			if (result.isCheckResult()) {
+				// 開始時間<終了時間チェック
+				if (DateUtils.getParseTime(datas[1])
+						.isBefore(DateUtils.getParseTime(datas[0]))) {
+					result.addErrorMsg(MsgCodeDef.START_END_ERROR);
+					result.setCheckResult(false);
+				}
+			}
+
+			// 作業内容サイズチェック
+			validationChek = InputValidation.inputSize(datas[3], 0, 40);
+			if (!validationChek) {
+				result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "作業内容", "0", "40");
+				result.setCheckResult(false);
+			}
+
+			// 備考 サイズチェック
+			validationChek = InputValidation.inputSize(datas[4], 0, 40);
+			if (!validationChek) {
+				result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "備考", "0", "40");
+				result.setCheckResult(validationChek);
+			}
+		}
+	}
+
+	/**
+	 * CSVファイルの文字囲みを除去
+	 * 
+	 * @param line
+	 *            CSVファイルの1行データ
+	 * @return 文字囲み除去後のデータ配列
+	 */
+	private String[] trimData(String line) {
+
+		String[] bfDatas = line.split(CSV_DELIMITER);
+
+		ArrayList<String> dataList = new ArrayList<>();
+		// 文字の囲み「""」を除去
+		Pattern ptn = Pattern.compile("^\".*\"$");
+		for (String data : bfDatas) {
+			Matcher matcher = ptn.matcher(data);
+			if (matcher.find()) {
+				String afData = matcher
+						.replaceAll(data.substring(1, data.length() - 1));
+				dataList.add(afData);
+			} else {
+				dataList.add(data);
+			}
+		}
+		String[] datas = dataList.toArray(new String[dataList.size()]);
+
+		return datas;
 	}
 
 	/**
@@ -937,6 +1161,7 @@ public class WorkLogic {
 		}
 		editForm.setContents(work.getContents());
 		editForm.setNote(work.getNote());
+		editForm.setWorkDate(DateUtils.formatDate(work.getWorkDate()));
 
 		return editForm;
 	}
@@ -998,7 +1223,7 @@ public class WorkLogic {
 
 		StringBuilder sb = new StringBuilder();
 		// タイトル列を作成
-		sb.append(String.join(CSV_DELIMITER, csvTitles));
+		sb.append(String.join(CSV_DELIMITER, CSV_TITLES));
 		sb.append(NEW_LINE);
 
 		// 内容を出力

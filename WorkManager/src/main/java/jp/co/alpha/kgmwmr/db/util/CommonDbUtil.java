@@ -346,6 +346,8 @@ public class CommonDbUtil {
 					obj = result.getInt(label);
 				} else if (typeStr.contains("Time")) {
 					obj = result.getTime(label);
+				} else if (typeStr.contains("Date")) {
+					obj = result.getDate(label);
 				} else {
 					obj = result.getString(label);
 				}

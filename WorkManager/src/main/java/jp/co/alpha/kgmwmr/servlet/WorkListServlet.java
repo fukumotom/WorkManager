@@ -72,25 +72,31 @@ public class WorkListServlet extends HttpServlet {
 		String userName = request.getUserPrincipal().getName();
 
 		WorkListForm criteria = setForm(request);
+		// 初期表示時は今日の日付を設定
+		criteria.setWorkDate(DateUtils.getTodayStr());
 
 		// 初期表示の作業リスト検索条件をセッションに設定
 		request.getSession().setAttribute(ConstantDef.CRITERIA, criteria);
 
 		WorkLogic logic = new WorkLogic();
-		logic.copyTodayWork(userName);
+		logic.copyWork(userName, LocalDate.now());
 		WorkListViewForm form = logic.getWorkListViewForm(userName,
 				LocalDate.now(), false);
 
-		// 作業リスト表示条件をセッションに保持
+		request.setAttribute(ConstantDef.ATTR_FORM, form);
+		// 最初の作業リスト表示条件をセッションに保持
 		WorkListForm creteriaForm = (WorkListForm) request.getSession()
 				.getAttribute(ConstantDef.CRITERIA);
 		if (creteriaForm == null) {
 			// 検索条件を設定
-			request.getSession().setAttribute(ConstantDef.CRITERIA,
-					setForm(request));
-		}
+			WorkListForm initCreteria = new WorkListForm();
+			initCreteria.setUserName(userName);
+			initCreteria.setWorkDate(DateUtils.getTodayStr());
+			initCreteria.setDeleteCechk(ConstantDef.DELETE_CHECK_OFF);
 
-		request.setAttribute(ConstantDef.ATTR_FORM, form);
+			request.getSession().setAttribute(ConstantDef.CRITERIA,
+					initCreteria);
+		}
 
 		RequestDispatcher dispatcher = request
 				.getRequestDispatcher(WORKLIST_JSP_PATH);
@@ -146,22 +152,21 @@ public class WorkListServlet extends HttpServlet {
 				request.setAttribute(ConstantDef.ATTR_EDIT_FORM, editForm);
 			}
 
+			if (request.getParameter("csvDownloadBtn") != null) {
+				// ダウンロード時以外の時
+				// 新しい検索条件をセッションに保存
+				request.getSession().setAttribute(ConstantDef.CRITERIA,
+						inputForm);
+			}
+
 		} catch (BusinessException e) {
 			logger.warn(PropertyUtils.getValue(MsgCodeDef.INPUT_ERROR));
+
 			// 作業リストの再表示
-			// セッションにある検索条件を取得
-			WorkListForm criteria = (WorkListForm) request.getSession()
-					.getAttribute(ConstantDef.CRITERIA);
-			LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
-			boolean delete = criteria.getDeleteCechk()
-					.equals(ConstantDef.DELETE_CHECK_ON);
-			viewForm = logic.getWorkListViewForm(criteria.getUserName(), date,
-					delete);
+			viewForm = getWorkListViaSession(request);
 
 			// エラーメッセージ設定
 			viewForm.setErrMsgs(e.getMessage());
-		} finally {
-
 		}
 
 		request.setAttribute(ConstantDef.ATTR_FORM, viewForm);
@@ -174,6 +179,26 @@ public class WorkListServlet extends HttpServlet {
 		} catch (ServletException | IOException e) {
 			throw new SystemException(e, MsgCodeDef.ERR_FORWARD);
 		}
+	}
+
+	/**
+	 * セッションにある検索条件を取得
+	 * 
+	 * @param request
+	 *            リクエスト情報
+	 * @return 作業リスト
+	 */
+	private WorkListViewForm getWorkListViaSession(HttpServletRequest request) {
+
+		WorkListForm criteria = (WorkListForm) request.getSession()
+				.getAttribute(ConstantDef.CRITERIA);
+		LocalDate date = DateUtils.getParseDate(criteria.getWorkDate());
+		boolean delete = criteria.getDeleteCechk()
+				.equals(ConstantDef.DELETE_CHECK_ON);
+		WorkLogic logic = new WorkLogic();
+		WorkListViewForm viewForm = logic
+				.getWorkListViewForm(criteria.getUserName(), date, delete);
+		return viewForm;
 	}
 
 	/**
@@ -196,14 +221,20 @@ public class WorkListServlet extends HttpServlet {
 			if (request.getParameter("historyBtn") != null) {
 				// 履歴処理の日付未入力はnullを設定
 				form.setWorkDate(null);
+			} else {
+				// 履歴処理以外の日付未入力は表示日付を設定
+				String listDate = request.getParameter("listDate");
+				form.setWorkDate(listDate);
 			}
-			form.setWorkDate(DateUtils.getTodayStr());
 		} else {
 			form.setWorkDate(workDate);
 		}
+
 		String deleteCheck = request.getParameter("deleteFlg");
 		if (deleteCheck == null) {
 			form.setDeleteCechk(ConstantDef.DELETE_CHECK_OFF);
+		} else {
+			form.setDeleteCechk(deleteCheck);
 		}
 		return form;
 	}
@@ -222,7 +253,7 @@ public class WorkListServlet extends HttpServlet {
 		response.setContentType("application/octet-stream");
 		response.setContentLength((int) csvFile.length());
 		response.setHeader("Content-disposition",
-				"attachment; filename=\"" + csvFile.getName() + "\"");// csvFile.getName()
+				"attachment; filename=\"" + csvFile.getName() + "\"");
 
 		// キャッシュの無効化
 		response.setHeader("Cache-Control",

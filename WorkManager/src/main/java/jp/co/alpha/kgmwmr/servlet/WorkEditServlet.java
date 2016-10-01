@@ -104,6 +104,9 @@ public class WorkEditServlet extends HttpServlet {
 		String note = (String) request.getParameter("note");
 		editForm.setNote(note);
 
+		String workDate = request.getParameter("workDate");
+		editForm.setWorkDate(workDate);
+
 		return editForm;
 	}
 }
