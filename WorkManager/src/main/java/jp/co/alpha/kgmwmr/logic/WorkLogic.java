@@ -217,13 +217,19 @@ public class WorkLogic {
 			inputWork.setUserName(editForm.getUserName());
 			inputWork.setWorkDate(
 					DateUtils.getParseDate(editForm.getWorkDate()));
+			inputWork.setStatusFlg(ConstantDef.STATUS_EDIT);
 
 			WorkDao dao = new WorkDao();
-			List<Work> working = dao.findWorking(inputWork);
+			List<Work> workingList = dao.findWorking(inputWork);
 
-			// 作業中の作業がある場合に終了時間が入力されなければエラー
-			if (working.size() == 1 && editForm.getEndTime().isEmpty()) {
-				throw new BusinessException(MsgCodeDef.ALREADY_EXIT_WORKING);
+			// 編集作業以外で作業中の作業がある場合に終了時間が入力されなければエラー
+			if (workingList.size() == 1) {
+				Work working = workingList.get(0);
+				if (!String.valueOf(working.getId()).equals(editForm.getId())
+						&& editForm.getEndTime().isEmpty()) {
+					throw new BusinessException(
+							MsgCodeDef.ALREADY_EXIT_WORKING);
+				}
 			}
 
 			// 入力チェック
@@ -413,6 +419,8 @@ public class WorkLogic {
 
 		// 現在時間を設定
 		inputWork.setWorkDate(LocalDate.now());
+		// 状態フラグ（未編集）を設定
+		inputWork.setStatusFlg(ConstantDef.STATUS_NOT_EDIT);
 
 		List<Work> workList;
 
@@ -610,6 +618,8 @@ public class WorkLogic {
 
 				inputWork.setContents(registerForm.getContents());
 				inputWork.setNote(registerForm.getNote());
+				// 状態フラグを設定
+				inputWork.setStatusFlg(ConstantDef.STATUS_NOT_EDIT);
 
 				// トランザクション管理設定
 				CommonDbUtil.openConnection(false);

@@ -52,6 +52,11 @@ public class WorkDto implements Serializable {
 	private boolean deleteFlg;
 
 	/**
+	 * 状態フラグ
+	 */
+	private int statusFlg;
+
+	/**
 	 * 作業日付
 	 */
 	private Date workDate;
@@ -174,6 +179,21 @@ public class WorkDto implements Serializable {
 	 */
 	public void setDeleteFlg(boolean deleteFlg) {
 		this.deleteFlg = deleteFlg;
+	}
+
+	/**
+	 * @return the statusFlg
+	 */
+	public int getStatusFlg() {
+		return statusFlg;
+	}
+
+	/**
+	 * @param statusFlg
+	 *            the statusFlg to set
+	 */
+	public void setStatusFlg(int statusFlg) {
+		this.statusFlg = statusFlg;
 	}
 
 	/**
