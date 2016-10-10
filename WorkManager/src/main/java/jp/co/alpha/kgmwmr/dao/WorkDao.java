@@ -148,7 +148,7 @@ public class WorkDao {
 			logger.debug("正常に作業が終了");
 			logger.info(PropertyUtils.getValue(MsgCodeDef.DB_UPDATE,
 					String.valueOf(resultCnt)));
-			
+
 		} else {
 			throw new SystemException(MsgCodeDef.MISS_DB_UPDATE);
 		}

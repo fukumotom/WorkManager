@@ -34,7 +34,7 @@
 						<input type="submit" name="returnBtn" value="戻る" />
 					</div></td>
 				<td><div align="center">
-						<input type="submit" name="confilmBtn" value="確認" />
+						<input type="submit" name="confirmBtn" value="確認" />
 					</div></td>
 			</tr>
 		</table>

@@ -5,7 +5,6 @@ import java.util.List;
 import jp.co.alpha.kgmwmr.common.exception.IllegalOperationException;
 import jp.co.alpha.kgmwmr.common.util.InputValidation;
 import jp.co.alpha.kgmwmr.common.util.MsgCodeDef;
-import jp.co.alpha.kgmwmr.common.util.PropertyUtils;
 import jp.co.alpha.kgmwmr.common.util.ValidationResult;
 import jp.co.alpha.kgmwmr.dao.UserRegisterDao;
 import jp.co.alpha.kgmwmr.dao.dto.UserDto;
@@ -76,14 +75,13 @@ public class UserRegistLogic {
 		validationChek = InputValidation.inputSize(userForm.getUserName(), 5,
 				20);
 		if (!validationChek) {
-			result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
-					"ユーザ名", "5", "20"));
+			result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "ユーザ名", "5", "20");
 			result.setCheckResult(false);
 		}
 		// ユーザ重複チェック
 		validationChek = multiUserCheck(userForm.getUserName());
 		if (!validationChek) {
-			result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.EXIT_USER));
+			result.addErrorMsg(MsgCodeDef.EXIT_USER);
 			result.setCheckResult(false);
 		}
 
@@ -91,8 +89,7 @@ public class UserRegistLogic {
 		validationChek = InputValidation.inputSize(userForm.getPassword(), 5,
 				20);
 		if (!validationChek) {
-			result.addErrorMsg(PropertyUtils.getValue(MsgCodeDef.SIZE_ERROR,
-					"パスワード", "5", "64"));
+			result.addErrorMsg(MsgCodeDef.SIZE_ERROR, "パスワード", "5", "64");
 			result.setCheckResult(false);
 		}
 
@@ -100,8 +97,7 @@ public class UserRegistLogic {
 		validationChek = InputValidation.confilm(userForm.getPassword(),
 				userForm.getConfirmPassword());
 		if (!validationChek) {
-			result.addErrorMsg(
-					PropertyUtils.getValue(MsgCodeDef.CONFIRM_ERROR));
+			result.addErrorMsg(MsgCodeDef.CONFIRM_ERROR);
 			result.setCheckResult(false);
 		}
 

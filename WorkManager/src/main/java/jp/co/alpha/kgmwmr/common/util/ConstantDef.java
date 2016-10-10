@@ -43,10 +43,19 @@ public class ConstantDef {
 	 * 検索条件の削除checkbox(ON)
 	 */
 	public static final String DELETE_CHECK_ON = "on";
-	
 
 	/**
 	 * 検索条件の削除checkbox(OFF)
 	 */
 	public static final String DELETE_CHECK_OFF = "off";
+
+	/**
+	 * 状態フラグ(未編集)
+	 */
+	public static final int STATUS_NOT_EDIT = 0;
+
+	/**
+	 * 状態フラグ(編集中)
+	 */
+	public static final int STATUS_EDIT = 1;
 }

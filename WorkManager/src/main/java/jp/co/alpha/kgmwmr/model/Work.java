@@ -52,6 +52,11 @@ public class Work implements Serializable {
 	private boolean delete;
 
 	/**
+	 * 状態フラグ
+	 */
+	private int statusFlg;
+
+	/**
 	 * 作業日付
 	 */
 	private LocalDate workDate;
@@ -177,6 +182,21 @@ public class Work implements Serializable {
 	}
 
 	/**
+	 * @return the statusFlg
+	 */
+	public int getStatusFlg() {
+		return statusFlg;
+	}
+
+	/**
+	 * @param statusFlg
+	 *            the statusFlg to set
+	 */
+	public void setStatusFlg(int statusFlg) {
+		this.statusFlg = statusFlg;
+	}
+
+	/**
 	 * @return the workDate
 	 */
 	public LocalDate getWorkDate() {
@@ -190,4 +210,5 @@ public class Work implements Serializable {
 	public void setWorkDate(LocalDate workDate) {
 		this.workDate = workDate;
 	}
+
 }
