@@ -421,10 +421,10 @@ public class WorkDao {
 	 * @param inputWork
 	 *            更新条件
 	 */
-	public void copyTodayWork(Work inputWork) {
+	public void copyWork(Work inputWork) {
 
 		// SQL読み込み
-		StringBuilder sql = CommonDbUtil.readSql("copyTodayWork.sql");
+		StringBuilder sql = CommonDbUtil.readSql("copyWork.sql");
 
 		// DTOに詰め替え
 		WorkDto dto = new WorkDto();
