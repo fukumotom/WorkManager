@@ -34,12 +34,18 @@ public class UserRegistServlet extends HttpServlet {
 	/**
 	 * ユーザ登録フォームへの遷移パス
 	 */
-	private static final String USERREGISTFORM_JSP_PATH = "/WEB-INF/jsp/user/userRegistForm.jsp";
+	private static final String USER_REGIST_FORM_JSP_PATH = "/WEB-INF/jsp/user/userRegistForm.jsp";
 
 	/**
 	 * ユーザ登録確認画面への遷移パス
 	 */
-	private static final String USERREGISTCONFIRM_JSP_PATH = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
+	private static final String USER_REGIST_CONFIRM_JSP_PATH = "/WEB-INF/jsp/user/userRegistConfirm.jsp";
+	
+	
+	/**
+	 * ユーザ登録完了画面への遷移パス
+	 */
+	private static final String USER_REGIST_COMPLETE_JSP_PATH = "/WEB-INF/jsp/user/userRegistComplete.jsp";
 
 	/**
 	 * ユーザ登録フォーム表示、ユーザ登録完了画面表示
@@ -55,7 +61,7 @@ public class UserRegistServlet extends HttpServlet {
 
 		if (request.getParameter("userRegit") != null) {
 			// ユーザ新規登録ボタン押下時
-			forwardPath = USERREGISTFORM_JSP_PATH;
+			forwardPath = USER_REGIST_FORM_JSP_PATH;
 
 		} else if (request.getParameter("registBtn") != null) {
 
@@ -73,7 +79,7 @@ public class UserRegistServlet extends HttpServlet {
 			// 不要なスコープ削除
 			session.removeAttribute(ConstantDef.ATTR_FORM);
 
-			forwardPath = USERREGISTCONFIRM_JSP_PATH;
+			forwardPath = USER_REGIST_COMPLETE_JSP_PATH;
 
 		}
 
@@ -103,10 +109,10 @@ public class UserRegistServlet extends HttpServlet {
 				// 戻るボタン押下時
 				response.sendRedirect("/WorkManager/Menu");
 
-			} else if (request.getParameter("confilmBtn") != null) {
+			} else if (request.getParameter("confirmBtn") != null) {
 
 				// 確認ボタン押下時
-				String forwardPath = USERREGISTCONFIRM_JSP_PATH;
+				String forwardPath = USER_REGIST_CONFIRM_JSP_PATH;
 
 				UserRegistLogic logic = new UserRegistLogic();
 				// 画面表示情報設定
@@ -114,7 +120,7 @@ public class UserRegistServlet extends HttpServlet {
 				viewForm.setUserName(userForm.getUserName());
 				if (!viewForm.getErrMsgs().isEmpty()) {
 					// 入力チェックエラーの場合、ユーザ登録フォームへ遷移
-					forwardPath = USERREGISTFORM_JSP_PATH;
+					forwardPath = USER_REGIST_FORM_JSP_PATH;
 				}
 
 				// セッションにユーザ情報を保存
